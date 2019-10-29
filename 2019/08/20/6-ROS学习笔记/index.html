@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>ROS学习笔记（六） | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="ROS,tf">
+    <meta name="description" content="tf包的介绍，以及基本使用。">
+<meta name="keywords" content="ROS,tf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS学习笔记（六）">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;08&#x2F;20&#x2F;6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="tf包的介绍，以及基本使用。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.974Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ROS学习笔记（六）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">ROS学习笔记（六）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-20T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-08-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">介绍</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#示例程序"><span class="post-toc-number">2.</span> <span class="post-toc-text">示例程序</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#广播Node"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">广播Node</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#监听变换"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">监听变换</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#TF和时间的关系"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">TF和时间的关系</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#命令行工具"><span class="post-toc-number">3.</span> <span class="post-toc-text">命令行工具</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-6-ROS学习笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ROS学习笔记（六）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-21 00:00:00" datetime="2019-08-20T16:00:00.000Z"  itemprop="datePublished">2019-08-21</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>tf包的介绍，以及基本使用。</p>
+<a id="more"></a>
+
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><h1 id="示例程序"><a href="#示例程序" class="headerlink" title="示例程序"></a>示例程序</h1><p>示例程序展示了二维平面内：通过TF实现的坐标跟随（turtle仿真中两只小乌龟相互跟随，<a href="http://wiki.ros.org/tf/Tutorials/Introduction%20to%20tf" target="_blank" rel="noopener">参考</a>）。</p>
+<p>整个示例程序包括以下node：</p>
+<ul>
+<li>turtle1_tf_broadcaster：广播turtle1的绝对坐标</li>
+<li>turtle2_tf_broadcaster: 广播turtle2的绝对坐标</li>
+<li>turtle_tf_listener: 从/tf获取turtle2到turtle1的相对变换，并控制turtle2向turtle1移动</li>
+<li>turtlesim_node、turtle_teleop_key：turtle套件</li>
+</ul>
+<h2 id="广播Node"><a href="#广播Node" class="headerlink" title="广播Node"></a>广播Node</h2><p>广播node监听/turtle/pose中的位置数据，并计算其绝对坐标系。</p>
+<p>针对其接收到的每一条消息，调用回调函数将其广播到/tf中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_turtle_pose</span><span class="params">(msg, turtlename)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">        回调函数，负责广播turtle的相对坐标系</span></span><br><span class="line"><span class="string">    :param msg:</span></span><br><span class="line"><span class="string">    :param turtlename:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    br = tf.TransformBroadcaster()</span><br><span class="line">    br.sendTransform((msg.x, msg.y, <span class="number">0</span>),</span><br><span class="line">                     tf.transformations.quaternion_from_euler(<span class="number">0</span>, <span class="number">0</span>, msg.theta), <span class="comment"># 将欧拉角，转换为四元数</span></span><br><span class="line">                     rospy.Time.now(),</span><br><span class="line">                     turtlename,</span><br><span class="line">                     <span class="string">"world"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">        turtle_tf_broadcaster节点负责发布某个turtle的绝对坐标系（即相对于World坐标系的变换）。</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        进程启动后完成以下工作：</span></span><br><span class="line"><span class="string">            1. 获取传入的参数turtle；</span></span><br><span class="line"><span class="string">            2. 监听/~turtle/pose的消息，并对每个消息调用回调函数handle_turtle_pose</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    rospy.init_node(<span class="string">'turtle_tf_broadcaster'</span>)</span><br><span class="line">    turtlename = rospy.get_param(<span class="string">'~turtle'</span>)</span><br><span class="line">    rospy.Subscriber(<span class="string">'/%s/pose'</span> % turtlename,</span><br><span class="line">                     turtlesim.msg.Pose,</span><br><span class="line">                     handle_turtle_pose,        <span class="comment"># 回调函数</span></span><br><span class="line">                     turtlename)                <span class="comment"># 回调函数的参数</span></span><br><span class="line">    rospy.spin()</span><br></pre></td></tr></table></figure>
+<p><a href="http://wiki.ros.org/tf/Tutorials/Writing%20a%20tf%20broadcaster%20%28Python%29" target="_blank" rel="noopener">完整代码</a></p>
+<h2 id="监听变换"><a href="#监听变换" class="headerlink" title="监听变换"></a>监听变换</h2><p>接收并缓冲系统中广播的所有坐标系，查询特定坐标系之间的变换关系。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    rospy.init_node(<span class="string">'turtle_tf_listener'</span>)</span><br><span class="line">    listener = tf.TransformListener()</span><br><span class="line"></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">        在turtlesim_node中在模拟出第二个turtle，并指定其初始位置和位置控制topiccmd_vel</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">        .....</span><br><span class="line"></span><br><span class="line">    rate = rospy.Rate(<span class="number">10.0</span>) <span class="comment"># 指定以下循环的频率</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> rospy.is_shutdown():</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># 获取/turtle2到/turtle1的坐标系变换，rospy.Time(0)表示最新的变换</span></span><br><span class="line">            (trans,rot) = listener.lookupTransform(<span class="string">'/turtle2'</span>, <span class="string">'/turtle1'</span>, rospy.Time(<span class="number">0</span>))</span><br><span class="line">        <span class="keyword">except</span> (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 以下内容控制turtle2向turtle1移动，即将turtle2坐标系向turtle1移动</span></span><br><span class="line"></span><br><span class="line">        ......</span><br><span class="line"></span><br><span class="line">        rate.sleep()</span><br></pre></td></tr></table></figure>
+<p><a href="http://wiki.ros.org/tf/Tutorials/Writing%20a%20tf%20listener%20%28Python%29" target="_blank" rel="noopener">完整代码</a></p>
+<h2 id="TF和时间的关系"><a href="#TF和时间的关系" class="headerlink" title="TF和时间的关系"></a>TF和时间的关系</h2><p>计算frame-A在Ta相对于frame-B在Tb的时间坐标系：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    now = rospy.Time.now()</span><br><span class="line">    past = now - rospy.Duration(<span class="number">5.0</span>)</span><br><span class="line">    listener.waitForTransformFull(<span class="string">"/turtle2"</span>, now,<span class="string">"/turtle1"</span>, past,<span class="string">"/world"</span>, rospy.Duration(<span class="number">1.0</span>))</span><br><span class="line">    (trans, rot) = listener.lookupTransformFull(<span class="string">"/turtle2"</span>, now,<span class="string">"/turtle1"</span>, past,<span class="string">"/world"</span>)</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="命令行工具"><a href="#命令行工具" class="headerlink" title="命令行工具"></a>命令行工具</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 打印当前tf的拓扑到pdf文件中</span><br><span class="line">rosrun tf view_frames</span><br><span class="line"></span><br><span class="line"># 打印tf拓扑</span><br><span class="line">rosrun rqt_tf_tree rqt_tf_tree</span><br><span class="line"></span><br><span class="line"># 打印坐标系的变换关系，输出为 Translation（原点平移关系）、Rotation（转动角度，包括：四元数和欧拉角）</span><br><span class="line">rosrun tf tf_echo [frame_id_1] [frame_id_2]</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://wiki.ros.org/tf" target="_blank" rel="noopener">tf</a></p>
+<p><a href="http://wiki.ros.org/tf/Tutorials/Debugging%20tf%20problems" target="_blank" rel="noopener">Debugging tf problems</a></p>
+<p><a href="http://wiki.ros.org/tf2" target="_blank" rel="noopener">tf2</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.974Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" target="_blank" rel="external">https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ROS/" rel="tag">ROS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tf/" rel="tag">tf</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（六）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（六）》 — LQing的博客&source=tf包的介绍，以及基本使用。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（六）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/09/01/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">摄像头标定</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/08/12/3-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ROS学习笔记（三）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（六）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（六）》 — LQing的博客&source=tf包的介绍，以及基本使用。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（六）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/20/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuElEQVR42u3a0a7aMBAEUP7/p6nUp6oSMLNr91Lp5AkBSXyC5DXjfTzi4/n7ePX+n58+XxzJdd6//+o7Bw48PDy80dCTYbWY9vrJWfk18fDw8G7z8kn5GRyz0tKWn+gueHh4eD/Kez+I5KHkS/b3JDw8PLz/l9cWiVmogYeHh/edvDwsyAeRl4rNfY9lLXh4eHhdVlBsgH3D64v7e3h4eHiLXfXNxtV+ab4fLR4eHt4NXhvX5mFru7BOFtNtYIGHh4d3g9feZtNauikP+diGOTQeHh7e6P/7rDng/WJ3Uzxm1385cjw8PLxDvHwzPp+UTy2m8zaFl2fh4eHhXeBFTUtxg1ReZpK4dt/SioeHh3eDl0++m0hihp+VnJf7e3h4eHhHeW17U95MUMSsRx9c0SmGh4eHN0pK2z//LWnTKNAuxPHw8PD+Da+NX5NBn10ot+EIHh4e3j1eMpRk6HkhaaPYTViMh4eHd4/3OHrcbkcYNl3h4eHhHeJttufbwc2uMytadSSBh4eHF/Pajas8fp0thdtmrA/jx8PDw7vAS760GcSs6SpfrEcPFA8PD+8ob/aX/sa0PitIdU8ZHh4e3jVevmxtA4hZwDGLevHw8PBu8GblYRZhzK7Thhofdvnw8PDw1rx92JoUgPb17I7R74aHh4e35rUtU/mn+7at9nFHY8DDw8Nb89oJPY8S8ql8tpSPfjc8PDy8C7x2sp5t4betA6cKDB4eHt4N3mxCb8PZfLtrdtaHfBoPDw/vKG9WGPIp/lSku2liwMPDw7vB22wvtbFFW1o2BQMPDw/vNi9fHM/Am1aDNnPAw8PD+zZeGyvkQ98soD80EODh4eH9EC9fRretBm28W/dH4OHh4V3gtWFEvkSewTYbY8UuHx4eHt783OEG2Kwk5HFtfv0rrQN4eHh4f5/1CxcF+T6gJkgEAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

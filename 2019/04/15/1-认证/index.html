@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Solr 认证配置 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Solr">
+    <meta name="description" content="简单说明 Solr 认证配置相关配置">
+<meta name="keywords" content="Solr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Solr 认证配置">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;04&#x2F;15&#x2F;1-%E8%AE%A4%E8%AF%81&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="简单说明 Solr 认证配置相关配置">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.973Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Solr 认证配置</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Solr 认证配置</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-04-15T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-04-15
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#认证插件"><span class="post-toc-number">1.</span> <span class="post-toc-text">认证插件</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Basic-插件"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Basic 插件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Hadoop-插件"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Hadoop 插件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Kerberos-插件"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Kerberos 插件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Znode节点添加ACLs"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">Znode节点添加ACLs</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Cloudera中配置Solr认证"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">Cloudera中配置Solr认证</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#自定义security-json"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">自定义security.json</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Znode启用ACLs"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">Znode启用ACLs</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">2.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-1-认证"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Solr 认证配置</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-04-16 00:00:00" datetime="2019-04-15T16:00:00.000Z"  itemprop="datePublished">2019-04-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>简单说明 Solr 认证配置相关配置</p>
+<a id="more"></a>
+
+
+<p>Solr包含一些开箱即用的插件，通过这些插件能够完成Solr的认证、授权等功能。</p>
+<p>默认情况下Solr中的所有认证、授权配置保存在security.json文件中。Standlone模式下，Security.json文件保存在$SOLR_HOME目录下，SolrCloud模式时该文件保存在ZK中。</p>
+<p>security.json文件示例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"authentication"</span> : &#123;</span><br><span class="line">    <span class="attr">"class"</span>: <span class="string">"class.that.implements.authentication"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"authorization"</span>: &#123;</span><br><span class="line">    <span class="attr">"class"</span>: <span class="string">"class.that.implements.authorization"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用CDH时以下命令可以将security.json文件upload到zk中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上传或者覆盖配置信息</span></span><br><span class="line">/opt/cloudera/parcels/CDH/lib/solr/bin/zkcli.sh -zkhost bdnode1:2181 -cmd putfile &#123;znode_name&#125; &#123;src_path&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 下载配置信息</span></span><br><span class="line">/opt/cloudera/parcels/CDH/lib/solr/bin/zkcli.sh -zkhost bdnode1:2181 -cmd getfile &#123;znode_name&#125; &#123;dest_path&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用 ./bin/solr zk命令能够操作ZNODE</span></span><br><span class="line">solr zk upconfig|downconfig -d &lt;confdir&gt; -n &lt;configName&gt; [-z zkHost]</span><br><span class="line">solr zk cp [-r] &lt;src&gt; &lt;dest&gt; [-z zkHost]</span><br><span class="line">solr zk rm [-r] &lt;path&gt; [-z zkHost]</span><br><span class="line">solr zk mv &lt;src&gt; &lt;dest&gt; [-z zkHost]</span><br><span class="line">solr zk ls [-r] &lt;path&gt; [-z zkHost]</span><br><span class="line">solr zk mkroot &lt;path&gt; [-z zkHost]</span><br></pre></td></tr></table></figure>
+<h1 id="认证插件"><a href="#认证插件" class="headerlink" title="认证插件"></a>认证插件</h1><p>当前Solr提供了以下几种认证插件：</p>
+<table>
+<thead>
+<tr>
+<th>插件名称</th>
+<th>官方参考</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kerberos</td>
+<td><a href="https://lucene.apache.org/solr/guide/7_0/kerberos-authentication-plugin.html#kerberos-authentication-plugin" target="_blank" rel="noopener">参考</a></td>
+<td></td>
+</tr>
+<tr>
+<td>Basic</td>
+<td><a href="https://lucene.apache.org/solr/guide/7_0/basic-authentication-plugin.html#basic-authentication-plugin" target="_blank" rel="noopener">参考</a></td>
+<td></td>
+</tr>
+<tr>
+<td>Hadoop</td>
+<td><a href="https://lucene.apache.org/solr/guide/7_0/hadoop-authentication-plugin.html#hadoop-authentication-plugin" target="_blank" rel="noopener">参考</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>Solr还支持PKIAuthenticationPlugin插件，该插件用来处理Solr内部请求的安全认证。需要注意的是PKIAuthenticationPlugin的加密原理对时间敏感，Solr节点间需要保证5s以内的时间同步。通过pkiauth.ttl参数可以控制密钥失效时间。</p>
+<h2 id="Basic-插件"><a href="#Basic-插件" class="headerlink" title="Basic 插件"></a>Basic 插件</h2><p>Basic 插件基于用户名/密码进行认证。</p>
+<p>下面的配置，同时启用了baseAuthPlugin和授权插件。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">"authentication"</span>:&#123; </span><br><span class="line">   <span class="attr">"blockUnknown"</span>: <span class="literal">true</span>, </span><br><span class="line">   <span class="attr">"class"</span>:<span class="string">"solr.BasicAuthPlugin"</span>,</span><br><span class="line">   <span class="attr">"credentials"</span>:&#123;<span class="attr">"solr"</span>:<span class="string">"IV0EHq1OnNrj6gvRCwvFwTrZ1+z1oBbnQdiVC3otuq0= Ndd7LKvVBAaZIF0QAVi1ekCfAJXr1GGfLtRUXhgrF8c="</span>&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参数含义如下：</p>
+<ul>
+<li>class：实现的插件类</li>
+<li>credentials：定义了solr用户和该用户的密码（密码带盐值的sha256密文）</li>
+</ul>
+<p>编辑插件的配置可以参考<a href="https://lucene.apache.org/solr/guide/7_0/basic-authentication-plugin.html#editing-authentication-plugin-configuration" target="_blank" rel="noopener">官方文档</a>，Solr本身也有API可以进行用户管理。</p>
+<h2 id="Hadoop-插件"><a href="#Hadoop-插件" class="headerlink" title="Hadoop 插件"></a>Hadoop 插件</h2><p>此插件将所有功能委派给<a href="https://hadoop.apache.org/docs/stable/hadoop-auth/index.html" target="_blank" rel="noopener">Hadoop authentication library</a>。</p>
+<p>由于Hadoop支持simple和Kerberos两种认证方式，所以使用这个插件实际上能够实现Kerberos认证。<a href="http://lucene.apache.org/solr/guide/7_7/hadoop-authentication-plugin.html" target="_blank" rel="noopener">官方</a>提供了Kerberos、Simple两种配置的security.json样例。</p>
+<p>该插件有ConfigurableInternodeAuthHadoopPlugin和HadoopAuthPlugin两种实现类区别在于：前者同时处理内部认证和外部认证，后者只处理内部认证。</p>
+<h2 id="Kerberos-插件"><a href="#Kerberos-插件" class="headerlink" title="Kerberos 插件"></a>Kerberos 插件</h2><p>Solr集成Kerberos插件后，Solr可以实现以下效果：</p>
+<ul>
+<li>使用principal和keytab在Zookeeper上完成认证；</li>
+<li>Solr集群内部完成节点的相互认证；</li>
+<li>Admin UI和其他客户端需要认证后访问solr；</li>
+</ul>
+<p><a href="https://lucene.apache.org/solr/guide/7_0/kerberos-authentication-plugin.html" target="_blank" rel="noopener">官方文档</a>比较详细的说明了该插件的配置方法，并且简要说明了如何进行Delegation Tokens配置，以及使用SolrJ完成Kerberos认证。</p>
+<h2 id="Znode节点添加ACLs"><a href="#Znode节点添加ACLs" class="headerlink" title="Znode节点添加ACLs"></a>Znode节点添加ACLs</h2><p>默认情况下，Solr启用认证后只对本身API生效。Solr存储在Zookeeper上配置依然是open-unsafe配置。</p>
+<p>Solr在ZK上的权限管理，取决于以下两个配置：</p>
+<ul>
+<li><p>zkCredentialsProvider：ZK的凭证管理类，用于获取在ZooKeeper中执行操作的权限。按照个人理解，这个配置当ZK使用digest认证时才有用，Kerberos认证时只需配置默认值即可。该配置的默认值是DefaultZkCredentialsProvider，另一个配置是VMParamsSingleSetCredentialsDigestZkCredentialsProvider。使用后者时，涉及到的配置项还有zkDigestPassword、zkDigestUsername。</p>
+</li>
+<li><p>zkACLProvider ：这个配置控制solr在ZK上创建ZNode时，Znode的权限。</p>
+</li>
+</ul>
+<p>zkACLProvider包括以下配置（org.apache.solr.common.cloud.xxx）：</p>
+<ul>
+<li>DefaultZkACLProvider: 默认配置创建的ZNode是所有人都可以访问的。</li>
+<li>VMParamsAllAndReadonlyDigestZkACLProvider：ZK使用Digest认证时使用这个配置。</li>
+<li>SaslZkACLProvider：ZK使用Kerberos认证时使用这个配置。</li>
+</ul>
+<p>通常情况下，需要在将上面提及的配置添加到环境变量SOLR_ZK_CREDS_AND_ACLS，并在solr.in.sh和zkcli.sh中引入这两个配置。</p>
+<h2 id="Cloudera中配置Solr认证"><a href="#Cloudera中配置Solr认证" class="headerlink" title="Cloudera中配置Solr认证"></a>Cloudera中配置Solr认证</h2><h3 id="自定义security-json"><a href="#自定义security-json" class="headerlink" title="自定义security.json"></a>自定义security.json</h3><p>CDH默认使用 Hadoop 插件作为Solr的认证工具，在parcels包的solr/clusterconfig/目录下有security.json的模板文件。</p>
+<p>每次Cloudera启动Solr都会加载security.json模板文件，并覆盖Zookeeper上的配置文件。如果要自定义solr授权、认证方案，需要修改/opt/cloudera/cm-agent/service/solr/solr.sh文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">379   if [ $CDH_VERSION -ge 6 ]; then</span><br><span class="line">380     export SOLR_SEC_CONFIG_FILE="$&#123;SOLR_HOME&#125;/clusterconfig/hadoop_multi_scheme_config.json"</span><br><span class="line">381 </span><br><span class="line">382 #    if $SOLR_HOME/bin/zksynctool.sh; then</span><br><span class="line">383 #      echo "Successfully configured security for Solr cluster in Zookeeper"</span><br><span class="line">384 #    else</span><br><span class="line">385 #      echo "ERROR: Failed to configure security for Solr cluster in Zookeeper"</span><br><span class="line">386 #      exit 1</span><br><span class="line">387 #    fi</span><br><span class="line">388 </span><br><span class="line">389     # set this very high to keep Solr's forced shutdown from interfering with CM's forced shutdown (value in seconds)</span><br><span class="line">390     export SOLR_STOP_WAIT=$&#123;SOLR_STOP_WAIT:-2592000&#125;</span><br><span class="line">391   fi</span><br></pre></td></tr></table></figure>
+<p>使用下面的命令可以上传security.json到ZK（前提是配置好zkcli.sh中的Kerberos认证信息），需要注意是每次修改security.json之后需要重启Solr。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/cloudera/parcels/CDH/lib/solr/bin/zkcli.sh -cmd putfile /solr/security.json ./security.json -z bdnode1:2181,bdnode2:2181,bdnode3:2181</span><br></pre></td></tr></table></figure>
+
+<h3 id="Znode启用ACLs"><a href="#Znode启用ACLs" class="headerlink" title="Znode启用ACLs"></a>Znode启用ACLs</h3><p>当在已有CDH中开启Kerberos时，Cloudera不会将原有Znode配置ACLs。用户需要修改zkcli.sh文件，执行以下命令将之前创建的ZNode修改ACLs配置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行以下命令更新ZNode的ACL配置</span></span><br><span class="line">cd /opt/cloudera/cm-agent/service/solr/ &amp;&amp; ./bin/zkcli.sh -zkhost bdnode1:2181,bdnode2:2181,bdnode3:2181 -cmd updateacls /solr</span><br></pre></td></tr></table></figure>
+
+<p>参考以下方式修改zkcli.sh中的SOLR_ZK_CREDS_AND_ACLS变量：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Settings <span class="keyword">for</span> ZK ACL</span></span><br><span class="line">SOLR_ZK_CREDS_AND_ACLS="-DzkACLProvider=org.apache.solr.common.cloud.SaslZkACLProvider \</span><br><span class="line">  -Djava.security.auth.login.config=/etc/zookeeper/conf/jaas.conf"</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://lucene.apache.org/solr/guide/7_0/securing-solr.html" target="_blank" rel="noopener">官方安全文档</a></p>
+<p><a href="https://lucene.apache.org/solr/guide/7_0/authentication-and-authorization-plugins.html#authentication-and-authorization-plugins" target="_blank" rel="noopener">认证 &amp; 授权插件</a></p>
+<p><a href="https://lucene.apache.org/solr/guide/7_7/zookeeper-access-control.html" target="_blank" rel="noopener">ZooKeeper Access Control</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.973Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/04/15/1-%E8%AE%A4%E8%AF%81/" target="_blank" rel="external">https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Solr/" rel="tag">Solr</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/&title=《Solr 认证配置》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/&title=《Solr 认证配置》 — LQing的博客&source=简单说明 Solr 认证配置相关配置" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Solr 认证配置》 — LQing的博客&url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/04/15/2-%E6%8E%88%E6%9D%83/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Solr 授权配置</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/04/10/0-%E5%85%A5%E9%97%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Solr 学习笔记</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/&title=《Solr 认证配置》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/&title=《Solr 认证配置》 — LQing的博客&source=简单说明 Solr 认证配置相关配置" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Solr 认证配置》 — LQing的博客&url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/15/1-%E8%AE%A4%E8%AF%81/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACM0lEQVR42u3a22rDMBAFwP7/T7vQ12L57EoJWBo9BSeNPSkse/v5ic/1d+6ujN/9f/3u83fvLjsYGBivZVzDc3f7KzhjcP56/P0YGBjnMMZBdhwik9CZIJP73l7HwMDAGCZt1cdKwisGBgbGDCMJvtW0DwMDAyNh5IVo3ozLS9Cv1uIYGBgvZFQHA998/cH5BgYGxksYV+tUi9U8mPaeCgMDY29Gr1gd3yxv1VVL4oegjIGBcQyjmhQmaVyvAK424DAwMPZmJEGwWj/2StM8KGNgYJzGSBYpqitiSRO/N4q4/QwGBsamjOqgcWaEmfNyanNeioGB8SpGElJ76xF5Qy0P5Q9sDAyMrRlR/thag/jE8DJ6EgwMjI0YeUCsrk3kD1dtxj3sjGBgYBzD6CV/vaWK3pLHbbsNAwNjU0Z1Jriqod/7ZHMhDAMD47WM3qpWHo5XlcrlnREMDIztGDMF56rUcCbcY2BgnMDofUWv6M3vtWyQiYGB8XJGL5iuLUerV6IRJgYGxkaMaik700SbT/sWrIhhYGC8kJGnZcmjVG9fXQLDwMA4k5FXgvl6RFL6lmN/jsHAwNiOcRVPddkib9vlP9DDfwADA2M7xsz6RR6mqwsWzSUwDAyMrRlrBwB5Upj8VWGMioGBcQAjb/onQ8cqdWYFBAMDA6MaKKtrFnlSiIGBgdF7rCSNy0vTqSocAwPjAEZvGPCJsUFzEouBgbE1oxqUq623XvMuXy/DwMDYmvELqZ0d8zIkIocAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

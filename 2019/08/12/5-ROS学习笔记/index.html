@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>ROS学习笔记（五） | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="ROS,Moveit,ROS Control">
+    <meta name="description" content="ROS Controlros_control是通用Robot控制框架，用来连接ROS中应用和实际（仿真）机器人，它包含一系列控制器接口、传动装置接口、硬件接口、控制器工具箱等等，可以帮助机器人应用快速落地，提高开发效率。 ros_control运行时，包括以下几个部分：  Controller Manager：Manger管理了多个Controller，每个Controller代表一个上层RO">
+<meta name="keywords" content="ROS,Moveit,ROS Control">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS学习笔记（五）">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;08&#x2F;12&#x2F;5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="ROS Controlros_control是通用Robot控制框架，用来连接ROS中应用和实际（仿真）机器人，它包含一系列控制器接口、传动装置接口、硬件接口、控制器工具箱等等，可以帮助机器人应用快速落地，提高开发效率。 ros_control运行时，包括以下几个部分：  Controller Manager：Manger管理了多个Controller，每个Controller代表一个上层RO">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;wiki.ros.org&#x2F;ros_control?action=AttachFile&amp;do=get&amp;target=gazebo_ros_control.png">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.974Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;wiki.ros.org&#x2F;ros_control?action=AttachFile&amp;do=get&amp;target=gazebo_ros_control.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ROS学习笔记（五）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">ROS学习笔记（五）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-12T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-08-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ROS-Control"><span class="post-toc-number">1.</span> <span class="post-toc-text">ROS Control</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#其他概念"><span class="post-toc-number">2.</span> <span class="post-toc-text">其他概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Transmissions"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">Transmissions</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Joint-Limits"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Joint Limits</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Controller-manager"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Controller manager</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-5-ROS学习笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ROS学习笔记（五）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-13 00:00:00" datetime="2019-08-12T16:00:00.000Z"  itemprop="datePublished">2019-08-13</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <a id="more"></a>
+
+<h1 id="ROS-Control"><a href="#ROS-Control" class="headerlink" title="ROS Control"></a>ROS Control</h1><p>ros_control是通用Robot控制框架，用来连接ROS中应用和实际（仿真）机器人，它包含一系列控制器接口、传动装置接口、硬件接口、控制器工具箱等等，可以帮助机器人应用快速落地，提高开发效率。</p>
+<p>ros_control运行时，包括以下几个部分：</p>
+<ul>
+<li>Controller Manager：Manger管理了多个Controller，每个Controller代表一个上层ROS应用。</li>
+<li>Controller：Controller可以完成每个joint的控制，请求下层的硬件资源，并且提供了PID控制器，读取硬件资源接口中的状态，并发布控制命令。</li>
+<li>Hardware Rescource：抽象接口层</li>
+<li>RobotHW：硬件抽象层和硬件直接打交道，通过write和read方法来完成硬件的操作，这一层也包含关节限位、力矩转换、状态转换等功能。</li>
+</ul>
+<p>下图是ros_control的数据流图：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://wiki.ros.org/ros_control?action=AttachFile&do=get&target=gazebo_ros_control.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+
+<p>目前，ros_control中提供了一些现成Controllers和Hardware Interface，用户可以根据需要自己定制这些插件。</p>
+<h1 id="其他概念"><a href="#其他概念" class="headerlink" title="其他概念"></a>其他概念</h1><h2 id="Transmissions"><a href="#Transmissions" class="headerlink" title="Transmissions"></a>Transmissions</h2><p>Transmissions就是机器人的传动系统，机器人每个需要运动的关节都需要配置相应的Transmission。</p>
+<p>通常情况下Transmission的内容会在<a href="http://wiki.ros.org/urdf/XML/Transmission" target="_blank" rel="noopener">URDF文件</a>中直接定义。用户定义Transmission内容时可以定义在单独的文件中，之后include到需要的URDF文件中。</p>
+<p>目前，ROS提供的<a href="http://docs.ros.org/jade/api/transmission_interface/html/c++/group__transmission__types.html" target="_blank" rel="noopener">transmission类型</a>包括：</p>
+<ul>
+<li>DifferentialTransmission</li>
+<li>FourBarLinkageTransmission</li>
+<li>SimpleTransmission</li>
+</ul>
+<p>机械臂中一般只会用到SimpleTransmission。</p>
+<p>以下是一个Joint的传动定义</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">transmission</span> <span class="attr">name</span>=<span class="string">"trans_name"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">type</span>&gt;</span>transmission_interface/SimpleTransmission<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">joint</span> <span class="attr">name</span>=<span class="string">"joint_name"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hardwareInterface</span>&gt;</span>PositionJointInterface<span class="tag">&lt;/<span class="name">hardwareInterface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">joint</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">actuator</span> <span class="attr">name</span>=<span class="string">"joint_motor"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mechanicalReduction</span>&gt;</span>1<span class="tag">&lt;/<span class="name">mechanicalReduction</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">actuator</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">transmission</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>上述定义中，注意以下两点：</p>
+<ul>
+<li>hardwareInterface：Controller和RobotHw沟通的接口，基本上和controllers的种类是对应的（参考<a href="http://docs.ros.org/api/hardware_interface/html/c++/namespacehardware__interface.html" target="_blank" rel="noopener">HardwareInterface类型</a>）。</li>
+<li>actuator：??? 不知道用来干啥的？？？</li>
+</ul>
+<h2 id="Joint-Limits"><a href="#Joint-Limits" class="headerlink" title="Joint Limits"></a>Joint Limits</h2><p>Joint Limits是RobotHW中的一块，维护一个关节限位的数据结构，包含关节速度、位置、加速度、加加速度、力矩等方面的限位，还包含安全作用的位置软限位、速度边界（k_v）和位置边界（k_p）等等。</p>
+<p>Joint Limits可以直接定义在URDF文件中，可以通过YAML文件加载到ROS parameter server中，还可以使用joint_limits_interface在代码中定义。</p>
+<h2 id="Controller-manager"><a href="#Controller-manager" class="headerlink" title="Controller manager"></a>Controller manager</h2><p>Controller Manager可以加载、开始运行、停止运行、卸载不同的controller，并且提供了多种工具来完成这些操作。</p>
+<p>命令行工具：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun controller_manager controller_manager &lt;command&gt; &lt;controller_name&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.ncnynl.com/archives/201708/1932.html" target="_blank" rel="noopener">ROS Control介绍</a></p>
+<p><a href="http://gazebosim.org/tutorials?tut=ros_control" target="_blank" rel="noopener">Gazebo Ros Control</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.974Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" target="_blank" rel="external">https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Moveit/" rel="tag">Moveit</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ROS/" rel="tag">ROS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ROS-Control/" rel="tag">ROS Control</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（五）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（五）》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（五）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/08/12/3-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">ROS学习笔记（三）</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ROS学习笔记（四）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（五）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（五）》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（五）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuklEQVR42u3aS25bMRAEQN//0gqQVYxYcPcMKTlIvZUQvA+LAchxcz4+4uvx+0p+/3kl73l2599PJXcOLzw8PLzR0J9dzz6Qf6ylzv796RTg4eHhXePtP5+/M5m42eTi4eHh/TTe5p5nUzArvvHw8PD+LV67MeTPzu7Ew8PDexcvCSOSpzZldPLUxawFDw8PL+adPQB7ze+3ne/h4eH997xHebXl7Ga5n43w0xvw8PDwLvCSw63NRrI5NmtL5OIvBjw8PLwFb9MEcOrALHl/O/Wf9j08PDy8o7zZ6/bxa9tqkDQfFGEuHh4e3iFe3hQ1Cx3ybWZ29FX3R+Dh4eGNeG2RWrQ6lcV329QVbTN4eHh413htwZqXs22Y27Z5RTEuHh4e3lFevsiebQuYLfRJjhKFEXh4eHjXeElLQR7F5kdZbctXVNDj4eHhHeLtI4B2mvKvt1vCF8/i4eHhXePlyHyBbmF5VFGEGnh4eHjXePtjp9mdm7I7ipLx8PDwLvBmAW5SZOeY9m05Gw8PD+8GL//k7PA+jzPycrmYRDw8PLyX8PIAom0m2MQNbQle7E54eHh4I95s4d43Rc2W+6LpCg8PD+8yLz9qmh16neqGyseAh4eHd4O3b3KaLf3JJjSrjb9JqfHw8PAO8e6Ftpuh3yjW8fDw8Pa8qGlpVNpuYohjDQp4eHh4L+e1rahJmdtGCbPA95vsGQ8PD2/Ba2OC2WLdBhDtcOu/FfDw8PAWvEd5JUt828K1P2B7Olo8PDy8C7z2WKtdmvfBbv57WFjj4eHhjXjtZrBagstAoW3qqgtrPDw8vAWvDWo3w2oL5Y/9/OHh4eG9iZcPLi+g25A3+Q/Aw8PD+8m8UxtMu8IX2wkeHh7eNd7s0CuKA8roYT8SPDw8vNu82aKctBHk5fKsFeBAVIGHh4fX8X4B39k/pEpcoS8AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

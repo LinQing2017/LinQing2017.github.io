@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>在Kerberos环境中运行Spark On Yarn | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="安全,Yarn,Spark">
+    <meta name="description" content="Kerberos接入的场景下，提交spark任务。">
+<meta name="keywords" content="安全,Yarn,Spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Kerberos环境中运行Spark On Yarn">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;03&#x2F;03&#x2F;%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="Kerberos接入的场景下，提交spark任务。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.975Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">在Kerberos环境中运行Spark On Yarn</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">在Kerberos环境中运行Spark On Yarn</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-03T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-03-03
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Yarn"><span class="post-toc-number">1.</span> <span class="post-toc-text">Yarn</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Spark"><span class="post-toc-number">2.</span> <span class="post-toc-text">Spark</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-运行任务"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">在Kerberos环境中运行Spark On Yarn</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-04 00:00:00" datetime="2019-03-03T16:00:00.000Z"  itemprop="datePublished">2019-03-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>Kerberos接入的场景下，提交spark任务。</p>
+<a id="more"></a>
+
+<h1 id="Yarn"><a href="#Yarn" class="headerlink" title="Yarn"></a>Yarn</h1><p>当Hadoop接入Kerberos之后，CDH对向Yarn的提交任务的用户进行了限制：</p>
+<ol>
+<li>不能是root用户（参考：hadoop-yarn-project\hadoop-yarn\hadoop-yarn-server\hadoop-yarn-server-nodemanager\src\main\native\container-executor\impl\container-executor.c）</li>
+<li>用户的id必须大于min.user.id</li>
+<li>用户不能再黑名单（banned.users）中</li>
+</ol>
+<p>如果用户需要使用小于min.user.id的账号提交yarn任务（比如impala、hue、hive等账号），那么需要将用户加入到allowed.system.users配置中</p>
+<h1 id="Spark"><a href="#Spark" class="headerlink" title="Spark"></a>Spark</h1><p>对Spark任务来说，在yarn上运行时可以自动获取tgt，并自动刷新票据。</p>
+<p>通过以下配置可以调整Kerberos登录参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>说明</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>spark.yarn.keytab</td>
+<td>使用的keytab文件</td>
+<td>可以在spark-submit中通过–principal指定</td>
+</tr>
+<tr>
+<td>spark.yarn.principal</td>
+<td>kerberos指定的用户名</td>
+<td>可以在spark-submit中通过–keytab指定</td>
+</tr>
+<tr>
+<td>spark.yarn.access.hadoopFileSystems</td>
+<td>需要访问Hadoop，可以指定多个</td>
+<td>默认是none</td>
+</tr>
+<tr>
+<td>spark.yarn.kerberos.relogin.period</td>
+<td>检查票据失效的周期</td>
+<td>默认是1m</td>
+</tr>
+<tr>
+<td>spark.security.credentials.${service}.enabled</td>
+<td>访问Hive、HBase等服务时是否通过Kerberos用户访问</td>
+<td>默认是true</td>
+</tr>
+</tbody></table>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://spark.apache.org/docs/latest/security.html#kerberos" target="_blank" rel="noopener">security kerberos</a><br><a href="https://spark.apache.org/docs/latest/running-on-yarn.html#kerberos" target="_blank" rel="noopener">running on yarn</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.975Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/" target="_blank" rel="external">https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spark/" rel="tag">Spark</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Yarn/" rel="tag">Yarn</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/&title=《在Kerberos环境中运行Spark On Yarn》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/&title=《在Kerberos环境中运行Spark On Yarn》 — LQing的博客&source=Kerberos接入的场景下，提交spark任务。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《在Kerberos环境中运行Spark On Yarn》 — LQing的博客&url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/03/04/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Hive 安全认证相关</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/02/28/zookeeper%E5%AE%89%E5%85%A8%E8%AE%A4%E8%AF%81/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Zookeeper 安全认证</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/&title=《在Kerberos环境中运行Spark On Yarn》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/&title=《在Kerberos环境中运行Spark On Yarn》 — LQing的博客&source=Kerberos接入的场景下，提交spark任务。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《在Kerberos环境中运行Spark On Yarn》 — LQing的博客&url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/03/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsklEQVR42u3aQW4jMQwEQP//094HBBl3k1LWh5pTEMeWSgEomuTrFT/vx+fnX7Y/t598+MHDw8O7sPV38LTI563/tnp7KHh4eHj3eM9Ltssnx5dE8uffJMeEh4eH9w28ZHPJq3no31wweHh4eN/AS4L484UxQ+Lh4eF9Gy8pRjy/qw3obdH2eq0FDw8PL+blXaTv+flKfw8PDw9v3VVPAu7zhZGUcTcXyYfd4uHh4V3g5QH3PXo2zbDZ0BUeHh7e3/DO5p/5wMF+3aLIi4eHh3eN124lKci2qXZ+YRQFXDw8PLxrvFnhIGe3F8PsUsHDw8P7X7ziq/7osskx7WABHh4e3j3eqRQ2b4PlLa781aK/h4eHh3eINwv9UfE0jtLtNTDs7OHh4eEd4uWLbRLiY62s/ODw8PDwLvBmra+8DJEUgmeHmKfdeHh4eGd5yabzQYFN4ypvaxVgPDw8vD/kzVLefUBPjikaFDh13nh4eHhl4tuWEjZNrE31IKq14OHh4R3lbZpb7+Bpiw6boasPowN4eHh4R3ntxTArYZwauiqKEXh4eHhHecMv+UF5dzZ0lX9C8SoeHh7eUV4biPcjAkmK3A4uRP83PDw8vEO8TRLcbr1NzduCyGt2j+Hh4eGNePtUeNMMyy+Y9sHDw8O7zcvT07xNtS9h5KsXb8DDw8O7zGs3fap51haahxcDHh4e3prXkmbBfTZWNftkPDw8vLO82df7WREhT8pn4wUfqix4eHh4h3htqE0S7lmCnh/lsCSBh4eHd5Q3uwzytDgP2cke8lYcHh4e3m3erNGVXAOnhhLysi8eHh7ed/LaVlnbGGvLGb8eJR4eHt6X8WYJcdtCW40j4OHh4V3jbcL0cyMqeW9eCkkKH3h4eHi3efsBqXyZNqy3wwer/h4eHh7e5/38A0pwX/RYWrdsAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

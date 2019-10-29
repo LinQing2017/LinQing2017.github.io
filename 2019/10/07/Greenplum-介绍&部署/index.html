@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- GreenPlum | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,GreenPlum">
+    <meta name="description" content="GreenPlum 调研笔记">
+<meta name="keywords" content="数据库,GreenPlum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- GreenPlum">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;10&#x2F;07&#x2F;Greenplum-%E4%BB%8B%E7%BB%8D&amp;%E9%83%A8%E7%BD%B2&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="GreenPlum 调研笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;gp.stage.vonbros.com&#x2F;wp-content&#x2F;themes&#x2F;twentyseventeen&#x2F;assets&#x2F;images&#x2F;architecture.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;greenplum.cn&#x2F;gp6&#x2F;graphics&#x2F;highlevel_arch.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;greenplum.cn&#x2F;gp6&#x2F;graphics&#x2F;spread-mirroring.png">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.974Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;gp.stage.vonbros.com&#x2F;wp-content&#x2F;themes&#x2F;twentyseventeen&#x2F;assets&#x2F;images&#x2F;architecture.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- GreenPlum</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- GreenPlum</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-10-07T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-10-07
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#1-概述"><span class="post-toc-number">1.</span> <span class="post-toc-text">1. 概述</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#架构"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">架构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#事务控制"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">事务控制</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MVCC"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">MVCC</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据冗余和故障切换"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">数据冗余和故障切换</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#2-安装部署"><span class="post-toc-number">2.</span> <span class="post-toc-text">2. 安装部署</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#准备工作"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">准备工作</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#安装Greenplum-DB"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">安装Greenplum DB</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#初始化数据库"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">初始化数据库</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#配置文件"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">配置文件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#基本操作"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">基本操作</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#配置文件-1"><span class="post-toc-number">2.6.</span> <span class="post-toc-text">配置文件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#日志文件"><span class="post-toc-number">2.7.</span> <span class="post-toc-text">日志文件</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#3-高可用"><span class="post-toc-number">3.</span> <span class="post-toc-text">3. 高可用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#高可用方案"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">高可用方案</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置Segment镜像"><span class="post-toc-number">3.1.1.</span> <span class="post-toc-text">配置Segment镜像</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置Master镜像"><span class="post-toc-number">3.1.2.</span> <span class="post-toc-text">配置Master镜像</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#4-数据备份和恢复"><span class="post-toc-number">4.</span> <span class="post-toc-text">4. 数据备份和恢复</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#gpbackup和gprestore"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">gpbackup和gprestore</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#5-扩容"><span class="post-toc-number">5.</span> <span class="post-toc-text">5. 扩容</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#6-数据对象"><span class="post-toc-number">6.</span> <span class="post-toc-text">6.数据对象</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据库"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">数据库</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#表空间"><span class="post-toc-number">6.2.</span> <span class="post-toc-text">表空间</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SCHEMA"><span class="post-toc-number">6.3.</span> <span class="post-toc-text">SCHEMA</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#表"><span class="post-toc-number">6.4.</span> <span class="post-toc-text">表</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#表分布策略"><span class="post-toc-number">6.4.1.</span> <span class="post-toc-text">表分布策略</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#表存储模型"><span class="post-toc-number">6.4.2.</span> <span class="post-toc-text">表存储模型</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他对象"><span class="post-toc-number">6.5.</span> <span class="post-toc-text">其他对象</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">7.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Greenplum-介绍&amp;部署"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- GreenPlum</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-08 00:00:00" datetime="2019-10-07T16:00:00.000Z"  itemprop="datePublished">2019-10-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>GreenPlum 调研笔记</p>
+<a id="more"></a>
+
+<h1 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h1><p>GreenPlum中文社区的<a href="https://greenplum.cn/intro/" target="_blank" rel="noopener">介绍</a>中，将Greenplum定位成<strong>开源大数据平台</strong>，而不仅仅是一个MPP数据查询引擎。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://gp.stage.vonbros.com/wp-content/themes/twentyseventeen/assets/images/architecture.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<p>Greenplum的优势：</p>
+<ul>
+<li>处理和分析各种数据源的数据的平台：包括hadoop、Hive、HBase、S3等等，支持结构化、半结构化、非结构化数据</li>
+<li>数据水平分布、并行查询执行、专业优化器、线性扩展能力、多态存储、资源管理、高可用、高速数据加载</li>
+<li>接口可扩展，支持SQL、JDBC和ODBC等行业标准</li>
+<li>集成数据分析平台：MADlib (Github 245个Star，半死不活)</li>
+<li>在金融、保险、证券等领域有众多应用案例，具备较为完善的生态</li>
+<li>采用 ** Apache 2 协议 **</li>
+</ul>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://greenplum.cn/gp6/graphics/highlevel_arch.jpg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<p>Greenplum基本架构包括：Master、SegmentHost。</p>
+<ul>
+<li>Master：Greenplum数据系统的入口，Client连接Master提供SQL。Master管理了全局系统目录，包含了有关Greenplum数据库本身的元数据（系统表）。Master的主备基于WAL预写式日志来实现主/备镜像。</li>
+<li>SegmentHosts：基于Postgresql 8.3的定制数据库，负责存储和处理用户数据。 一台Segment主机通常运行2至8个Greenplum的Segment。</li>
+<li>Interconect：Interconect是Greenplum数据库架构中的网络层，默认协议UDPIFC，如果使用TCP协议，那么Greenplum限制1000个Segment。</li>
+</ul>
+<h2 id="事务控制"><a href="#事务控制" class="headerlink" title="事务控制"></a>事务控制</h2><p>Greenplum支持事务控制，当并发更新时Greenplum通过MVCC模型来保证事务数据一致性。</p>
+<p><strong>MVCC模型</strong>基于<strong>快照</strong>机制是Postgresql中的一个特性，能够管理数据行的多个版本。</p>
+<h3 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h3><p>数据库ACID特性的描述：</p>
+<ul>
+<li><p>Atomicity：事务的操作结果要么全部执行要么全部不执行</p>
+</li>
+<li><p>Consistency：总是从一个一致的状态转换到另一个一致的状态</p>
+</li>
+<li><p>Durability：事务一旦被提交，它对数据库中数据的改变就是永久性的，接下来即使数据库发生故障也不应该对其有任何影响。</p>
+</li>
+<li><p>Isolation：事务的修改结果在什么时间能够被其他事务看到（SQL1992规范），隔离级别包括以下四个：</p>
+<ul>
+<li>未提交读：事务能够看到其他事务没有提交的修改，当另一个事务又回滚了修改后导致读取到脏数据，这种情况又称为 <strong>脏读</strong></li>
+<li>已提交读：事务能够看到其他事务提交后的修改，这时会出现<strong>一个事务内两次读取数据</strong>不一致，这种模式下事务是<strong>不可重复读</strong>的。</li>
+<li>可重复读:在两次读取时读取到的同一行数据是一致的，但是两次查询可能查到行数不一致（其他事务出现新的插入），这种情况称为<strong>幻读</strong>。</li>
+<li>序列化级别：不允许出现幻读、脏读、不可重复读。</li>
+</ul>
+</li>
+</ul>
+<p><strong>Greenplum中未提交读、已提交读隔离模式的效果和标准SQL一致；可重复读模式避免了不可重复读和幻读；Greenplum数据库并不完全支持可串行化模式（该模式时自动退化到可重复读模式），并且数据操作并非真正串行化的。</strong></p>
+<p>上述特性中，Isolation是关键，不同数据库实现了不同级别的隔离性，并且通常情况下使用<strong>锁</strong>来解决这些问题。<br>传统方案采用<strong>读写锁</strong>（读锁和读锁之间不互斥，写锁互斥其他所有锁），MVCC是一种完全使读写操作并发的方案（完全抛弃锁）。</p>
+<p>用户执行事务时可以在SQL中指定，事务隔离级别：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">BEGIN</span>;</span><br><span class="line"><span class="keyword">SET</span> <span class="keyword">TRANSACTION</span> <span class="keyword">ISOLATION</span> <span class="keyword">LEVEL</span> REPEATABLE <span class="keyword">READ</span>;</span><br><span class="line">...</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<p>MVCC的实现：</p>
+<ul>
+<li><p>在PostgreSQL中，每一个事务(包括单条SQL)都会得到一个被称作为 XID 的事务ID。Session请求事务操作时，PostgreSQL递增XID并赋给这个事务。</p>
+</li>
+<li><p>每一行记录都存储了事务相关信息，这些信息用于判断当前事务是否可见。</p>
+<ul>
+<li>xmin：在创建记录时，记录此时的事务id，后面每次update也会更新。</li>
+<li>xmax：在更新或删除或lock时，记录此时的事务id；如果记录没有被删除，那么此时为0。</li>
+<li>cmin：多语句事务存储创建这个元组的Command ID</li>
+<li>cmax：多语句事务删除这个元组的Command ID</li>
+</ul>
+</li>
+<li><p>一个事务会看到 xid &lt; xmin 的行（这些行已经commit），并且这些行 xid &gt; xmax （这些行已经被删除）。</p>
+</li>
+<li><p>cmin/cmax：用于多语句事务中，只在事务期间有意义，事务开始时该序列被重置为0。</p>
+</li>
+<li><p>每一个Segment数据库都有其自己的XID序列，Master会使用一个分布式事务ID，称为gp_session_id，Segment会会维护一个分布式事务ID到其本地XID的映射。</p>
+</li>
+<li><p>当一个Segment上的事务失败，会回滚所有Segment的修改。</p>
+</li>
+<li><p>一行支持二十亿个事务，这之后这一行将成为一个新行，通过一次VACUUM操作可以避免这样的情况。可以配置xid_warn_limit和 xid_stop_limit控制事务上限告警。</p>
+</li>
+</ul>
+<p>MVCC的实现存储了多个数据版本，非常容易造成<strong>表膨胀</strong>。VACUUM命令会标记过期行所使用的空间可以被重用。通常可以使用以下策略运行VACUUM命令：</p>
+<ul>
+<li>重度更新的表，可能每天需要运行几次VACUUM。</li>
+<li>运行了一个更新或者删除大量行的事务之后运行VACUUM。</li>
+<li>VACUUM FULL命令会把表重写为没有过期行，并且将表减小到其最小尺寸，同时该操作会锁表。</li>
+<li>运行<strong>VACUUM VERBOSE tablename</strong>来得到一份Segment上已移除的死亡行数量、受影响页面数以及有可用空闲空间页面数的报告。</li>
+</ul>
+<p>用户可以使用<strong>LOCK LOCK</strong>命令显示加锁（[参考]（<a href="https://gp-docs-cn.github.io/docs/ref_guide/sql_commands/LOCK.html））。" target="_blank" rel="noopener">https://gp-docs-cn.github.io/docs/ref_guide/sql_commands/LOCK.html））。</a></p>
+<h2 id="数据冗余和故障切换"><a href="#数据冗余和故障切换" class="headerlink" title="数据冗余和故障切换"></a>数据冗余和故障切换</h2><p>部署Greenplum数据库系统时，Segment可以配置Mirror实例，当Primary节点宕机时，Mirror节点提供服务，如果系统中存在Segment没有配置Mirror，那么Segment会成为整个系统的单点故障。</p>
+<p>Greenplum数据库中Segment镜像拓扑：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://greenplum.cn/gp6/graphics/spread-mirroring.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<p>用户可以选择一台不同于Master节点的主机上部署一个Master实例的备份或者镜像。 </p>
+<p>后备Master利用事务日志复制进程保持与主Master同步，复制进程运行在后备Master上并且负责在主备Master主机之间同步数据。如果主Master失效，日志复制进程会停止，并且后备Master会被激活以替代它的位置。<strong>Master失效时，主备切换不会自动发生，需要外部激励触发。</strong></p>
+<h1 id="2-安装部署"><a href="#2-安装部署" class="headerlink" title="2. 安装部署"></a>2. 安装部署</h1><p>官方Github上提供了从源码编译gpdb和gporca的完整步骤，同时也提供了预编译好的RPM和DEB包，以下安装不步骤参考网络上的一些文档，并非官方推荐的安装步骤（我没找到！！）。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><ul>
+<li><p>所有节点配置NTP服务</p>
+</li>
+<li><p>更新以下系统配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">sudo bash -c &apos;cat &gt;&gt; /etc/sysctl.conf &lt;&lt;-EOF</span><br><span class="line">kernel.shmmax = 500000000</span><br><span class="line">kernel.shmmni = 4096</span><br><span class="line">kernel.shmall = 4000000000</span><br><span class="line">kernel.sem = 500 1024000 200 4096</span><br><span class="line">kernel.sysrq = 1</span><br><span class="line">kernel.core_uses_pid = 1</span><br><span class="line">kernel.msgmnb = 65536</span><br><span class="line">kernel.msgmax = 65536</span><br><span class="line">kernel.msgmni = 2048</span><br><span class="line">net.ipv4.tcp_syncookies = 1</span><br><span class="line">net.ipv4.ip_forward = 0</span><br><span class="line">net.ipv4.conf.default.accept_source_route = 0</span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br><span class="line">net.ipv4.tcp_max_syn_backlog = 4096</span><br><span class="line">net.ipv4.conf.all.arp_filter = 1</span><br><span class="line">net.ipv4.ip_local_port_range = 1025 65535</span><br><span class="line">net.core.netdev_max_backlog = 10000</span><br><span class="line">net.core.rmem_max = 2097152</span><br><span class="line">net.core.wmem_max = 2097152</span><br><span class="line">vm.overcommit_memory = 2</span><br><span class="line"></span><br><span class="line">EOF&apos;</span><br><span class="line"></span><br><span class="line">sudo bash -c &apos;cat &gt;&gt; /etc/security/limits.conf &lt;&lt;-EOF</span><br><span class="line">* soft nofile 65536</span><br><span class="line">* hard nofile 65536</span><br><span class="line">* soft nproc 131072</span><br><span class="line">* hard nproc 131072</span><br><span class="line"></span><br><span class="line">EOF&apos;</span><br><span class="line"></span><br><span class="line">sysctl -p</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在每个节点中创建gpadmin用户用于管理Greenplum，并且打通该节点的集群免密</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">groupadd -g 530 gpadmin</span><br><span class="line">useradd -g 530 -u 530 -m -d /home/gpadmin -s /bin/bash gpadmin</span><br><span class="line">echo "ruijie" | passwd --stdin gpadmin</span><br><span class="line"></span><br><span class="line">su - gpadmin</span><br><span class="line"><span class="meta">#</span><span class="bash"> 只需要打通第一个节点到其他节点的ssh，之后执行 gpssh-exkeys -f hostlists 打通所有节点之间的互信</span></span><br><span class="line">ssh-copy-id gpadmin@node11 &amp;&amp; ssh-copy-id gpadmin@node12 &amp;&amp; ssh-copy-id gpadmin@node13</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="安装Greenplum-DB"><a href="#安装Greenplum-DB" class="headerlink" title="安装Greenplum DB"></a>安装Greenplum DB</h2><p>下载RPM包，执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum localinstall -y greenplum-db-6.0.0-rhel7-x86_64.rpm</span><br></pre></td></tr></table></figure>
+<p>安装完成后，安装目录为/usr/local/greenplum-db，同时还要将greenplum-db中的lib添加到ld.so.conf中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo bash -c 'cat &gt;&gt; /etc/ld.so.conf.d/greenplum.conf &lt;&lt;-EOF</span><br><span class="line">/usr/local/greenplum-db/lib</span><br><span class="line">EOF'</span><br><span class="line"></span><br><span class="line">ldconfig</span><br></pre></td></tr></table></figure>
+<p>在/home/gpadmin目录下配置环境变量、修改目录权限、创建配置目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># /usr/local/greenplum-db/greenplum_path.sh 添加以下内容</span></span></span><br><span class="line"></span><br><span class="line">source /usr/local/greenplum-db/greenplum_path.sh</span><br><span class="line">export MASTER_DATA_DIRECTORY=/data/data_ssd/greenplum/data/master/gpseg-1</span><br><span class="line">export PGPORT=5432</span><br><span class="line">export PGDATABASE=gp_sydb</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改bin文件和数据目录权限：</span></span><br><span class="line">chown -R  gpadmin:gpadmin  /usr/local/greenplum-db/</span><br><span class="line">mkdir -p /data/data_ssd/greenplum # 数据目录</span><br><span class="line">chown -R gpadmin:gpadmin /data/data_ssd/greenplum</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建配置目录</span></span><br><span class="line">su - gpadmin</span><br><span class="line">mkdir -p /home/gpadmin/conf</span><br><span class="line">touch /home/gpadmin/conf/all_hosts #集群all_hosts文件,包含所有节点</span><br><span class="line">touch /home/gpadmin/conf/seg_hosts #集群seg_hosts文件,包含所有segment节点</span><br></pre></td></tr></table></figure>
+
+<h2 id="初始化数据库"><a href="#初始化数据库" class="headerlink" title="初始化数据库"></a>初始化数据库</h2><p>登录master的gpadmin用户，验证免密是否成功：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 验证免密是否可用</span></span><br><span class="line">gpssh-exkeys -f /home/gpadmin/conf/all_hosts </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> gpssh命令提供类似ansible的公众</span></span><br><span class="line">gpssh -f /home/gpadmin/conf/all_hosts</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 所有节点创建数据目录</span></span><br><span class="line">mkdir -p /data/data_ssd/greenplum/data/master </span><br><span class="line">mkdir -p /data/data_ssd/greenplum/data/primary</span><br><span class="line">mkdir -p /data/data_ssd/greenplum/data/mirror</span><br></pre></td></tr></table></figure>
+<p>配置文件模板位于/usr/local/greenplum-db/docs/cli_help/gpconfigs目录中，参考gpinitsystem_config创建配置文件/home/gpadmin/conf/gpinitsystem_config</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">RRAY_NAME=&quot;Greenplum Data Platform&quot;</span><br><span class="line">SEG_PREFIX=gpseg</span><br><span class="line">PORT_BASE=6000</span><br><span class="line">declare -a DATA_DIRECTORY=(/data/data_ssd/greenplum/data/primary /data/data_ssd/greenplum/data/primary /data/data_ssd/greenplum/data/primary)</span><br><span class="line">MASTER_HOSTNAME=node11</span><br><span class="line">MASTER_DIRECTORY=/data/data_ssd/greenplum/data/master </span><br><span class="line">MASTER_PORT=5432</span><br><span class="line">TRUSTED_SHELL=ssh</span><br><span class="line">CHECK_POINT_SEGMENTS=8</span><br><span class="line">ENCODING=UNICODE</span><br><span class="line">DATABASE_NAME=gp_sydb</span><br><span class="line">MACHINE_LIST_FILE=/home/gpadmin/conf/seg_hosts</span><br><span class="line"></span><br><span class="line"># 需要配置冗余时</span><br><span class="line"># MIRROR_PORT_BASE=7000</span><br><span class="line"># declare -a MIRROR_DATA_DIRECTORY=(/data/data_ssd/greenplum/data/mirror /data/data_ssd/greenplum/data/mirror /data/data_ssd/greenplum/data/mirror)</span><br></pre></td></tr></table></figure>
+
+<p>执行gpinitsystem -c /home/gpadmin/conf/gpinitsystem_config 初始化数据库。</p>
+<p>如果需要使用冗余配置，则执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpinitsystem -c gpinitsystem_config  -h hostfile_exkeys -s &#123;master备份节点&#125; -S &#123;master备份目录&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>初始化完成后，master节点的 <strong>MASTER_DIRECTORY</strong> 目录下会自动生成<strong>gpseg-1</strong>目录，该目录中的文件类似pg的配置文件，包含：postgresql.conf、pg_hba.conf等内容。</p>
+<p>初始化成功后，Greenplum会自动创建管理员用户（默认情况下为执行初始化化程序的用户）。</p>
+<p>初次启动时，用户需要使用管理员用户登录，并创建Client使用的账号以及修改账号登录方式（pg_hba.conf）。</p>
+<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 下面的所有操作在Master节点上运行，且使用gpadmin用户</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动</span></span><br><span class="line">gpstart -a</span><br><span class="line"><span class="meta">#</span><span class="bash"> 关闭，-M fast表示关闭所有事务，并且回滚</span></span><br><span class="line">gpstop -M fast</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重启服务</span></span><br><span class="line">gpstop -r</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重载 pg_hba.conf 和 postgresql.conf，部分参数需要通过完全重启才能生效</span></span><br><span class="line">gpstop -u</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 部分情况下，客户端进程会出现卡死，gp集群无法关闭，此时需要具有SUPERUSER权限的Greenplum用户登录postgres，杀死客户端进程。操作过程，参考：https://greenplum.cn/gp6/managing/startstop.html</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> SELECT usename, pid, waiting, query, datname FROM pg_stat_activity;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上面的sql可以查出当前GP的活跃client，使用pg_cancel_backend(pid)、pg_terminate_backend(pid)可以强制退出这些线程。</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看服务的状态</span></span><br><span class="line">gpstate -s</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置文件-1"><a href="#配置文件-1" class="headerlink" title="配置文件"></a>配置文件</h2><p>Greenplum集群中包括：master参数和本地参数，这些参数存储每个实例的postgresql.conf、pg_hba.conf文件中。</p>
+<ul>
+<li><p>master参数：</p>
+<ul>
+<li>系统范围参数：编辑$MASTER_DATA_DIRECTORY/postgresql.conf文件</li>
+<li>数据库级别参数：使用<strong>ALTER DATABASE xxx SET xxx TO xxx</strong>修改</li>
+<li>Role级别参数：使用<strong>ALTER ROLE xxx SET xxx TO xxx;</strong>修改</li>
+<li>会话基本参数：在会话中使用<strong>SET XXX TO XXX</strong>修改</li>
+</ul>
+</li>
+<li><p>本地参数：本地参数保存在每一个postgresql.conf文件（包括：primary和mirror）中，要更新参数，可以使用 gpconfig 命令（如，<strong>gpconfig -c xxx -v xxx</strong>），也可以使用这个命令查看Seg的参数（如，<strong>gpconfig –show xxx</strong>）。</p>
+</li>
+</ul>
+<p>关于参数配置说明，可以参考<a href="https://gp-docs-cn.github.io/docs/ref_guide/config_params/guc_config.html" target="_blank" rel="noopener">服务器配置参数</a>。</p>
+<h2 id="日志文件"><a href="#日志文件" class="headerlink" title="日志文件"></a>日志文件</h2><p>以下方式可以查看GP集群的日志文件：</p>
+<ul>
+<li>每个Master和Segment实例都在其数据目录的 pg_log中有它们自己的日志文件。</li>
+<li>Master的日志文件包含了大部分信息，应该总是首先检查它。</li>
+<li>gplogfilter工具可以用来检查Greenplum数据库日志文件。 如果要检查segment日志文件，使用gpssh在segment主机上执行gplogfilter工具。默认查找$MASTER_DATA_DIRECTORY 目录下的日志文件，用户也可以手工指定。</li>
+</ul>
+<h1 id="3-高可用"><a href="#3-高可用" class="headerlink" title="3. 高可用"></a>3. 高可用</h1><h2 id="高可用方案"><a href="#高可用方案" class="headerlink" title="高可用方案"></a>高可用方案</h2><ul>
+<li>硬件级别RAID：在磁盘级别实现数据冗余</li>
+<li>数据存储总和校验：该机制是默认开启的，数据被写入磁盘时会计算校验和，下一次读取时检查校验和，从而达到防止磁盘上数据损坏的目的（涉及的配置项包括：<strong>ignore_checksum_failure</strong>和<strong>HEAP_CHECKSUM</strong>）。</li>
+<li>Segment镜像</li>
+<li>Master镜像</li>
+<li>双集群：双ETL方案、”备份/恢复”方案</li>
+<li>备份和恢复：gpbackup/gprestore工具备份/恢复Greenplum数据库，<a href="https://greenplum.cn/gp6/managing/backup-gpbackup.html" target="_blank" rel="noopener">参考</a></li>
+</ul>
+<h3 id="配置Segment镜像"><a href="#配置Segment镜像" class="headerlink" title="配置Segment镜像"></a>配置Segment镜像</h3><p>默认情况下，在GP集群运行时执行gpaddmirrors -p 10000，就能在本集群内创建Segment镜像，执行期间会提示输入mirror数据的存储位置。10000表示mirror服务的端口号在原primary基础上加上10000。</p>
+<p>上述命令，以group方式创建mirror，如果用户需要mirror分散部分或者分布在另外的HOST上，那么需要定义文件指定mirror到primary的映射（<a href="https://gp-docs-cn.github.io/docs/admin_guide/highavail/topics/g-enabling-segment-mirroring.html" target="_blank" rel="noopener">参考</a>）。</p>
+<p><strong>gp_segment_configuration</strong>表记录了所有primary和mirror的状态，以及连接信息，这张表常用用于判断mirror的状态。这张表中mode字段描述了Seg的三种状态：</p>
+<ul>
+<li>Change Tracking Mode ：没有找到mirror实例</li>
+<li>resync：重新同步</li>
+<li>in-sync：同步完成</li>
+</ul>
+<p>当mirror因为一些原因同步失败时，可以使用 <strong>gprecoverseg</strong> 进行一次增量同步，或者使用 <strong>gprecoverseg -F</strong> 进行全量同步。</p>
+<p><strong>gp_segment_configuration</strong>表的role和preferred_role表示 Segment 表示当前的状态，以及偏好状态。当它们不匹配时，就可能有每台硬件主机上活动主Segment数量造成的倾斜。为了重新平衡该集群并且让所有的Segment回到它们的首选角色，可以用-r选项运行gprecoverseg命令。</p>
+<p>当Segment故障时，有以下恢复手段：</p>
+<ul>
+<li>在Master节点执行<strong>gprecoverseg</strong>，将下线Segment重新上线。gprecoverseg会恢复数据文件，此时数据库的写活动被禁止。</li>
+<li>当所有Segment状态为<strong>Synchronized</strong>时，可以运行<strong>gprecoverseg -r</strong>使Segment回到它们的首选角色。</li>
+<li><strong>gprecoverseg -F</strong>是全量恢复手段：从活动segment实例（当前主实例）复制数据前， 删除离线segment实例的数据目录。</li>
+<li><strong>gprecoverseg -i recover_config_file</strong>将失效Segment恢复到其他主机，<a href="https://greenplum.cn/gp6/highavail/topics/g-when-a-segment-host-is-not-recoverable.html" target="_blank" rel="noopener">参考</a></li>
+</ul>
+<h3 id="配置Master镜像"><a href="#配置Master镜像" class="headerlink" title="配置Master镜像"></a>配置Master镜像</h3><p>当GP集群正在运行时，通过<strong>gpinitstandby -s {standby_host}</strong>能够快速启动一个Master的镜像。</p>
+<p>通过<strong>gpstate -f</strong>，可以检查Master Mirror的运行状态，正常情况下：standby master的状态应该是passive，WAL sender状态应该是streaming。</p>
+<p><strong>需要注意：StandbyMaster不能提供任何服务！</strong></p>
+<p>主master故障时，需要手工执行<strong>gpactivatestandby</strong>（如，gpactivatestandby -d /data/master/gpseg-1）来激活后备Master。激活Master主机后，可以执行<strong>psql dbname -c ‘ANALYZE;’</strong>。</p>
+<p>关于Master恢复的一些问题：</p>
+<ul>
+<li><p>激活后备Master后，官方建议一直将该Master作为主Master使用，并且初始化一个新的后备Master</p>
+</li>
+<li><p>要恢复原来的主Master遵循下面的步骤（下面将原Master主机成为MHost，当前Master主机称为SMHost）：</p>
+<ul>
+<li>备份 MHost 上的gpseg-1</li>
+<li>在 SMHost 上运行：gpinitstandby -s MHost</li>
+<li>检查 MHost 上后备Master的状态：gpstate -f（standby master 状态应该是passive，WAL sender状态应该是streaming）</li>
+<li>停止 SMHost 上的Master：gpstop -m （即把当前的主master停掉）</li>
+<li>在MHost上运行：gpactivatestandby -d $MASTER_DATA_DIRECTORY（即将当前备升级为主Master）</li>
+<li>移除 SMHost 上的gpinitstandby，并在MHost上执行：gpinitstandby -s SMHOST</li>
+</ul>
+</li>
+</ul>
+<h1 id="4-数据备份和恢复"><a href="#4-数据备份和恢复" class="headerlink" title="4. 数据备份和恢复"></a>4. 数据备份和恢复</h1><p>数据备份和恢复有以下两种方式：</p>
+<ul>
+<li>并行：每台Segment主机都同时把其数据写入到本地的磁盘存储上</li>
+<li>非并行：数据必须通过网络从Segment被发送到Master，后者把所有的数据写入它的存储中。 </li>
+</ul>
+<p>推荐使用并行方式，非并行方式时间上是将GP集群当做一个pg来执行任务。</p>
+<h2 id="gpbackup和gprestore"><a href="#gpbackup和gprestore" class="headerlink" title="gpbackup和gprestore"></a>gpbackup和gprestore</h2><p>gpbackup和gprestore在github上是一个<a href="https://github.com/greenplum-db/gpbackup/releases" target="_blank" rel="noopener">独立项目</a>，不属于gpdb工程，其release是两个可执行文件，下载后放到gpadmin用户目录下就可以使用。</p>
+<p>gpbackup 和 gprestore 支持以下功能：</p>
+<ul>
+<li>并行备份恢复</li>
+<li>全量备份、增量备份</li>
+<li>备份整个数据库，或者 数据库特定scheme和表</li>
+<li>gpbackup将元数据和数据分开成不同文件可读文件，这些文件放在各个节点上</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 基本备份操作</span></span><br><span class="line">./gpbackup --dbname  benchtest --backup-dir /home/gpadmin/backups</span><br><span class="line"><span class="meta">#</span><span class="bash"> 基本恢复操作</span></span><br><span class="line">./gprestore  --backup-dir /home/gpadmin/backups/ --timestamp 20191010111727 --create-db --jobs 8</span><br></pre></td></tr></table></figure>
+
+<p>其他关于GP集群备份的内容：</p>
+<ul>
+<li><a href="https://greenplum.cn/gp6/managing/backup-gpbackup-incremental.html" target="_blank" rel="noopener">增量备份</a></li>
+<li><a href="https://greenplum.cn/gp6/managing/backup-boostfs.html" target="_blank" rel="noopener">在特定存储设备上备份</a></li>
+<li><a href="https://greenplum.cn/gp6/managing/backup-plugin-api.html" target="_blank" rel="noopener">自定义存储插件</a></li>
+</ul>
+<h1 id="5-扩容"><a href="#5-扩容" class="headerlink" title="5. 扩容"></a>5. 扩容</h1><p>对GP集群进行扩容需要注意的几点：</p>
+<ul>
+<li><p>当Segment使用Mirror时，一次扩容最少需要两台机器（如果不使用Mirror则没有这种要求）；</p>
+</li>
+<li><p>括容之后Segment需要对表进行重平衡：</p>
+<ul>
+<li>重平操作是一次数据重写，会极大消耗磁盘IO，以及占用磁盘空间</li>
+<li><strong>表在重平衡期间不可用</strong></li>
+<li>用户可以控制表的重平衡顺序</li>
+<li>重平衡不影响新创建的表</li>
+</ul>
+</li>
+<li><p>扩容之前的数据备份文件不可用，需要重新备份</p>
+</li>
+</ul>
+<p>扩容步骤：</p>
+<ul>
+<li><p>准备节点：</p>
+<ul>
+<li>配置系统变量，必要时候进行性能测试</li>
+<li>安装Greenplum软件</li>
+<li>创建gpadmin用户</li>
+<li>配置SSH免密</li>
+</ul>
+</li>
+<li><p>初始化新节点：这个步骤将新的节点添加到GP集群中</p>
+<ul>
+<li>创建扩容文件，这个文件可以手工编辑，也可以通过 <strong>gpexpand</strong> 命令生成（如何生成该文件<a href="https://greenplum.cn/gp6/expand/expand-initialize.html" target="_blank" rel="noopener">参考</a>）。</li>
+<li>运行<strong>gpexpand -i input_file</strong>，将扩容实例上线，如果上述过程失败可以执行<strong>gpexpand –rollback</strong>回滚。</li>
+</ul>
+</li>
+<li><p>重分布表：此步骤一旦开始，那么需要重平衡的表变得不再可读写</p>
+<ul>
+<li>执行<strong>gpexpand -d 60:00:00</strong>可以开始表扩容操作，-d表示重分布的最大时间限制</li>
+<li>进行重分布时，通过gpexpand.status、gpexpand.expansion_progress、gpexpand.status_detail表可以查看重分布表的状态，调整gpexpand.status_detail的rank值还可以控制重分布表的顺序。</li>
+</ul>
+</li>
+<li><p>移除扩容操作</p>
+<ul>
+<li>gpexpand -c</li>
+</ul>
+</li>
+</ul>
+<h1 id="6-数据对象"><a href="#6-数据对象" class="headerlink" title="6.数据对象"></a>6.数据对象</h1><h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><p>Greenplum中数据库有<strong>模板</strong>的概念，用户可以从模板创建数据库，新的数据库会拥有模板的所有表和数据。</p>
+<ul>
+<li>默认模板包括：template1所有新建库的默认模板、template0系统数据库（如postgres）的模板</li>
+<li>从模板克隆数据库：<strong>CREATE DATABASE new_dbname TEMPLATE old_dbname;</strong></li>
+<li>本质上模板和数据库等价，任何数据库都能当做模板</li>
+<li>查看当前数据库：<strong>\l</strong>、<strong>查看pg_database表</strong></li>
+</ul>
+<h2 id="表空间"><a href="#表空间" class="headerlink" title="表空间"></a>表空间</h2><p>表空间用于<strong>将数据库中的对象(如表、索引等)到不同的存储介质上</strong>，不同表空间的区别在于<strong>存储介质不同</strong>。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建一个表空间，其存放目录要事先创建，并且所有Seg都能访问</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLESPACE</span> fastspace LOCATION <span class="string">'/fastdisk/gpdb'</span>;</span><br><span class="line"><span class="comment">-- 为Role赋权，使他能够在表空间上创建对象</span></span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">CREATE</span> <span class="keyword">ON</span> <span class="keyword">TABLESPACE</span> fastspace <span class="keyword">TO</span> <span class="keyword">admin</span>;</span><br><span class="line"><span class="comment">-- 创建表时指定表空间</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> foo(i <span class="built_in">int</span>) <span class="keyword">TABLESPACE</span> fastspace;</span><br><span class="line"><span class="comment">-- 指定默认表空间</span></span><br><span class="line"><span class="keyword">SET</span> default_tablespace = fastspace;</span><br></pre></td></tr></table></figure>
+
+<p>查询<strong>pg_tablespace</strong>可以得到当前环境的所有表空间，Greenplum创建之后包含默认表空间：</p>
+<ul>
+<li>pg_default ：默认表空间。由template1和template0数据库使用，存储位置为$PADATA/base/。</li>
+<li>pg_global  ：用于共享系统的catalogs，存储位置为$PADATA/global/。</li>
+</ul>
+<p>Greenplum中的表空间和PG是一致的，可以参考这个<a href="https://www.cnblogs.com/lottu/p/9239535.html" target="_blank" rel="noopener">文章</a>。</p>
+<h2 id="SCHEMA"><a href="#SCHEMA" class="headerlink" title="SCHEMA"></a>SCHEMA</h2><p>Schema从<strong>逻辑上组织一个数据库中的对象和数据</strong>。 Schema<strong>允许用户在同一个数据库中拥有多于一个对象（例如表）具有相同的名称而不发生冲突</strong>，只要把它们放在不同的Schema中就好，<strong>Public</strong>是默认SCHEMA。</p>
+<p>用户可以设置search_path配置参数来指定在其中搜索对象的可用schema的顺序。 在该搜索路径中第一个列出的方案会成为默认schema。 如果没有指定方案，对象会被创建在默认schema中。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 指定查找特定schema下的表</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> myschema.mytable;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 设定数据库的搜索顺序</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">DATABASE</span> mydatabase <span class="keyword">SET</span> search_path <span class="keyword">TO</span> myschema, </span><br><span class="line"><span class="keyword">public</span>, pg_catalog;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看搜索路径、以及schema</span></span><br><span class="line"><span class="keyword">SHOW</span> search_path;</span><br><span class="line"><span class="keyword">SELECT</span> current_schema();</span><br></pre></td></tr></table></figure>
+
+<h2 id="表"><a href="#表" class="headerlink" title="表"></a>表</h2><h3 id="表分布策略"><a href="#表分布策略" class="headerlink" title="表分布策略"></a>表分布策略</h3><p>支持三种分布策略：</p>
+<ul>
+<li>DISTRIBUTED BY（哈希分布）</li>
+<li>DISTRIBUTED RANDOMLY（随机分布）</li>
+<li>DISTRIBUTED REPLICATED（全分布）</li>
+</ul>
+<p>关于分布策略有以下几点需要注意：</p>
+<ul>
+<li><p>不显示指定分布策略时，表如何分布取决于<a href="https://gp-docs-cn.github.io/docs/ref_guide/config_params/guc-list.html#gp_create_table_random_default_distribution" target="_blank" rel="noopener">gp_create_table_random_default_distribution</a></p>
+</li>
+<li><p>使用随机分布时，不能在表中指定PRIMARY KEY 或者 UNIQUE 列</p>
+</li>
+<li><p>对于DISTRIBUTED BY可以自定义操作符</p>
+</li>
+</ul>
+<h3 id="表存储模型"><a href="#表存储模型" class="headerlink" title="表存储模型"></a>表存储模型</h3><ul>
+<li><p>堆存储：</p>
+<ul>
+<li>默认配置，模型和PostgreSQL相同</li>
+<li>堆表存储在OLTP类型负载下表现最好，适合频繁修改的的小表</li>
+<li>行级存储方式</li>
+</ul>
+</li>
+<li><p>追加优化存储：指定appendoptimized=true</p>
+<ul>
+<li>成批地被载入并且被只读查询访问的事实表；</li>
+<li>不推荐单行的INSERT语句</li>
+<li>更新表时有功能限制（如事务中不支持UPDATE和DELETE等）</li>
+</ul>
+</li>
+<li><p>选择面向行或者面向列的存储：列表(appendoptimized=true, orientation=column)</p>
+<ul>
+<li>支持行，列或两者的组合</li>
+<li>面向列的表存储只能用于追加优化表</li>
+<li>频繁的插入时，行表优于列表</li>
+</ul>
+</li>
+<li><p>压缩表： 指定(appendoptimized=true, compresstype=zlib, compresslevel=5);</p>
+<ul>
+<li>只适用于追加优化表</li>
+<li>可以进行整个表的压缩、或者指定列的压缩</li>
+</ul>
+</li>
+</ul>
+<p>参考介绍：<a href="https://greenplum.cn/gp6/ddl/ddl-storage.html" target="_blank" rel="noopener">选择表存储模型</a></p>
+<h2 id="其他对象"><a href="#其他对象" class="headerlink" title="其他对象"></a>其他对象</h2><ul>
+<li>序列：Greenplum数据库序列对象是一个特殊的单行表，用作数字生成器。 <a href="https://greenplum.cn/gp6/ddl/ddl-sequence.html" target="_blank" rel="noopener">参考</a></li>
+<li>索引：<a href="https://greenplum.cn/gp6/ddl/ddl-index.html" target="_blank" rel="noopener">参考</a></li>
+<li>视图:<a href="https://greenplum.cn/gp6/ddl/ddl-view.html" target="_blank" rel="noopener">参考</a></li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://greenplum.cn/" target="_blank" rel="noopener">GreenPlum中文社区</a></p>
+<p><a href="http://mysql.taobao.org/monthly/2017/10/01/" target="_blank" rel="noopener">PGSQL MVCC机制</a></p>
+<p><a href="https://greenplum.cn/gp6/intro/about_statistics.html" target="_blank" rel="noopener">Greenplum 表统计信息</a></p>
+<p><a href="https://greenplum.cn/gp6/access_db/topics/pgbouncer.html" target="_blank" rel="noopener">PgBouncer客户端配置</a></p>
+<p><a href="https://gp-docs-cn.github.io/docs/ref_guide/ref_guide.html" target="_blank" rel="noopener">Greenplum数据库参考指南</a></p>
+<p><a href="https://gpdb.docs.pivotal.io/6-0/ref_guide/system_catalogs/gp_segment_configuration.html" target="_blank" rel="noopener">Greenplum系统表表结构</a></p>
+<p><a href="https://greenplum.cn/gp6/managing/backup-gpbackup.html" target="_blank" rel="noopener">gprestore和gpbackup介绍</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.974Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&amp;%E9%83%A8%E7%BD%B2/" target="_blank" rel="external">https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&amp;%E9%83%A8%E7%BD%B2/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GreenPlum/" rel="tag">GreenPlum</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/10/10/Greenplum-%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BA/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/09/29/sysbench/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- Sysbench</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/10/07/Greenplum-%E4%BB%8B%E7%BB%8D&%E9%83%A8%E7%BD%B2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADPElEQVR42u3ayW7jQAwFwPz/T3uuBjKSHkkFsOjSKdDmrtaB4fLzEx+vt+P3mffz71eP3jP/3aOrNx/Y2NjYD2G/To/kngR/fk8OyDfi4s3Y2NjY69jnwSZfUC+AnWPON6j5u9jY2NhfzC4EidP7e+BkbdjY2NjYyevyq9UwlqcoyZZhY2Njfw87CTM5uPpsUlTK13ZzLQ0bGxv749l5V/Tz//6T/jY2Njb2B7NfxeM8UOUlpMn8zA0KbGxs7EXsahO3t6C7Ggy9BObwTmxsbOzV7HyJedsgD4GT0n8hXcHGxsZewU541Ubs+Zn8qXkYO9w4bGxs7HXsvDyUb1B1K/NQVxjKOXoWGxsbexE7v1zdlOrIZq+Je0Pag42Njb2C3SshzdOGJIHJt7g8yoONjY29iN0LS730oxoaqyusBlRsbGzsp7OrZf1q2JsXoSZhDxsbG/sb2L2iUp4wJKWoPKTlTYVCIxkbGxt7Bbu3T5PS/Kt19IpHF1kXNjY29sPZSajIB2ImbeC8FJWP/lxMKmFjY2OvYN/blO0lBnlBqtdUKMRtbGxs7Iezz/+hT0JaNVDl6VC1CZGUybCxsbF3sKv/+ldbsNXkodDNiD9YoROCjY2N/Vh2oZMwCGa9rclHcwpbjI2Njb2anRd6JsWj3hDPPBXBxsbG3sfuBZveGGWvhdBrD0dlMmxsbOxF7LuGLKNBmZvaDJPGAzY2NvYm9rwcnwSJPM3IS1fVMPafDAwbGxt7BTun/rSOSTEo35pqQQobGxt7K/uuQJWHvWrgzOtC0cZhY2NjL2LnrYJJEJpvca+oFH02bGxs7Iezqz9Zba/mZ/Kxm963vRjZwcbGxl7BrjZ0/+INd4XJqD2AjY2NvYjdG53Jk4F5Wb86WHmxNmxsbOwV7N6wS77EaiOhFxTzgFfYUWxsbOyHsCfDN1XwZHF5CSn5PNjY2Nj72NWgVR3NmQCqbebCF8bGxsZex54Ehl7ZaDKykyczh09hY2NjfzG7SpokPHnqUi05YWNjY38zu5ds9FoOvaAY3Y+NjY29jl0NG71yz2ShvRbCRSqCjY2NvYKdJwmTklDyVJ5yJBva23RsbGzsR7H/AayEF3LadZEnAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

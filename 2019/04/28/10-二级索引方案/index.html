@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>HBase 的二级索引方案 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Solr,HBase">
+    <meta name="description" content="说明在CDH环境中，如何使用CDH公司提供hbase-indexers对HBase进行二级索引。">
+<meta name="keywords" content="Solr,HBase">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase 的二级索引方案">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;04&#x2F;28&#x2F;10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="说明在CDH环境中，如何使用CDH公司提供hbase-indexers对HBase进行二级索引。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.973Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">HBase 的二级索引方案</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">HBase 的二级索引方案</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-04-28T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-04-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#HBase-Indexers"><span class="post-toc-number">1.</span> <span class="post-toc-text">HBase Indexers</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#使用说明"><span class="post-toc-number">2.</span> <span class="post-toc-text">使用说明</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#创建HBase表"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">创建HBase表</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#创建Solr上的Collection"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">创建Solr上的Collection</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#创建Indexer"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">创建Indexer</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#存在的问题"><span class="post-toc-number">3.</span> <span class="post-toc-text">存在的问题</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-10-二级索引方案"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">HBase 的二级索引方案</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-04-29 00:00:00" datetime="2019-04-28T16:00:00.000Z"  itemprop="datePublished">2019-04-29</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>说明在CDH环境中，如何使用CDH公司提供hbase-indexers对HBase进行二级索引。</p>
+<a id="more"></a>
+
+<h1 id="HBase-Indexers"><a href="#HBase-Indexers" class="headerlink" title="HBase Indexers"></a>HBase Indexers</h1><p>HBase的二级索引方案特别多，其中使用Solr建立二级索引是用的比较多的。</p>
+<p>CDH集成了Key-Value Store Indexer服务，该服务能够为HBase动态更新Solr上的索引！这个服务在Github上的项目名叫hbase-indexer。</p>
+<p>HBase Indexers在CDH中主要用来和 Cloudera Search 配套使用，但是我经过尝试后发现，脱离Search这个东西实际上可以独立使用。</p>
+<p>HBase Indexer使用HBase的备份接口拦截对表的读写请求，并异步通知Solr更新索引。由于整个过程交互是异步的，因此使用这个方案不会对HBase产生性能影响，但是Solr上建立索引的时效性可能会延后。Cloudera官方给出的时延级别是秒级！</p>
+<p>Key-Value Store Indexer服务依赖Zookeeper实现高可用、以及配置同步，Zookeeper上的Znode节点是hbaseindexer</p>
+<h1 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h1><p>我们需要安装：Solr、HBase、Key-Value Store Indexer三个服务。</p>
+<h2 id="创建HBase表"><a href="#创建HBase表" class="headerlink" title="创建HBase表"></a>创建HBase表</h2><p>假设我们的HBase表结构是下面这样的：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> HBase 中dict_app表</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="meta">#</span><span class="bash">		天涯论坛 |      16       |   0   |  博客·论坛   |天涯论坛</span></span><br><span class="line"><span class="meta">#</span><span class="bash">		rowkey   | app_class_id |is_loan|  app_class   |app_abbr</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 表中所有字段属于info列族，类型都是字符串</span></span><br></pre></td></tr></table></figure>
+<p>我们在创建dict_app表时需要打开表的备份功能：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create 'dict_app', &#123;NAME=&gt; 'info', REPLICATION_SCOPE=&gt; 1&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="创建Solr上的Collection"><a href="#创建Solr上的Collection" class="headerlink" title="创建Solr上的Collection"></a>创建Solr上的Collection</h2><p>使用solrctl命令我们创建集合dict_app，这个Collection用来保存dict_app表的索引。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建本地配置文件</span></span><br><span class="line">solrctl instancedir --generate dict_app_config</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改schema文件</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上传配置文件到Zookeeper</span></span><br><span class="line">solrctl instancedir --create dict_app_config dict_app_config</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建Collection</span></span><br><span class="line">solrctl collection --create dict_app -s 2 -c dict_app_config</span><br></pre></td></tr></table></figure>
+<p>我们在创建dict_app前，需要修改 dict_app_config/conf/managed-schema 文件，预先定义相关的字段。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    我们将dict_app表除row key以外的列都定义成索引，row key是集合的ID</span></span><br><span class="line"><span class="comment">--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"app_class_id"</span> <span class="attr">type</span>=<span class="string">"text_general"</span> <span class="attr">indexed</span>=<span class="string">"true"</span> <span class="attr">stored</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"is_loan"</span> <span class="attr">type</span>=<span class="string">"text_general"</span> <span class="attr">indexed</span>=<span class="string">"true"</span> <span class="attr">stored</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"app_class"</span> <span class="attr">type</span>=<span class="string">"text_general"</span> <span class="attr">indexed</span>=<span class="string">"true"</span> <span class="attr">stored</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">field</span> <span class="attr">name</span>=<span class="string">"app_abbr"</span> <span class="attr">type</span>=<span class="string">"text_general"</span> <span class="attr">indexed</span>=<span class="string">"true"</span> <span class="attr">stored</span>=<span class="string">"true"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="创建Indexer"><a href="#创建Indexer" class="headerlink" title="创建Indexer"></a>创建Indexer</h2><p>我们可以使用hbase-indexer命令创建索引，但是创建之前我们需要编辑两个文件！</p>
+<p>indexer.xml 这个文件告诉hbase-indexer我们为哪张表创建索引，以及morphlines.conf文件的位置！</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">indexer</span> <span class="attr">table</span>=<span class="string">"dict_app"</span> <span class="attr">mapper</span>=<span class="string">"com.ngdata.hbaseindexer.morphline.MorphlineResultToSolrMapper"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"morphlineFile"</span> <span class="attr">value</span>=<span class="string">"/etc/hbase-solr/conf/morphlines.conf"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">indexer</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>morphlines.conf 这个文件将Collection的字段信息和HBase列对应起来，每个Indexer都要能在同样的节点访问到这个文件：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">morphlines : [</span><br><span class="line">  &#123;</span><br><span class="line">    id : morphline1</span><br><span class="line">    importCommands : ["org.kitesdk.morphline.**", "com.ngdata.**"]</span><br><span class="line"></span><br><span class="line">    commands : [</span><br><span class="line">      &#123;</span><br><span class="line">        extractHBaseCells &#123;</span><br><span class="line">          mappings : [</span><br><span class="line">            &#123;</span><br><span class="line">              inputColumn : "info:app_class_id"</span><br><span class="line">              outputField : "app_class_id"</span><br><span class="line">              type : string</span><br><span class="line">              source : value</span><br><span class="line">            &#125;,</span><br><span class="line">			&#123;</span><br><span class="line">              inputColumn : "info:is_loan"</span><br><span class="line">              outputField : "is_loan"</span><br><span class="line">              type : string</span><br><span class="line">              source : value</span><br><span class="line">            &#125;,</span><br><span class="line">			&#123;</span><br><span class="line">              inputColumn : "info:app_class"</span><br><span class="line">              outputField : "app_class"</span><br><span class="line">              type : string</span><br><span class="line">              source : value</span><br><span class="line">            &#125;,</span><br><span class="line">			&#123;</span><br><span class="line">              inputColumn : "info:app_abbr"</span><br><span class="line">              outputField : "app_abbr"</span><br><span class="line">              type : string</span><br><span class="line">              source : value</span><br><span class="line">            &#125;</span><br><span class="line">          ]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      &#123; logTrace &#123; format : "output record: &#123;&#125;", args : ["@&#123;&#125;"] &#125; &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>分发命令后使用以下命令创建Indexer：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 创建Indexer</span></span><br><span class="line">hbase-indexer add-indexer \</span><br><span class="line">--name dict_app \</span><br><span class="line">--indexer-conf indexer.xml \</span><br><span class="line">--connection-param solr.zk=bdnode1:2181,bdnode2:2181,bdnode3:2181/solr \</span><br><span class="line">--connection-param solr.collection=dict_app \</span><br><span class="line">--zookeeper bdnode1:2181,bdnode2:2181,bdnode3:2181</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 改动配置文件后更新Indexer</span></span><br><span class="line">hbase-indexer update-indexer -n myIndexer  -c indexer.xml </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 列出所有Indexer</span></span><br><span class="line">hbase-indexer list-indexers</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看indexer状态</span></span><br><span class="line">hbase-indexer   replication-status</span><br></pre></td></tr></table></figure>
+
+<h1 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h1><ul>
+<li>直接truncate表示，索引似乎不会自动更新。</li>
+<li>indexer服务退出可能造成部分行写入时没有进行索引，并且当服务恢复以后，需要手工运行MR任务来重建索引！</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 先从HBase捞出数据到HDFS上，然后将HDFS中的数据发到solr</span></span><br><span class="line">export HADOOP_USER_NAME=solr; \</span><br><span class="line">HADOOP_CLIENT_OPTS='-DmaxConnectionsPerHost=10000 -DmaxConnections=10000'; \</span><br><span class="line">hadoop --config /etc/hadoop/conf \</span><br><span class="line">jar /opt/cloudera/parcels/CDH/lib/hbase-solr/tools/hbase-indexer-mr-*-job.jar \</span><br><span class="line">--conf /etc/hbase/conf/hbase-site.xml \</span><br><span class="line">-D 'mapred.child.java.opts=-Xmx500m' \</span><br><span class="line">--hbase-indexer-file indexer.xml \</span><br><span class="line">--zk-host bdnode1:2181,bdnode2:2181,bdnode3:2181/solr \</span><br><span class="line">--collection staSyslog \</span><br><span class="line">--go-live \</span><br><span class="line">--output-dir hdfs://nameservice1/hbase_test/offline_indexer/staSyslog \ # 这个目录要属于solr用户，并且solr可以访问</span><br><span class="line">--overwrite-output-dir \</span><br><span class="line"> --clear-index \</span><br><span class="line">--log4j /etc/hbase-solr/conf/log4j.properties</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 直接将Hbase中的数据发到Solr</span></span><br><span class="line">HADOOP_CLIENT_OPTS='-DmaxConnectionsPerHost=10000 -DmaxConnections=10000'; \</span><br><span class="line">hadoop --config /etc/hadoop/conf \</span><br><span class="line">jar /opt/cloudera/parcels/CDH/lib/hbase-solr/tools/hbase-indexer-mr-*-job.jar \</span><br><span class="line">--conf /etc/hbase/conf/hbase-site.xml \</span><br><span class="line">-D 'mapred.child.java.opts=-Xmx500m' \</span><br><span class="line">--hbase-indexer-file indexer.xml \</span><br><span class="line">--zk-host bdnode1:2181,bdnode2:2181,bdnode3:2181/solr \</span><br><span class="line">--collection staSyslog \</span><br><span class="line">--reducers 0 \</span><br><span class="line"> --clear-index \</span><br><span class="line">--log4j /etc/hbase-solr/conf/log4j.properties</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://github.com/cloudera/hbase-indexer" target="_blank" rel="noopener">hbase-indexer</a><br><a href="http://ngdata.github.io/hbase-indexer/" target="_blank" rel="noopener">官网</a><br><a href="https://www.cloudera.com/documentation/enterprise/6/6.1/topics/search_config_hbase_indexer_for_search.html" target="_blank" rel="noopener">Lily HBase Near Real Time Indexing for Cloudera Search</a><br><a href="https://www.cloudera.com/documentation/enterprise/6/6.1/topics/search_hbase_batch_indexer.html#xd_583c10bfdbd326ba--43d5fd93-1410993f8c2--7ed9" target="_blank" rel="noopener">Lily HBase Batch Indexing for Cloudera Search</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.973Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/" target="_blank" rel="external">https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HBase/" rel="tag">HBase</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Solr/" rel="tag">Solr</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/&title=《HBase 的二级索引方案》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/&title=《HBase 的二级索引方案》 — LQing的博客&source=说明在CDH环境中，如何使用CDH公司提供hbase-indexers对HBase进行二级索引。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《HBase 的二级索引方案》 — LQing的博客&url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/06/02/TiDB-%E5%AE%89%E8%A3%85&%E4%BB%8B%E7%BB%8D/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- TiDB</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/04/15/2-%E6%8E%88%E6%9D%83/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Solr 授权配置</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/&title=《HBase 的二级索引方案》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/&title=《HBase 的二级索引方案》 — LQing的博客&source=说明在CDH环境中，如何使用CDH公司提供hbase-indexers对HBase进行二级索引。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《HBase 的二级索引方案》 — LQing的博客&url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/28/10-%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95%E6%96%B9%E6%A1%88/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADGElEQVR42u3aQXIiMQwF0Nz/0sw2i+nmSzJVafF6RUFi+4mFkOSfn/h5/XquPr1/fbXa1ZPve/XpgQcbGxv7IezJ9sk7VytcrZ/sXl3nP6fCxsbGXsfO09I8tdyvloejmjKxsbGxse/TyanklAcdGxsbG3uSwCYtnvugTNIkNjY29jezkzRTbR71mkHzNQ/30rCxsbH/PDufiv791x+Zb2NjY2P/Yfar+EwGt0kLaX5xJ1JgY2NjL2L3Gka9AfCng1tueGFjY2OvYE/aMflQYbJOXnIkbS9sbGzsrezqj/7qtZ5eouoNnssVGDY2NvYidu/pdeOrpGpT6c2n2NjY2IvY+QXKU0HJC5VqiCeBw8bGxn4uO/npnw8G7ptBOaO3co7HxsbG3sfuFRWT1tLZhlF+SQgbGxt7H7v6I76aKqrjgbwcyofB2NjY2LvZk3Z/729OtZ+qgcPGxsbeyq6OBHobzNtSzVnH/ZeEjY2NvYKdLD0ZAOfD3WopkofgshTBxsbGXsc+NUYdtewPjQfepDdsbGzsL2BXk1Bv9FutDqonvFwNGxsbex17Un6cukwzGSEUwNjY2Nhfyc6vY84bT4d5vTun2NjY2I9lT5pKvWZTL/klQYxum2JjY2MvZfeOXuUlSaj3+j7pXiYwbGxs7BXsavHQawMlBU+z6V+9fImNjY29iJ0s0bwcE+/SGxv0xhjY2NjYm9i97fMEljeqqkVO/kRpFRsbG/vh7ElCqm5cHf1W014hcNjY2Njr2HkRkufDpA2UNJXyoqLwlWBjY2OvY+f46js96mT8EAUFGxsbex371KB3nikmKbMQJmxsbOyl7B6g2tDvjWyrJceb/8LGxsZewX4Vn15hMAlZ7zxvAoSNjY29iD0f1p5KTtWCpzoSboYAGxsb+yHs6gWa6mbVxn3SVJoEGhsbG3srOz9KtceeFxJ5jj3cS8PGxsb+MvakkVQ9bl54lIsTbGxsbOzqT//i4SZpNfqqsLGxsdexPzHcTQa91bBWk+XlCtjY2NiL2L22/iT95EesXuipNrywsbGxH87+B+AD2YWvilW4AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

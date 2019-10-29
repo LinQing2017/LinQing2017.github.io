@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Kafka 安全认证 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="安全,Kafka">
+    <meta name="description" content="简要说明Zookeeper对接Kerberos的过程，以及在Zookeeper中使用ACL功能的方案。">
+<meta name="keywords" content="安全,Kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka 安全认证">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;03&#x2F;11&#x2F;kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="简要说明Zookeeper对接Kerberos的过程，以及在Zookeeper中使用ACL功能的方案。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.975Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Kafka 安全认证</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Kafka 安全认证</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-11T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-03-11
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#认证"><span class="post-toc-number">1.</span> <span class="post-toc-text">认证</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对接Kerberos"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">对接Kerberos</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#服务端配置"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">服务端配置</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#客户端配置"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">客户端配置</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他关于认证的配置"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">其他关于认证的配置</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#启用多种认证配置"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">启用多种认证配置</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#授权"><span class="post-toc-number">2.</span> <span class="post-toc-text">授权</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#授权配置"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">授权配置</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ACLs命令"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">ACLs命令</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#CDH中启用Kerberos认证"><span class="post-toc-number">3.</span> <span class="post-toc-text">CDH中启用Kerberos认证</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-kafka安全相关"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Kafka 安全认证</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-12 00:00:00" datetime="2019-03-11T16:00:00.000Z"  itemprop="datePublished">2019-03-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>简要说明Zookeeper对接Kerberos的过程，以及在Zookeeper中使用ACL功能的方案。</p>
+<a id="more"></a>
+
+<h1 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h1><p>在 Kafka 0.9.0 以后的版本，添加了安全相关的功能，包括以下：</p>
+<ul>
+<li>支持SSL和SASL两种认证方式，其中SASL框架支持 GSSAPI 、PLAIN 、SCRAM-SHA-256 、OAUTHBEARER 等多种认证引擎。认证发生在：client-broker，broker之间，broker-zookeeper。</li>
+<li>支持使用SSL进行数据传输加密。</li>
+<li>支持client对topic的读写授权。</li>
+<li>支持授权服务可插拔，并且支持与外部授权服务（比如sentry）的集成。</li>
+</ul>
+<h2 id="对接Kerberos"><a href="#对接Kerberos" class="headerlink" title="对接Kerberos"></a>对接Kerberos</h2><h3 id="服务端配置"><a href="#服务端配置" class="headerlink" title="服务端配置"></a>服务端配置</h3><p>Cloudera导入Kerberos以后，CM自动为Kafka创建了principal账号，并且生成了jaas.conf。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">KafkaServer &#123;</span><br><span class="line">   com.sun.security.auth.module.Krb5LoginModule required</span><br><span class="line">   doNotPrompt=true</span><br><span class="line">   useKeyTab=true</span><br><span class="line">   storeKey=true</span><br><span class="line">   keyTab=&quot;&#123; process-config &#125;/kafka.keytab&quot;</span><br><span class="line">   principal=&quot;kafka/&#123; broker-host &#125;@IDATA.RUIJIE.COM&quot;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Client &#123;</span><br><span class="line">   com.sun.security.auth.module.Krb5LoginModule required</span><br><span class="line">   useKeyTab=true</span><br><span class="line">   storeKey=true</span><br><span class="line">   keyTab=&quot;&#123; process-config &#125;/kafka.keytab&quot;</span><br><span class="line">   principal=&quot;kafka/&#123; broker-host &#125;@IDATA.RUIJIE.COM&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上述配置中，包括Client和KafkaServer两个context：</p>
+<ul>
+<li>KafkaServer：主要用于broker之间，以及client和broker之间的认证；</li>
+<li>Client：主要用于broker和zookeeper之间的认证；</li>
+</ul>
+<p>安装Kafka的官方文档，Kafka在进行SASL时使用context名称为KafkaServer，在这个配置下可以定义多个不同的listenerName、同一个listenerName下可以定义多个不同的认证机制（PS:这个部分的内容<a href="http://kafka.apache.org/documentation/#security_jaas_broker" target="_blank" rel="noopener">官网</a>描述的不是太清晰，没怎么看懂！）。</p>
+<p>官方文档中，kafka.properties涉及到的配置项包括：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">listeners=SASL_PLAINTEXT://host.name:port           # broker使用的listeners名称</span><br><span class="line">security.inter.broker.protocol=SASL_PLAINTEXT       # broker之间使用的认证协议</span><br><span class="line">sasl.kerberos.service.name=kafka            # broker使用的kerberos Principal名称</span><br><span class="line"></span><br><span class="line">sasl.mechanism.inter.broker.protocol=GSSAPI # 默认配置就是GSSAPI</span><br><span class="line">sasl.enabled.mechanisms=GSSAPI              # 默认配置就是GSSAPI</span><br></pre></td></tr></table></figure>
+<p>涉及到的JVM环境变量包括：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">-Djava.security.krb5.conf=/etc/kafka/krb5.conf</span><br><span class="line">-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="客户端配置"><a href="#客户端配置" class="headerlink" title="客户端配置"></a>客户端配置</h3><p>客户端可以使用两种方式配置jaas的参数：</p>
+<ul>
+<li>通过配置文件jaas.conf指定认证信息，最后通过KAFKA_OPTS=”${KAFKA_OPTS} -Djava.security.auth.login.config=jaas.conf” 指定jaas.conf参数。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">KafkaClient &#123;</span><br><span class="line">    com.sun.security.auth.module.Krb5LoginModule required</span><br><span class="line">    useKeyTab=true</span><br><span class="line">    storeKey=true</span><br><span class="line">    keyTab=&quot;/etc/security/keytabs/kafka_client.keytab&quot;</span><br><span class="line">    principal=&quot;kafka-client-1@EXAMPLE.COM&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过sasl.jaas.config在producer/consumer的properties配置文件指定，该方式优先级高于使用jaas.conf指定，通过这种方式可以在同一个JVM中指定多个sasl配置；</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sasl.jaas.config=com.sun.security.auth.module.Krb5LoginModule required \</span><br><span class="line">    useKeyTab=true \</span><br><span class="line">    storeKey=true  \</span><br><span class="line">    keyTab=&quot;/etc/security/keytabs/kafka_client.keytab&quot; \</span><br><span class="line">    principal=&quot;kafka-client-1@EXAMPLE.COM&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>其他client配置包括：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">security.protocol=SASL_PLAINTEXT</span><br><span class="line">sasl.mechanism=GSSAPI</span><br><span class="line">sasl.kerberos.service.name=kafka</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他关于认证的配置"><a href="#其他关于认证的配置" class="headerlink" title="其他关于认证的配置"></a>其他关于认证的配置</h2><h3 id="启用多种认证配置"><a href="#启用多种认证配置" class="headerlink" title="启用多种认证配置"></a>启用多种认证配置</h3><p>Kafka支持同时启用多种认证配置，下面的示例中jaas.conf同时指定了Kerberos和秘钥方式的认证：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">KafkaServer &#123;</span><br><span class="line">    com.sun.security.auth.module.Krb5LoginModule required</span><br><span class="line">    useKeyTab=true</span><br><span class="line">    storeKey=true</span><br><span class="line">    keyTab=&quot;/etc/security/keytabs/kafka_server.keytab&quot;</span><br><span class="line">    principal=&quot;kafka/kafka1.hostname.com@EXAMPLE.COM&quot;;</span><br><span class="line"></span><br><span class="line">    org.apache.kafka.common.security.plain.PlainLoginModule required</span><br><span class="line">    username=&quot;admin&quot;</span><br><span class="line">    password=&quot;admin-secret&quot;</span><br><span class="line">    user_admin=&quot;admin-secret&quot;</span><br><span class="line">    user_alice=&quot;alice-secret&quot;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>用户同时在kafka.properties中指定：</p>
+<ul>
+<li>sasl.enabled.mechanisms=GSSAPI,PLAIN           # 启动kerberos和密码两种认证方式</li>
+<li>security.inter.broker.protocol=SASL_PLAINTEXT </li>
+<li>sasl.mechanism.inter.broker.protocol=GSSAPI    # broker内部指定使用Kerberos认证</li>
+</ul>
+<p>PS:Kafka甚至支持client连接同一个集群的不同Broker时，不同Broker采用不同的认证方式！</p>
+<h1 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h1><h2 id="授权配置"><a href="#授权配置" class="headerlink" title="授权配置"></a>授权配置</h2><p>Kafka 授权模块是通过插件方式实现，支持为以下ACL方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Principal P is [Allowed/Denied] Operation O From Host H on any Resource R matching ResourcePattern RP。</span><br><span class="line"></span><br><span class="line">Principal：表示用户</span><br><span class="line">Operation：表示用户操作，包括：Read, Write, Create, Delete, Alter, Describe, ClusterAction, All</span><br><span class="line">Host： 表示发起操作的主机</span><br><span class="line">ResourcePattern： 表示一组正则匹配的资源</span><br></pre></td></tr></table></figure>
+
+<p>ACL涉及到的kafka.properties配置包括：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer # 指定认证插件</span><br><span class="line">allow.everyone.if.no.acl.found=false        # 指定到任意未关联ACL的topic，是否允许任意人访问</span><br><span class="line">super.users=User:idata;User:kafka           # 指定超级用户</span><br><span class="line">sasl.kerberos.principal.to.local.rules      # 指定Kerberos的principal匹配规则，使用默认配置即可</span><br></pre></td></tr></table></figure>
+
+<h2 id="ACLs命令"><a href="#ACLs命令" class="headerlink" title="ACLs命令"></a>ACLs命令</h2><p>通过Kafka自带的kafka-acls.sh，可以进行权限配置。</p>
+<h1 id="CDH中启用Kerberos认证"><a href="#CDH中启用Kerberos认证" class="headerlink" title="CDH中启用Kerberos认证"></a>CDH中启用Kerberos认证</h1><p>CDH中开启Kerberos时，CM中已经自动生成了JAAS配。kafka在Zookeeper上的元数据依然是全局访问，用户需要进行手工迁移。</p>
+<p>Kafka需要进行以下设置，在CDH上开启Kerberos和ACL认证：</p>
+<ol start="0">
+<li><p>CM上导入Kerberos完成；</p>
+</li>
+<li><p>kafka.properties安全阀追加以下配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">zookeeper.set.acl=true</span><br><span class="line">authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer   #启用sentry时，该配置走的是org.apache.sentry.kafka.authorizer.SentryKafkaAuthorizer</span><br><span class="line">super.users=User:idata;User:kafka               # 该配置在CM中有独立配置，但是在启用Sentry时才生效的。需要直接通过安全阀配置。</span><br></pre></td></tr></table></figure></li>
+<li><p>创建client.properties 配置文件，该配置文件主要是给测试工具使用的。代码中应该直接将配置项嵌入代码中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">security.protocol=SASL_PLAINTEXT</span><br><span class="line">sasl.mechanism=GSSAPI</span><br><span class="line">sasl.kerberos.service.name=kafka</span><br><span class="line">sasl.jaas.config=com.sun.security.auth.module.Krb5LoginModule required useTicketCache=true;  #表示使用手工kinit的方式获取权限，实际在代码中应该通过keytab的方式</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用kafka账号将元数据迁移为安全模式，迁移后只有通过kafka账号能够创建、删除topic。其他账号均不允许！</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kinit -kt /opt/idata_security/ktable/kafka.keytab kafka@IDATA.RUIJIE.COM</span><br><span class="line">export KAFKA_OPTS=&quot;$&#123;KAFKA_OPTS&#125; -Djava.security.auth.login.config=/opt/idata_security/kafka_jaas.conf&quot;</span><br><span class="line">/opt/cloudera/parcels/CDH/lib/kafka/bin/zookeeper-security-migration.sh --zookeeper.acl=secure --zookeeper.connect=bdnode1:2181</span><br><span class="line">zookeeper-client -server bdnode1:2181,bdnode2:2181,bdnode3:2181 setAcl / world:anyone:cdrwa</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://kafka.apache.org/documentation/#security" target="_blank" rel="noopener"> Kafka Security </a><br><a href="http://kafka.apache.org/documentation/#security_authz_cli" target="_blank" rel="noopener"> Command Line Interface </a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.975Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" target="_blank" rel="external">https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Kafka 安全认证》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Kafka 安全认证》 — LQing的博客&source=简要说明Zookeeper对接Kerberos的过程，以及在Zookeeper中使用ACL功能的方案。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kafka 安全认证》 — LQing的博客&url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/03/31/Offset%E4%BF%A1%E6%81%AF%E4%BF%9D%E5%AD%98/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Kafka 如何保存 Offset</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/03/10/1-impala%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Impala 安装部署</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Kafka 安全认证》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Kafka 安全认证》 — LQing的博客&source=简要说明Zookeeper对接Kerberos的过程，以及在Zookeeper中使用ACL功能的方案。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kafka 安全认证》 — LQing的博客&url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/11/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtElEQVR42u3aQZLbMAwEQP//08kDEkszgLhRqlonl0teqnUgsQN8PvH164/r+p7rb7799vr7b/c8cOHh4eGtH/36sZ69Z/ZqkmfGw8PDO81rN+V8seRQSY6f4QGDh4eH90pestEnB8D1/Xh4eHj/Iy9/3ORXbWGNh4eH9zZeEka0R0gbcLSfH85a8PDw8CZpwE0X6T2fj/T38PDw8NZd9baczcvi/JBYPS0eHh7eAd5s+aTInkW9m5f4dV08PDy8A7x2C2637/YFJeFvHiXj4eHh/Qxv36ZKguDZeFYeLuPh4eGd4yVjT/mG2w5OzUKQokWHh4eHd5iX/6ufF8RtkJF/j4eHh/dvecmYVH4Y7IcP2tDhpgGGh4eH9ygvgbVBQ9v0yhtjw1eMh4eH9ygvJ81K3nwrn7W+bop1PDw8vAO8WTOsjVnbsYD2oPpsLjw8PLyYly8zg+Wb/r7p9Zdf4eHh4R3gJVFpOyKQl8KzYj15BVHigoeHh7fgzQKCTTmer5W3xFajA3h4eHgxbzM4ldyfFOiz7T45cvDw8PBO81rqcMkyul0FFnh4eHgHeLO4IV84D3b35ftqXAAPDw8v5rUxQd62b//CfqPHw8PD+0le3nbKC9+81M4/5400PDw8vHO8WWSQR71tmJtHuvVxhYeHh/cob1ba7rfyOniNqfWEFx4eHt6C99TGPWtrzUr2m2ACDw8P7xhv1mraNK7aIyT5azdZNR4eHt6at2/nJ2X3s8NVxa/w8PDwDvDaTTwPHWYtrk38sRnYwsPDw2t5yWGwWSxvrbWDXNGrx8PDwzvGa8vl2WM9MD7VPiceHh7eC3h5EXzuKtbCw8PDewEvGRfIS+38aGlLdjw8PLzTvE3zKWmAtS9rP7yFh4eHd443G5BKWmL5dj8rlx8YGsDDw8PreL8BTTL+K+Iw6eEAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

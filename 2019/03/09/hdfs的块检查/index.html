@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>HDFS 的块检查 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="安全,HDFS">
+    <meta name="description" content="简单说明HDFS DataNode 在运行过程中执行的：block scanner, volume scanner, directory scanner, disk checker">
+<meta name="keywords" content="安全,HDFS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HDFS 的块检查">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;03&#x2F;09&#x2F;hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="简单说明HDFS DataNode 在运行过程中执行的：block scanner, volume scanner, directory scanner, disk checker">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;DirectoryScanner_GC.png?raw=true">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;DirectoryScanner_mem.png?raw=true">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.974Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;DirectoryScanner_GC.png?raw=true">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">HDFS 的块检查</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">HDFS 的块检查</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-09T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-03-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#DataNode"><span class="post-toc-number">1.</span> <span class="post-toc-text">DataNode</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Block-Scanner-amp-amp-Volume-Scanner"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Block Scanner &amp;&amp; Volume Scanner</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Directory-Scanners"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Directory Scanners</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Disk-Checker"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Disk Checker</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#心跳和Report"><span class="post-toc-number">2.</span> <span class="post-toc-text">心跳和Report</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#心跳"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">心跳</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Block-Report"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Block Report</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Case"><span class="post-toc-number">3.</span> <span class="post-toc-text">Case</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-hdfs的块检查"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">HDFS 的块检查</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-10 00:00:00" datetime="2019-03-09T16:00:00.000Z"  itemprop="datePublished">2019-03-10</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>简单说明HDFS DataNode 在运行过程中执行的：block scanner, volume scanner, directory scanner, disk checker</p>
+<a id="more"></a>
+
+
+<h1 id="DataNode"><a href="#DataNode" class="headerlink" title="DataNode"></a>DataNode</h1><p>DataNode在运行过程中，通过不同的扫描机制处理以下问题：</p>
+<ul>
+<li>何时/如何检查文件的完成性；</li>
+<li>如何保证内存中的metadata信息和实际的一致性；</li>
+<li>处理读取块时候的IO异常；</li>
+</ul>
+<h2 id="Block-Scanner-amp-amp-Volume-Scanner"><a href="#Block-Scanner-amp-amp-Volume-Scanner" class="headerlink" title="Block Scanner &amp;&amp; Volume Scanner"></a>Block Scanner &amp;&amp; Volume Scanner</h2><p>block的checksum信息，这些信息和block文件放在相同的目录，文件名为 { block-id }-xxxx.meta。这些meta文件用来检查块的完整性。对于finalized状态的block，在hdfs上应该包括block文件+meta文件。</p>
+<p>Block Scanner是为了检查block文件是否存在损坏。</p>
+<p>DataNode在进行Block Scanner时，针对每个Volume会启动一个检查线程，这个检查线程称为Volume Scanner。Volume Scanner 负责读取自己磁盘目录下的所有block，并且进行校验码计算，将计算结果和meta文件中的值比较来判断块文件是否完整。</p>
+<p>通常情况下，block scanner要撸一便整个DN下的所有块文件，会发生巨大的IO。DN通过以下机制在节约IO带宽的同时，尽快发现坏块：</p>
+<ul>
+<li><p>DN在惊醒Block Scanner时将块分为：可疑块和常规块。可疑块指client（用户和其他DN）在读取过程中发生本地IO异常的块，这些块被DN放到队列中，在扫描时优先进行检查。</p>
+</li>
+<li><p>任意一个块被标记为可疑块，DN会立即检查这个块，并且跟踪这个块的状态10 min。之后块被移除可疑列表。</p>
+</li>
+<li><p>当可疑块的队列为空时，DN依次检查其他的块。当所有块检查完成以后，Volume Scannr 进入休眠状态，等待下一个Scanner周期。默认情况扫描周期间隔为3周（dfs.datanode.scan.period.hours）。</p>
+</li>
+<li><p>如果一个周期内无法扫描完成所有块，那么不会进入休眠，而是直接进入下一个周期。在休眠过程中一旦有块变成可疑块，那么扫描线程会立刻被唤醒。</p>
+</li>
+<li><p>DN会将扫描的进度保存在scanner.cursor中，重启DN会从该文件恢复上次的扫描</p>
+</li>
+<li><p>dfs.block.scanner.volume.bytes.per.second  可疑限制volume scan的带宽，默认为1m每秒</p>
+</li>
+</ul>
+<h2 id="Directory-Scanners"><a href="#Directory-Scanners" class="headerlink" title="Directory Scanners"></a>Directory Scanners</h2><p>DN会在内存中保存Block的位置信息（指的是block文件所处的目录），以及Block的状态信息。</p>
+<p>DN 通过Directory Scanners保证内存位置信息和实际的一致性。当Directory Scanners发现block文件、meta文件丢失时，会将block标记为corrupted，DN在下一次汇报中，将这个块汇报给NN。Directory Scanners只检查finalized状态的block，并且DN开机后立即运行。</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dfs.datanode.directoryscan.throttle.limit.ms.per.sec</td>
+<td>1000</td>
+<td>扫描线程在一秒内允许运行的的毫秒数，默认为1000ms，即不限制</td>
+</tr>
+<tr>
+<td>dfs.datanode.directoryscan.threads</td>
+<td>1</td>
+<td>扫描的线程数</td>
+</tr>
+<tr>
+<td>dfs.datanode.directoryscan.interval</td>
+<td>21600</td>
+<td>两次扫描的间隔时间，默认为6小时</td>
+</tr>
+</tbody></table>
+<h2 id="Disk-Checker"><a href="#Disk-Checker" class="headerlink" title="Disk Checker"></a>Disk Checker</h2><p>DN 检查HDFS用户是否有Volume目录下，finalized、tmp、rbw这三个目录的读写权限，并且只检查这三个目录，并不会检查子目录。</p>
+<p>Disk Checker是hdfs中非常保守的检查机制，只有在DN进程操作block发现IOException时才会发生，并且执行一次只需要5~6s。</p>
+<p>如果Volume在Disk Checker中失败，那么整个volume会被DN禁用，当volume Checker失败的Volume超过 dfs.datanode.failed.volumes.tolerated，那么DN会关闭。</p>
+<h1 id="心跳和Report"><a href="#心跳和Report" class="headerlink" title="心跳和Report"></a>心跳和Report</h1><p>DN的心跳和Block Report，即向NN汇报block以及自身的各种信息，这些信息基于上述各种扫描的结果。</p>
+<h2 id="心跳"><a href="#心跳" class="headerlink" title="心跳"></a>心跳</h2><p>默认情况下DN 三秒发一次心跳，心跳的信息包括：磁盘容量，使用率等等基础信息。</p>
+<h2 id="Block-Report"><a href="#Block-Report" class="headerlink" title="Block Report"></a>Block Report</h2><p>分为增量Report 和 全量Report。Block Report 发送的内容包括：</p>
+<ul>
+<li>block ID</li>
+<li>generation stamp</li>
+<li>block在DN上的文件大小</li>
+</ul>
+<p>心跳、block report的代码，均是实现在org.apache.hadoop.hdfs.server.datanode.BPServiceActor中。其中，BPServiceActor#offerService的offerService方法是DN的BP主循环，负责调用心跳（sendHeartBeat方法）、全量block Report（blockReport方法）。</p>
+<p>同时，BPServiceActor中还实现了IncrementalBlockReportManager对象，BPServiceActor调用该对象的sendIBRs接口进行增量回报。</p>
+<p>全量汇报会对NN和DN都产生压力，默认情况下当DN的Block超过100w时，DN会将报告分多次发送（该配置为dfs.blockreport.split.threshold）。当NN初次启动时，NN处理全量块汇报的时间长度，会影响HDFS的启动速度。</p>
+<h1 id="Case"><a href="#Case" class="headerlink" title="Case"></a>Case</h1><p>在生产环境的五节点环境中，间歇性发现DN出现Oom的现象。</p>
+<p>调整JVM内存从 1G 到 2G DN进程不再推出，但是观察DN的内存使用情况发现每个6小时，DN的内存使用率有一个明显的尖峰。 由于该集群的小文件非常之多，总共有将近300w个块，平均每个DN节点需要管理180w个块文件。</p>
+<p>由于内存尖峰的周期是6个小时，所以怀疑DN的以下两个操作（默认周期均是6小时）占用内存：</p>
+<ol>
+<li>6个小时一次的全量block report</li>
+<li>6个小时一次的Directory Scanner</li>
+</ol>
+<p>以下两个方式验证：</p>
+<ol>
+<li><p>通过 hdfs dfsadmin -triggerBlockReport ip:50020 手工出发全量block report</p>
+</li>
+<li><p>修改dn节点的Directory Scanners周期</p>
+</li>
+</ol>
+<p>结果发现，通过hdfs dfsadmin -triggerBlockReport触发全量汇报时，DN的内存没有任何波动。而改动Directory Scanners周期的DN，内存尖峰周期变为2个小时。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://github.com/LinQing2017/notes/blob/master/pictures/DirectoryScanner_GC.png?raw=true" alt="oozie-err" title="">
+                </div>
+                <div class="image-caption">oozie-err</div>
+            </figure>
+
+<p>上述测试，可以验证Directory Scanner是造成DN内存上升的原因。</p>
+<p>分析Directory Scanners 源码（org.apache.hadoop.hdfs.server.datanode.DirectoryScanner）发现，DN在进行Scanner时需要为每个Block创建一个ScanInfo对象，该对象的固定大小108byte，并且会创建大量临时File对象。</p>
+<p>参考环境5156488块，平均每个DN节点309w个block（五节点3副本）。因此在执行Directory Scanner时需要额外申请318mb的内存，并且而外创建608w个File对象。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://github.com/LinQing2017/notes/blob/master/pictures/DirectoryScanner_mem.png?raw=true" alt="oozie-err" title="">
+                </div>
+                <div class="image-caption">oozie-err</div>
+            </figure>
+
+
+<p>参考<a href="https://issues.apache.org/jira/browse/HDFS-4461" target="_blank" rel="noopener">HDFS-4461</a>发现，Directory Scanners在Hadoop 2.1时已经被优化过一轮。原先Scanner保存的是File对象而不是字符串。</p>
+<p>该对象包含以下内容：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ScanInfo</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">ScanInfo</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// blockId 8byte</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> blockId;</span><br><span class="line">	<span class="comment">// block文件的相对地址，格式为subdir9/subdir9/blk_1074334048（随着block数目的增加subdir会多级嵌套，所以这里大小不定。固定是16bit*30/8=60byte）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String blockSuffix;</span><br><span class="line">	<span class="comment">// meta文件名的后缀，格式为 blk_1074334048_593224.meta，后缀应当为_593224.meta（固定是17位16bit*12/8=24byte）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String metaSuffix;</span><br><span class="line">	<span class="comment">// 引用对象保存一个指针 8byte</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> FsVolumeSpi volume;</span><br><span class="line">	<span class="comment">// block 文件大小 8byte</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> blockFileLength;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Directory Scanner进行扫描时，需要创建临时File对象，获取block文件的句柄信息。</span></span><br><span class="line">	<span class="function">File <span class="title">getBlockFile</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> (blockSuffix == <span class="keyword">null</span>) ? <span class="keyword">null</span> :</span><br><span class="line">        <span class="keyword">new</span> File(volume.getBasePath(), blockSuffix);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">// Directory Scanner进行扫描时，需要创建临时File对象，获取block meta文件的句柄信息。</span></span><br><span class="line">	<span class="function">File <span class="title">getMetaFile</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (metaSuffix == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (blockSuffix == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> File(volume.getBasePath(), metaSuffix);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> File(volume.getBasePath(), blockSuffix + metaSuffix);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	......</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.cloudera.com/blog/2016/12/hdfs-datanode-scanners-and-disk-checker-explained/" target="_blank" rel="noopener">HDFS DataNode Scanners and Disk Checker Explained</a></p>
+<p><a href="http://www.aosabook.org/en/hdfs.html" target="_blank" rel="noopener"> The Hadoop Distributed File System </a></p>
+<p><a href="http://hadoop-common.472056.n3.nabble.com/HDFS-DirectoryScanner-is-bothering-me-td4165601.html" target="_blank" rel="noopener">Directory Scanner 引发的GC案例</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.974Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/" target="_blank" rel="external">https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HDFS/" rel="tag">HDFS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/&title=《HDFS 的块检查》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/&title=《HDFS 的块检查》 — LQing的博客&source=简单说明HDFS DataNode 在运行过程中执行的：block scanner, volume scanner, directory scanner,..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《HDFS 的块检查》 — LQing的博客&url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/03/10/2-impala-jdbc/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Impala 安装部署</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/03/04/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Hive 安全认证相关</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/&title=《HDFS 的块检查》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/&title=《HDFS 的块检查》 — LQing的博客&source=简单说明HDFS DataNode 在运行过程中执行的：block scanner, volume scanner, directory scanner,..." data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《HDFS 的块检查》 — LQing的博客&url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/09/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsElEQVR42u3aQW4CMRAEQP7/aXKNRFi6xzYBqfYURYtxOZI9ac/tFj/3h+f37x/feTbC9aeejX898oYHDw8Pb3nq118z++zjz8/GefZmsih/jI+Hh4d3jJdv5ckOnGz6yTK188HDw8P7TF6yfbdTnB0MeHh4eN/Ca5GzhctDEDw8PLz/4uWBQl5SzxYiH2dz1oKHh4cX8/JbpM/5+cj9Hh4eHt7yrXobK7SXZLPlK2aLh4eHd4C3q1xuA4WcmkQbL97Ew8PDO8CbTXfzNdVyJRwV33h4eHjLvHxrzgPWlUnPLs+KvxUeHh7eMi85DNYDi9l08/jjBRUPDw/vAK/dcPNLqfXwNxlneIOHh4eHt4k3u9a6fj/PRfIjKvlGPDw8vHO8fJOdxbKzMGI2/m02OTw8PLx4bslWnpTaK5t7gp8tHB4eHt453ouX4kaolYWYFeLD6BYPDw9vgbcSFuRtBO3FWNtcFYUReHh4eMd4s0nPAtbZwg1PPzw8PLxNvL3NAS0phw1btfDw8PAO8Op/7IOWrDaMaMv6ukzHw8PD28q7j542lp0V1iuxLx4eHt5pXrv1JzHBLOzIxymarvDw8PDezksaAtoqPi+1Z8uHh4eHd46X9ybNLsNmZXob7yYBCh4eHt5eXjuJ2eVW2zqwa7Z4eHh453ht0dxu9PW93HrTAB4eHt5hXnGxVEbAswK6Lfrrcw8PDw9vE6+NWWcRw6ytKj8q6pQFDw8PL+btClvbYreNOYZj4uHh4R3g5c9KydtOej0+rh88PDy8ktcOvTeizZcjPxjw8PDw3sPbWy7nUW8yzuxKDA8PD+9zeO2R0DYoJNt9MRoeHh7el/BWep/aRqsojMDDw8M7wGu/vi15d7Ve5UcRHh4e3jle+w9/viizXTq/WrvtevDw8PBS3g/A4UEFxYnC9wAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

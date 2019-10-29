@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>HBase Tools | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="HBase">
+    <meta name="description" content="HBase Tools 介绍 ~ 持续更新！！">
+<meta name="keywords" content="HBase">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HBase Tools">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;04&#x2F;07&#x2F;9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="HBase Tools 介绍 ~ 持续更新！！">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.974Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">HBase Tools</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">HBase Tools</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-04-07T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-04-07
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Canary"><span class="post-toc-number">1.</span> <span class="post-toc-text">Canary</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Read"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">Read</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Write"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Write</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Cloudera"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Cloudera</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#RegionSplitter"><span class="post-toc-number">2.</span> <span class="post-toc-text">RegionSplitter</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Health-Checker"><span class="post-toc-number">3.</span> <span class="post-toc-text">Health Checker</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Driver"><span class="post-toc-number">4.</span> <span class="post-toc-text">Driver</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#hbck-和-HBCK2"><span class="post-toc-number">5.</span> <span class="post-toc-text">hbck 和 HBCK2</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#HFile-Tool"><span class="post-toc-number">6.</span> <span class="post-toc-text">HFile Tool</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#WAL-Tools"><span class="post-toc-number">7.</span> <span class="post-toc-text">WAL Tools</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#CopyTable"><span class="post-toc-number">8.</span> <span class="post-toc-text">CopyTable</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#HashTable-SyncTable"><span class="post-toc-number">9.</span> <span class="post-toc-text">HashTable/SyncTable</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Export"><span class="post-toc-number">10.</span> <span class="post-toc-text">Export</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ImportTsv、CompleteBulkLoad、Import"><span class="post-toc-number">11.</span> <span class="post-toc-text">ImportTsv、CompleteBulkLoad、Import</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">12.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-9-hbase运维工具"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">HBase Tools</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-04-08 00:00:00" datetime="2019-04-07T16:00:00.000Z"  itemprop="datePublished">2019-04-08</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>HBase Tools 介绍 <del>~</del> 持续更新！！</p>
+<a id="more"></a>
+
+<h1 id="Canary"><a href="#Canary" class="headerlink" title="Canary"></a>Canary</h1><h2 id="Read"><a href="#Read" class="headerlink" title="Read"></a>Read</h2><p>Canary 工具可以对HBase集群的表进行”canary-test”。该检查支持一下三种模式：</p>
+<ul>
+<li>region mode： 从每个region的每个column-family上读取一行，如果都OK，那么测试通过。该模式是默认模式！</li>
+<li>regionserver mode： 从每个RegionServers的所有Region中随机选择一行读取，如果OK，那么测试通过。</li>
+<li>zookeeper mode： 读取HBase的Znode节点，如果读取正常，那么测试通过。</li>
+</ul>
+<p>以下是调用示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 所有table以region mode执行一次检查</span></span><br><span class="line">hbase canary </span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查所有dim_开头的表</span></span><br><span class="line">hbase canary -e dim_.*</span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查table表</span></span><br><span class="line">hbase canary dim_ac_info</span><br><span class="line"><span class="meta">#</span><span class="bash"> 以regionserver mode方式执行检查</span></span><br><span class="line">hbase canary -regionserver</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每隔5秒运行一次检查，并且即使检查发生错误，cannary进程也不会退出。超时时间为60s</span></span><br><span class="line">hbase canary -daemon -interval 5 -f false -t 60000</span><br><span class="line"><span class="meta">#</span><span class="bash"> 每隔5秒运行一次检查，检查发生错误，cannary进程退出</span></span><br><span class="line">hbase canary -daemon -interval 5 -treatFailureAsError</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在Kerberos hbase环境中进行检查</span></span><br><span class="line">hbase canary -Dhbase.client.kerberos.principal=hbase -Dhbase.client.keytab.file=/etc/krb5.keytab</span><br></pre></td></tr></table></figure>
+
+<h2 id="Write"><a href="#Write" class="headerlink" title="Write"></a>Write</h2><p>默认情况写入检查时不开启的，通过-writeSniffing配置可以开启写入检查。</p>
+<p>进行写入检查时，canary进程会写入一张指定的表，这张表由Canary进程创建，并且该表的分区分布在所有的region servers上。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 打开写入检查，默认情况下，写入表为hbase:canary</span></span><br><span class="line">hbase canary -writeSniffing</span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行canary写入的表名，以及写入大小（默认为10b）</span></span><br><span class="line">hbase canary -writeSniffing -writeTable ns:canary -Dhbase.canary.write.value.size=100</span><br></pre></td></tr></table></figure>
+
+<h2 id="Cloudera"><a href="#Cloudera" class="headerlink" title="Cloudera"></a>Cloudera</h2><p>cm页面集成了canary的配置项，默认情况下该配置不打开，并且不能调整Canary参数。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Cloudera 运行Canary的命令如下：</span></span><br><span class="line">org.apache.hadoop.hbase.tool.Canary -t 15000 -daemon -interval 6 -regionserver bdnode2</span><br></pre></td></tr></table></figure>
+
+<h1 id="RegionSplitter"><a href="#RegionSplitter" class="headerlink" title="RegionSplitter"></a>RegionSplitter</h1><p>手工Region预分区工具（<a href="http://hbase.apache.org/book.html#manual_region_splitting_decisions" target="_blank" rel="noopener">参考</a>），通过这个工具可以手工创建一张指定分区数目的新表，用户可以指定不同的Key策略，包括：HexStringSplit、DecimalStringSplit、UniformSplit</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase regionsplitter  &#123;table name&#125; HexStringSplit   -c 10 -f cf1:cf2</span><br></pre></td></tr></table></figure>
+
+<p>在hbase shell 中可以使用 split 命令和 merge 命令进行强制region拆分、合并操作。</p>
+<p>关于 Region 拆分合并的知识可以参考这篇<a href="https://www.cnblogs.com/hopeiscoming/p/10168932.html" target="_blank" rel="noopener">blog</a></p>
+<h1 id="Health-Checker"><a href="#Health-Checker" class="headerlink" title="Health Checker"></a>Health Checker</h1><p>HBase在<a href="https://issues.apache.org/jira/browse/HBASE-7351" target="_blank" rel="noopener">HBASE-7351</a>中提供了Health Checker机制，让HBASE服务通过sh调用的方式来确认master、regionserver等服务是否可用。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> health checker脚本涉及到以下几个配置项</span></span><br><span class="line"> hbase.node.health.script.location</span><br><span class="line"> hbase.node.health.script.timeout</span><br><span class="line"> hbase.node.health.script.frequency Default is every 60seconds.</span><br><span class="line"> hbase.node.health.failure.threshold Defaults to 3.</span><br></pre></td></tr></table></figure>
+
+<p>官方提供hbase-examples/src/main/sh/healthcheck/healthcheck.sh脚本作为设计checker脚本的参考。</p>
+<h1 id="Driver"><a href="#Driver" class="headerlink" title="Driver"></a>Driver</h1><p>HBase 提供一些便利的Driver Class，这些Class可以通过bin/hbase命令来运行。</p>
+<p>通过${HBASE_HOME}/bin/hbase org.apache.hadoop.hbase.mapreduce.UtilityName可以运行以下driver类</p>
+<table>
+<thead>
+<tr>
+<th>UtilityName</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LoadIncrementalHFiles</td>
+<td>将本地HFILE文件导入到HBase</td>
+<td></td>
+</tr>
+<tr>
+<td>CopyTable</td>
+<td>将一张表从一个HBase导出到另一个HBase</td>
+<td></td>
+</tr>
+<tr>
+<td>Export</td>
+<td>将表导出到HDFS中</td>
+<td></td>
+</tr>
+<tr>
+<td>Import</td>
+<td>将表导入到HBase中</td>
+<td></td>
+</tr>
+<tr>
+<td>ImportTsv</td>
+<td>将CSV导入到HBase中</td>
+<td></td>
+</tr>
+<tr>
+<td>RowCounter</td>
+<td>统计表的行数</td>
+<td></td>
+</tr>
+<tr>
+<td>CellCounter</td>
+<td>统计表的cell数目</td>
+<td></td>
+</tr>
+<tr>
+<td>replication.VerifyReplication</td>
+<td>比较两个HBase集群的表</td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="hbck-和-HBCK2"><a href="#hbck-和-HBCK2" class="headerlink" title="hbck 和 HBCK2"></a>hbck 和 HBCK2</h1><p>hbck是一个完整性、一致性工具，在hbase-1.x 版本之前该工具可以诊断表的完整性、同时可以用于修复不一致表。hbase-2.x版本以后，该工具被HBCK2取代，只能只读运行，不提供修复功能。</p>
+<p>使用以下命令可以进行HBase表的一致性检查：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 全表检查</span></span><br><span class="line">hbase hbck -details</span><br><span class="line"><span class="meta">#</span><span class="bash"> 检查指定表</span></span><br><span class="line">hbase hbck Table1 Table2</span><br></pre></td></tr></table></figure>
+
+<p>官方文档强烈不建议使用hbck去修复hbase 2.x的不一致，原因是hbck会绕过Master直接访问HDFS上的HFile文件，可能造成更严重的不一致。</p>
+<p>参考hbck的深入介绍：<a href="https://hbase.apache.org/2.1/book.html#hbck.in.depth" target="_blank" rel="noopener">hbck In Depth</a></p>
+<p>HBCK2 工具是一个独立于HBase的<a href="https://github.com/apache/hbase-operator-tools/tree/master/hbase-hbck2" target="_blank" rel="noopener">项目</a>，其jar包不随HBase一同发布需要用户从源码进行编译。</p>
+<p>由于 CDH 6.1.0 是基于 HBase 2.1.0 开发，HBCK2 说明文档中提及该工具不支持 2.0.3 和 2.1.1 之前的HBase版本，HBase只在3.x的官方文档中提到了这个工具。所以该工具用在hbase 2.1.0-CDH 6.1.0 上也不一定靠谱。</p>
+<p>HBCK2提供了以下功能：</p>
+<ul>
+<li>bypass：释放一个或者多个卡住的procedure</li>
+<li>assigns/unassigns：对应region，这两个操作在 hbase shell 中也可以运行。</li>
+<li>setTableState：设定表的状态，可以将表设定为ENABLED, DISABLED, DISABLING, ENABLING</li>
+<li>serverCrashProcedures：？？？？这个不知道干啥用的</li>
+</ul>
+<p>参考这篇blog说明了HBCK2的一些常见用法( 基本上是HBCK2 说明文档的翻译)：<a href="https://yq.aliyun.com/articles/683107" target="_blank" rel="noopener">HBase 2.0之修复工具HBCK2运维指南</a></p>
+<h1 id="HFile-Tool"><a href="#HFile-Tool" class="headerlink" title="HFile Tool"></a>HFile Tool</h1><p>使用HFile Tool可以查看HBase在HDFS上的hfile文件的内容</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase hfile -v -f  hdfs://nameservice1/hbase/data/default/TestTable/d051c004ff7f7441eb7f89eed9136c57/info0/c3d62dcd7c3f4b8dacfc9688b850d723</span><br></pre></td></tr></table></figure>
+<h1 id="WAL-Tools"><a href="#WAL-Tools" class="headerlink" title="WAL Tools"></a>WAL Tools</h1><p>主要是用来查看hbase的 WAL 日志，以及拆分WAL日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hbase org.apache.hadoop.hbase.regionserver.wal.FSHLog --dump hdfs://nameservice1/hbase/MasterProcWALs/pv2-00000000000000000048.log</span><br><span class="line">hbase org.apache.hadoop.hbase.regionserver.wal.FSHLog --split &#123;wal_log path&#125;</span><br></pre></td></tr></table></figure>
+
+<p>hbase wal 命令同样可以用来查看wal日志</p>
+<h1 id="CopyTable"><a href="#CopyTable" class="headerlink" title="CopyTable"></a>CopyTable</h1><p>表备份工具，可以跨集群备份，也可以同一个集群备份。</p>
+<h1 id="HashTable-SyncTable"><a href="#HashTable-SyncTable" class="headerlink" title="HashTable/SyncTable"></a>HashTable/SyncTable</h1><p>表的同步工具，两张表可以运行在不同的集群上。使用这个工具可以进行表的增量备份。</p>
+<h1 id="Export"><a href="#Export" class="headerlink" title="Export"></a>Export</h1><p>支持Mapreduce-based和Endpoint-based两种方式进行Export。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Mapreduce-based Export</span></span><br><span class="line">bin/hbase org.apache.hadoop.hbase.mapreduce.Export &lt;tablename&gt; &lt;outputdir&gt; [&lt;versions&gt; [&lt;starttime&gt; [&lt;endtime&gt;]]]</span><br><span class="line"><span class="meta">#</span><span class="bash"> Endpoint-based Export</span></span><br><span class="line">bin/hbase org.apache.hadoop.hbase.coprocessor.Export &lt;tablename&gt; &lt;outputdir&gt; [&lt;versions&gt; [&lt;starttime&gt; [&lt;endtime&gt;]]]</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="ImportTsv、CompleteBulkLoad、Import"><a href="#ImportTsv、CompleteBulkLoad、Import" class="headerlink" title="ImportTsv、CompleteBulkLoad、Import"></a>ImportTsv、CompleteBulkLoad、Import</h1><p>这三个都是批量导入工具。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://hbase.apache.org/book.html#ops_mgt" target="_blank" rel="noopener">官方文档</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.974Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/" target="_blank" rel="external">https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/HBase/" rel="tag">HBase</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/&title=《HBase Tools》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/&title=《HBase Tools》 — LQing的博客&source=HBase Tools 介绍 ~ 持续更新！！" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《HBase Tools》 — LQing的博客&url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/04/10/0-%E5%85%A5%E9%97%A8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Solr 学习笔记</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/03/31/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Kafka 功能调研</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/&title=《HBase Tools》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/&title=《HBase Tools》 — LQing的博客&source=HBase Tools 介绍 ~ 持续更新！！" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《HBase Tools》 — LQing的博客&url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/07/9-hbase%E8%BF%90%E7%BB%B4%E5%B7%A5%E5%85%B7/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADMUlEQVR42u3aQW7jQAwEwPz/095rgIXtblIGrEnpFMSCPDU6tEnOz098PX5dyT3/3/n7P8/+fnb/7AkXXNjY2Ng3YT9eXjN2/unrzXrNfr3ON0/GxsbGPo6dfE0SGAk+h71+8rP/RN+LjY2N/YfZSfi1JcoMvClssLGxsbHbBc2+MXk+NjY2NnbeVJptwSZ4kiD8eC8NGxsb++vZ+VT0+//+yHwbGxsb+4vZj/K6qsDYB9VKgY2NjX0Qe7aUpOnfFgntc5Kh8pvxMzY2NvZx7HbpHxzBlq3/1+PhZiewsbGx78rOD99c1QBqg3CzoW/uxMbGxr45O/lZ396zaQwlT8sj8OlKsLGxsQ9ltwXD6y3YhF/eMBo+DRsbG/sg9qZttBkS54GXl0ltEwobGxv7JPamvb5fblta5IPkqP2EjY2NfXP2rBhoD820g4erypvoDWNjY2Mfwc55nziIsx/l1gUVNjY29kHsTTmRx0a+uM09dWGDjY2NfQT72nZPPlqYxc+sXHl6ZAcbGxv7CPYGMwuh2VHO2RGiN68TGxsb+wh2XmDMCpUZdTY2zhtk2NjY2Key26hom/55oZJnb9vewsbGxj6PPfu5vxmytqPcWTmUBxs2Njb23dl5OLVlw2yQnARkUvBEUxFsbGzsI9hJVLTHd2Yh1AZkElTFOrGxsbFvy06KgVlE5ZuSf7oPv+ih2NjY2Ddkb0KoLVf2R3ny5tTTO7GxsbEPYuc/6NtQaUuXOoTWIw1sbGzsM9izVnsbJ5vDOm25Eh3TwcbGxj6IfcE8oRzu5o2hdsBcN7CwsbGx/wx7NgDOm/j5925GDtGQABsbG/vm7P3XXDXunW1Q/hqwsbGxz2a314yaDwySFtWw2YSNjY19BPtRXm2zPm/350XIbFAxzFtsbGzsr2fPgmpWwCRBlQRevtHtwBgbGxv7vuyrQis5OpPD2kCtR7/Y2NjYx7HbYJi1h5LFbdZTtJmwsbGx/zB706CfbeJsU968EmxsbGzsshjI21JXxdibV4WNjY19HHvW3M9HCJ+LruRlrMYD2NjY2F/PbtsxbdgkUZcXPFGZUY6KsbGxsW/L/gcyVONfFD2y6AAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>ROS学习笔记（一） | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="ROS">
+    <meta name="description" content="了解ROS的基本框架">
+<meta name="keywords" content="ROS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS学习笔记（一）">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;08&#x2F;08&#x2F;1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="了解ROS的基本框架">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;ros%E6%96%87%E4%BB%B6%E6%9E%B6%E6%9E%84.png">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.973Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;ros%E6%96%87%E4%BB%B6%E6%9E%B6%E6%9E%84.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ROS学习笔记（一）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">ROS学习笔记（一）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-08T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-08-08
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ROS概述"><span class="post-toc-number">1.</span> <span class="post-toc-text">ROS概述</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ROS系统整体架构"><span class="post-toc-number">2.</span> <span class="post-toc-text">ROS系统整体架构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#文件系统架构"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">文件系统架构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#计算图级架构"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">计算图级架构</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-node"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">1. node</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-Topic"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">2. Topic</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-服务"><span class="post-toc-number">2.2.3.</span> <span class="post-toc-text">3. 服务</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-配置管理器"><span class="post-toc-number">2.2.4.</span> <span class="post-toc-text">4. 配置管理器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#5-节点管理器"><span class="post-toc-number">2.2.5.</span> <span class="post-toc-text">5. 节点管理器</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#消息文件"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">消息文件</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-1-ROS学习笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ROS学习笔记（一）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-09 00:00:00" datetime="2019-08-08T16:00:00.000Z"  itemprop="datePublished">2019-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>了解ROS的基本框架</p>
+<a id="more"></a>
+
+<h1 id="ROS概述"><a href="#ROS概述" class="headerlink" title="ROS概述"></a>ROS概述</h1><p>ROS是运行在Linux等操作系统上的一个次级操作系统，提供机器人从开发到运行的一系列工具。</p>
+<p>ROS的核心模块包括：</p>
+<p><strong>1. ROS通信机制</strong></p>
+<p>ROS使用分布式架构，将机器人的功能和软件做成一个个node，然后每个node通过topic进行沟通，这些node可以部署在同一台机器上，也可以部署在不同机器上，还可以部署在互联网上。node之间通过<strong>topic发布/订阅</strong>的方式进行通信，或者基于ROS中<strong>Service机制点对点通信</strong>。</p>
+<p><strong>2. 机器人特性功能</strong></p>
+<p>机器人特性功能主要指机器人开发中常用的<strong>数据结构</strong>、<strong>算法</strong>、<strong>规范</strong>等内容。当基于ROS开发机器人程序时，可以直接引用相应lib。</p>
+<ul>
+<li>标准机器人消息</li>
+<li>机器人几何库</li>
+<li>机器人描述语言</li>
+<li>抢占式远程过程调用</li>
+<li>诊断</li>
+<li>位置估计</li>
+<li>定位导航</li>
+</ul>
+<p><strong>3. 工具集</strong></p>
+<p>工具集只机器人开发过程使用的<strong>辅助工具</strong>，包括：</p>
+<ul>
+<li>常用命令工具</li>
+<li>工程管理工具catkin</li>
+<li>可视化工具是rqt、rviz</li>
+<li>包管理工具</li>
+<li>第三方工具</li>
+</ul>
+<h1 id="ROS系统整体架构"><a href="#ROS系统整体架构" class="headerlink" title="ROS系统整体架构"></a>ROS系统整体架构</h1><h2 id="文件系统架构"><a href="#文件系统架构" class="headerlink" title="文件系统架构"></a>文件系统架构</h2><p>文件系统架构实际上指的是ROS程序开发过程中工作空间的架构。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://github.com/LinQing2017/notes/blob/master/pictures/ros%E6%96%87%E4%BB%B6%E6%9E%B6%E6%9E%84.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<p>ROS应用在开发过程中使用catkin进行包管理，而catkin的底层是通过CMake工作的。</p>
+<p>catkin目录说明：</p>
+<ul>
+<li>src：放置各个功能包和一个用于这些功能包的CMake配置文件CMakeLists.txt。</li>
+<li>build编译空间：放置CMake和catkin编译功能包时产生的缓存、配置、中间文件等。</li>
+<li>devel开发空间：放置编译好的可执行程序，这些可执行程序是不需要安装就能直接运行的。</li>
+</ul>
+<p>功能包是ROS程序的最小结构，表示一个node。安装完成ROS后所有自带的功能包位于$ROS_PACKAGE_PATH，用户可以自行开发功能包。</p>
+<p>功能包中通常包括下面几个文件：</p>
+<ul>
+<li>CMakeLists.txt：cmake配置文件。</li>
+<li>package.xml：功能包的配置信息，如依赖、名称等。</li>
+<li>include/<package_name>：*.h头文件放在这里。</li>
+<li>msg：非标准消息定义目录，ROS本身已经定义了许多用于node之间通信<a href="http://wiki.ros.org/common_msgs/" target="_blank" rel="noopener">标准消息</a>已经<a href="http://wiki.ros.org/std_msgs/" target="_blank" rel="noopener">标准数据类型</a>。</li>
+<li>srv：服务类型定义目录，ROS中node通信可以通过消息和服务两种方式，消息基于topic订阅，服务则是node之间点对点通信机制。</li>
+<li>scripts：bash、python或其他脚本的可执行文件。</li>
+<li>launch：存放<em>.launch文件，</em>.launch文件用于启动ROS功能包中的一个或多个节点（Ansible？？？）</li>
+<li>src：源码目录</li>
+</ul>
+<h2 id="计算图级架构"><a href="#计算图级架构" class="headerlink" title="计算图级架构"></a>计算图级架构</h2><p>计算图实际上指的是多个node在ROS中构成的网络，所有计算图中的节点可以进行数据交互。</p>
+<p>计算图中包含以下概念：</p>
+<h3 id="1-node"><a href="#1-node" class="headerlink" title="1. node"></a>1. node</h3><p>节点是计算执行进程，功能包中创建的每个可执行程序在被启动加载到系统进程中后，该进程就是一个ROS节点。</p>
+<p>节点都是各自独立的可执行文件，能够通过主题（topic）、服务（server）或参数服务器（parameter server）与其他节点通信。</p>
+<p>节点如果用c++进行编写，需要用到ROS提供的库roscpp；节点如果用python进行编写，需要用到ROS提供的库rospy。</p>
+<h3 id="2-Topic"><a href="#2-Topic" class="headerlink" title="2. Topic"></a>2. Topic</h3><p>node间沟通的方式之一是消息订阅/发布，每个消息都必须发布到相应的主题（topic），通过主题来实现在ROS计算图网络中的路由转发。</p>
+<p>同一个主题可以有多个订阅者也可以有多个发布者。每个主题都是强类型的，不管是发布消息到主题还是从主题中订阅消息，发布者和订阅者定义的消息类型必须与主题的消息类型相匹配。</p>
+<h3 id="3-服务"><a href="#3-服务" class="headerlink" title="3. 服务"></a>3. 服务</h3><p>在一些特殊的场合，节点间需要点对点的高效率通信并及时获取应答，这个时候就需要用服务的方式进行交互。</p>
+<p>服务通信过程中服务的数据类型需要用户自己定义，与消息不同，节点并不提供标准服务类型。服务类型的定义文件都是以*.srv为扩展名，并且被放在功能包的srv/文件夹下。</p>
+<h3 id="4-配置管理器"><a href="#4-配置管理器" class="headerlink" title="4. 配置管理器"></a>4. 配置管理器</h3><p>参数服务器（parameter server）能够使数据通过关键词存储在一个系统的核心位置。通过使用参数，就能够在节点运行时动态配置节点或改变节点的工作任务。参数服务器是可通过网络访问的共享的多变量字典，节点使用此服务器来存储和检索运行时的参数。</p>
+<h3 id="5-节点管理器"><a href="#5-节点管理器" class="headerlink" title="5. 节点管理器"></a>5. 节点管理器</h3><p>节点管理器（master）用于节点的名称注册和查找等，也负责设置节点间的通信。</p>
+<p>由于ROS本身就是一个分布式的网络系统，所以你可以在某台计算机上运行节点管理器，在这台计算机和其他台计算机上运行节点（节点管理器需不需要高可用？？）。</p>
+<p>ROS中提供了跟节点管理器相关的命令行工具，就是roscore，roscore命令用于启动节点管理器，这个命令会加载ROS节点管理器和其他ROS核心组件。</p>
+<p>当ROS开始工作时，用户需要首先执行<strong>roscore</strong>运行一个节点管理器，以此来保证后续启动的node可以正常通信。</p>
+<p>执行roscore的同时，系统会默认启动一个日志node（rosout），执行rosnode可以查看该node的详细信息。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> rosout启动发布了一个topic（rosout_agg），以及两个服务（get_loggers、set_logger_level）</span></span><br><span class="line"></span><br><span class="line">--------------------------------------------------------------------------------</span><br><span class="line">Node [/rosout]</span><br><span class="line">Publications: </span><br><span class="line"> * /rosout_agg [rosgraph_msgs/Log]</span><br><span class="line"></span><br><span class="line">Subscriptions: </span><br><span class="line"> * /rosout [unknown type]</span><br><span class="line"></span><br><span class="line">Services: </span><br><span class="line"> * /rosout/get_loggers</span><br><span class="line"> * /rosout/set_logger_level</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">contacting node http://ruijie-virtual-machine:39349/ ...</span><br><span class="line">Pid: 31314</span><br></pre></td></tr></table></figure>
+
+<h2 id="消息文件"><a href="#消息文件" class="headerlink" title="消息文件"></a>消息文件</h2><p>ROS使用消息类型描述语言，描述node之间传递的消息，并可以在不同的编程语言（如c++、python等）书写的程序中使用此消息。</p>
+<p>不管是ROS系统提供的标准类型消息，还是用户自定义的非标准类型消息，定义文件都是以*.msg作为扩展名。</p>
+<p>消息类型的定义分为两个主要部分：字段的数据类型和字段的名称，简单点说就是结构体中的变量类型和变量名称。</p>
+<p>经常用到的类型包括：</p>
+<ul>
+<li><a href="http://wiki.ros.org/std_msgs/" target="_blank" rel="noopener">基本类型</a>：包括int、boolean等基础数据类型。</li>
+<li><a href="http://wiki.ros.org/common_msgs" target="_blank" rel="noopener">通用类型</a>：高级数据类型，如四元数、传感器数据等。</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.cnblogs.com/hiram-zhang/tag/ROS%E5%85%A5%E9%97%A8/" target="_blank" rel="noopener">SLAM+语音机器人DIY系列</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.973Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" target="_blank" rel="external">https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ROS/" rel="tag">ROS</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（一）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（一）》 — LQing的博客&source=了解ROS的基本框架" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（一）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/08/08/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">ROS学习笔记（二）</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/08/07/0-ROS%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ROS环境安装部署</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（一）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（一）》 — LQing的博客&source=了解ROS的基本框架" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（一）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/08/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvUlEQVR42u3a0Y6cMAwF0Pn/n25fK21h7rXJdCodnkYshBxWSozt1ys+fv1x3J+/OvPz989x7s9fXfPAgYeHh7eY+s/jauirK++ndT/+/ZXJX//yCvDw8PCO8fJF+XKg+EXc39u+sjcWPDw8vK/kJRvJ/chJyI6Hh4f3P/KS0DbfKtoXh4eHh/dtvM3Hf3skyDap8UCuBQ8PDy/m5VWk7/l9pL6Hh4eHt66qtwt6W8qatRcUs8XDw8M7wDvROlA8OG7taq/Ew8PDO8dLFugWnE+0SMWOimp4eHh4J3izQlfbEDALtduy3KudFh4eHt6I1zYE5GmCp4LvWZMBHh4e3jlem0JtzyfgzbOifwAeHh7eAd4mOE4m2m48yWjDrwc8PDy8NW+4sAaL9SZJMWu3utzx8PDw8D7CS5b+thXgxLPeXImHh4d3gLd5TBtMJyNvXk20PeDh4eE9xKuX2vKu+8c/VfSKkHh4eHhrXp7ZbRsIZuWxpPSVI/Hw8PBO89q2p6TYf/9qNk+MQnw8PDy8A7xkcU+mmPcptOFyXmaLtjo8PDy8NS+fUP6A2SubbSFFZgUPDw/vUV6bAogSAWXIXgfHs6YrPDw8vDXvqbL9ZoRZaI6Hh4f3r3htxmKfpNgnOIp2MTw8PLwDvE0SYVMYyyc9O4OHh4d3mrcpO+Wl/fzMpvngNdt/8PDw8Ba8tuA0SzTMUhXDxAQeHh7eYV6+QLf37jeh2QcAHh4e3rO8TSE/SUnk5bFZ4e3NXXh4eHgHeLNldzbQrNz1bHsBHh4e3lO8NkGQNBzkW0sU9ccbAx4eHt4neclS3qYq2sB6toO9SYjg4eHhfQEvD3zbyT2Qk95vDHh4eHgf4bVNA+3G0zYf4OHh4X2Gt2mESpILm0auPI17GVLj4eHhPcqbBb6z1oEk+J6lffHw8PA+wvsNyxP0USnmrEQAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

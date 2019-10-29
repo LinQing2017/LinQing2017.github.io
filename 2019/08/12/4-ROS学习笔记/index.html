@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>ROS学习笔记（四） | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="ROS,URDF">
+    <meta name="description" content="理解URDF、XACRO文件的内容">
+<meta name="keywords" content="ROS,URDF">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS学习笔记（四）">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;08&#x2F;12&#x2F;4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="理解URDF、XACRO文件的内容">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.974Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ROS学习笔记（四）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">ROS学习笔记（四）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-12T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-08-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#URDF"><span class="post-toc-number">1.</span> <span class="post-toc-text">URDF</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#URDF文件格式"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">URDF文件格式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Joint-类型"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Joint 类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#XACRO"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">XACRO</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#可视化化URDF"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">可视化化URDF</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#组合机器人"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">组合机器人</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#SDF"><span class="post-toc-number">2.</span> <span class="post-toc-text">SDF</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SDF格式和URDF格式的差异"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">SDF格式和URDF格式的差异</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Gazebo插件"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Gazebo插件</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-4-ROS学习笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ROS学习笔记（四）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-13 00:00:00" datetime="2019-08-12T16:00:00.000Z"  itemprop="datePublished">2019-08-13</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>理解URDF、XACRO文件的内容</p>
+<a id="more"></a>
+
+
+<h1 id="URDF"><a href="#URDF" class="headerlink" title="URDF"></a>URDF</h1><p>URDF(Unified Robot Description Format), 是一种特殊的xml文件格式，绝大多数机器人应当提供xxx_description安装包，可以通过apt-get直接安装。</p>
+<p>xacro文件是一种提供了一些更为高级编辑方式的宏文件，通过下面的命令可以将xacro解析出urdf。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 生成urdf，一个xacro中可能include了多个子文件，但是最终只会生成一个urdf文件</span></span><br><span class="line">rosrun xacro xacro.py /opt/ros/melodic/share/franka_description/robots/panda_arm_hand.urdf.xacro &gt; panda_arm_hand.urdf</span><br></pre></td></tr></table></figure>
+<h2 id="URDF文件格式"><a href="#URDF文件格式" class="headerlink" title="URDF文件格式"></a>URDF文件格式</h2><p>URDF文件主要包括：</p>
+<ul>
+<li>link：表示Robot的一个关节<ul>
+<li>visual：描述形状，可以是简单形状，或者一个stl格式的文件</li>
+<li>collision：描述link的碰撞体积</li>
+</ul>
+</li>
+<li>joint：表示link之间的相对位置关系，包括：<ul>
+<li>parent</li>
+<li>child</li>
+<li>xyz：原点的平移向量(父链 ——&gt; 子链)，单位为米</li>
+<li>rpy: child和parent坐标系的旋转矢量（转动顺序为：x -&gt; y -&gt; z）</li>
+</ul>
+</li>
+</ul>
+<h2 id="Joint-类型"><a href="#Joint-类型" class="headerlink" title="Joint 类型"></a>Joint 类型</h2><p>参考URDF中<a href="http://wiki.ros.org/urdf/XML/joint" target="_blank" rel="noopener">joint标签</a>的定义，Joint有六种类型：</p>
+<ul>
+<li>revolute ：绕固定轴旋转有角度上下限</li>
+<li>continuous ：绕固定轴旋转没有角度限制</li>
+<li>prismatic ：滑动接头，沿轴线滑动，并具有由上限和下限指定的有限范围</li>
+<li>fixed ：固定连接</li>
+<li>floating ：该关节允许所有6个自由度的运动。</li>
+<li>planar ：该关节允许在垂直于轴的平面中运动。</li>
+</ul>
+<p>上述六种类型中，除fixed和floating以外，其余四种类型的运动轴均通过axis标签（默认情况下是(1,0,0)）定义。</p>
+<p><strong><a href="http://docs.ros.org/melodic/api/sensor_msgs/html/msg/JointState.html" target="_blank" rel="noopener">sensor_msgs/JointState</a></strong>描述revolute和prismatic描述机器人的姿态，格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Header header</span><br><span class="line"></span><br><span class="line">string[] name           # 所有joint名称序列</span><br><span class="line">float64[] position      # joint的运动幅度，是角度或者位移</span><br><span class="line">float64[] velocity      # 当前的速度</span><br><span class="line">float64[] effort        # 关节上施加的力</span><br></pre></td></tr></table></figure>
+
+<h2 id="XACRO"><a href="#XACRO" class="headerlink" title="XACRO"></a>XACRO</h2><p>XACRO文件和URDF实质上是等价的， 但是提供了一些更高级的方式来组织编辑机器人描述，包括：</p>
+<ul>
+<li>复用URDF段落</li>
+<li>嵌入简单的计算</li>
+<li>include多个xacro文件</li>
+</ul>
+<h2 id="可视化化URDF"><a href="#可视化化URDF" class="headerlink" title="可视化化URDF"></a>可视化化URDF</h2><p>查看urdf文件, 可以使用urdf_tutorial包:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">roslaunch urdf_tutorial display.launch model:=/home/ruijie/Desktop/panda_arm_hand.urdf</span><br><span class="line"></span><br><span class="line">roslaunch urdf_tutorial display.launch model:=/home/ruijie/Desktop/panda_arm_hand.urdf gui:=true</span><br><span class="line"></span><br><span class="line">roslaunch urdf_tutorial xacrodisplay.launch model:=/opt/ros/melodic/share/franka_description/robots/panda_arm_hand.urdf.xacro</span><br></pre></td></tr></table></figure>
+
+<p>上述命令中display.launch包含以下内容：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">launch</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- 输入参数包括模型文件、是否使用GUI、rvizconfig配置--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"model"</span> <span class="attr">default</span>=<span class="string">"$(find urdf_tutorial)/urdf/01-myfirst.urdf"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"gui"</span> <span class="attr">default</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"rvizconfig"</span> <span class="attr">default</span>=<span class="string">"$(find urdf_tutorial)/rviz/urdf.rviz"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- 将urdf上传到robot_description中 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"robot_description"</span> <span class="attr">command</span>=<span class="string">"$(find xacro)/xacro.py $(arg model)"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"use_gui"</span> <span class="attr">value</span>=<span class="string">"$(arg gui)"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">node</span> <span class="attr">name</span>=<span class="string">"joint_state_publisher"</span> <span class="attr">pkg</span>=<span class="string">"joint_state_publisher"</span> <span class="attr">type</span>=<span class="string">"joint_state_publisher"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">node</span> <span class="attr">name</span>=<span class="string">"robot_state_publisher"</span> <span class="attr">pkg</span>=<span class="string">"robot_state_publisher"</span> <span class="attr">type</span>=<span class="string">"state_publisher"</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">node</span> <span class="attr">name</span>=<span class="string">"rviz"</span> <span class="attr">pkg</span>=<span class="string">"rviz"</span> <span class="attr">type</span>=<span class="string">"rviz"</span> <span class="attr">args</span>=<span class="string">"-d $(arg rvizconfig)"</span> <span class="attr">required</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">launch</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上述launch启动三个node：</p>
+<ul>
+<li>joint_state_publisher： 一个发布JointState数据的工具。joint_state_publisher读取robot_description参数，查找所有非固定关节并发布一个JointState消息，其中定义了所有这些关节。joint_state_publisher的输出是/<code>joint_states</code> ,输入可以是GUI、其他Topic等。</li>
+<li>robot_state_publisher：订阅/joint_states，根据其中的JointState数据以及Robot的关节参数，更新/tf和/tf_static树中的坐标变换关系。</li>
+<li>rviz：可视化显示</li>
+</ul>
+<h2 id="组合机器人"><a href="#组合机器人" class="headerlink" title="组合机器人"></a>组合机器人</h2><p>UR + Barrett：<a href="https://www.2cto.com/kf/201608/541696.html" target="_blank" rel="noopener">参考文章</a>中的xacro，没有成功。</p>
+<p>Git上有不少UR + Barrett的例子，如<a href="https://github.com/jontromanab/ur5_barrett_moveit" target="_blank" rel="noopener">ur5_barrett_moveit</a>、<a href="https://github.com/jontromanab/ur5_barrett_description" target="_blank" rel="noopener">ur5_barrett_description</a></p>
+<h1 id="SDF"><a href="#SDF" class="headerlink" title="SDF"></a>SDF</h1><p>SDF格式是一种从世界级到机器人级的所有内容的完整描述，能够描述Gazebo环境中的Robot以及其他内容。</p>
+<p>SDF可以认为是URDF格式的扩展，提供了以下能力：</p>
+<ul>
+<li>在URDF基础上描述了物体的质量、惯性等更丰富的力学性质；</li>
+<li>通过插件的方式可以描述摄像机、IMU等Gazebo支持的传感器；</li>
+</ul>
+<p>Gazebo提供了一些开源SDF格式的模型，用户可以在线下载或者<a href="https://bitbucket.org/osrf/gazebo_models/downloads/" target="_blank" rel="noopener">离线下载</a>后解压到.gazebo/models目录下。</p>
+<p>Gazebo同时还支持一种.world格式的模型文件，这个文件同样支持SDF格式的语法，同SDF文件本质上没有差异。</p>
+<p>一个空白的world文件，只定义了灯光、背景、视角等信息等信息</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">&lt;?xml version="1.0" ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">sdf</span> <span class="attr">version</span>=<span class="string">"1.4"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- We use a custom world for the rrbot so that the camera angle is launched correctly --&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">world</span> <span class="attr">name</span>=<span class="string">"default"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">uri</span>&gt;</span>model://ground_plane<span class="tag">&lt;/<span class="name">uri</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Global light source --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">uri</span>&gt;</span>model://sun<span class="tag">&lt;/<span class="name">uri</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Focus camera on tall pendulum --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">gui</span> <span class="attr">fullscreen</span>=<span class="string">'0'</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">camera</span> <span class="attr">name</span>=<span class="string">'user_camera'</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">pose</span>&gt;</span>4.927360 -4.376610 3.740080 0.000000 0.275643 2.356190<span class="tag">&lt;/<span class="name">pose</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">view_controller</span>&gt;</span>orbit<span class="tag">&lt;/<span class="name">view_controller</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">camera</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">gui</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;/<span class="name">world</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sdf</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="SDF格式和URDF格式的差异"><a href="#SDF格式和URDF格式的差异" class="headerlink" title="SDF格式和URDF格式的差异"></a>SDF格式和URDF格式的差异</h2><p>SDF比URDF多出了inertial标签和gazebo标签：</p>
+<ul>
+<li>inertial标签：定义在link标签中，用来描述物体物理属性（如，质心位置、质量、惯性矩阵）</li>
+<li>gazebo标签：gazebo标签可能定义在robot、link、joint等各种地方，其内容一般是Gazebo的扩展属性，通常一般使用.gazebo文件额外定义gazebo标签中的内容。</li>
+</ul>
+<p>通过下面的launch文件，可以将World和URDF文件加载到Gazebo中：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">launch</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- Gazebo的启动参数，通常是paused、use_sim_time、gui、headless、debug --&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- 运行empty_world.launch可以加载，world_name指定的world文件 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">include</span> <span class="attr">file</span>=<span class="string">"$(find gazebo_ros)/launch/empty_world.launch"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"world_name"</span> <span class="attr">value</span>=<span class="string">"$(find rrbot_gazebo)/worlds/rrbot.world"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">        Gazebo的启动参数</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- 将URDF文件加载到robot_description --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"robot_description"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">command</span>=<span class="string">"$(find xacro)/xacro --inorder '$(find rrbot_description)/urdf/rrbot.xacro'"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- </span></span><br><span class="line"><span class="comment">    spawn_model是gazebo_ros中提供的Python脚本可以解析URDF格式的文件，并在软件中展示。</span></span><br><span class="line"><span class="comment">    </span></span><br><span class="line"><span class="comment">    参考：rosrun gazebo_ros spawn_model -h 会打印该命令的详细用法。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">node</span> <span class="attr">name</span>=<span class="string">"urdf_spawner"</span> <span class="attr">pkg</span>=<span class="string">"gazebo_ros"</span> <span class="attr">type</span>=<span class="string">"spawn_model"</span> <span class="attr">respawn</span>=<span class="string">"false"</span> <span class="attr">output</span>=<span class="string">"screen"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">args</span>=<span class="string">"-urdf -model rrbot -param robot_description"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">&lt;!-- ros_control rrbot launch file --&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--include file="$(find rrbot_control)/launch/rrbot_control.launch" /--&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">launch</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="Gazebo插件"><a href="#Gazebo插件" class="headerlink" title="Gazebo插件"></a>Gazebo插件</h2><p>Gazebo包括三种类型的插件：</p>
+<ul>
+<li>ModelPlugins</li>
+<li>SensorPlugins</li>
+<li>VisualPlugins</li>
+</ul>
+<p>需要注意SensorPlugins需要附加到link标签中进行定义，而不能单独定义。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">robot</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- ... robot description ... --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">link</span> <span class="attr">name</span>=<span class="string">"sensor_link"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- ... link description ... --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">link</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">gazebo</span> <span class="attr">reference</span>=<span class="string">"sensor_link"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sensor</span> <span class="attr">type</span>=<span class="string">"camera"</span> <span class="attr">name</span>=<span class="string">"camera1"</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- 传感器参数 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">plugin</span> <span class="attr">name</span>=<span class="string">"camera_controller"</span> <span class="attr">filename</span>=<span class="string">"libgazebo_ros_camera.so"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 插件参数 --&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sensor</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">gazebo</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">robot</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.ncnynl.com/archives/201610/947.html" target="_blank" rel="noopener">moveit！中文参考资料</a></p>
+<p><a href="http://gazebosim.org/tutorials?tut=ros_roslaunch" target="_blank" rel="noopener">Tutorial: Using roslaunch to start Gazebo, world files and URDF models</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.974Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" target="_blank" rel="external">https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ROS/" rel="tag">ROS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/URDF/" rel="tag">URDF</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（四）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（四）》 — LQing的博客&source=理解URDF、XACRO文件的内容" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（四）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/08/12/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">ROS学习笔记（五）</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/08/08/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ROS学习笔记（二）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（四）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（四）》 — LQing的博客&source=理解URDF、XACRO文件的内容" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（四）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/12/4-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACu0lEQVR42u3bwW7iUAwFUP7/pzvSrKZqA9fXeaCRTlYIpSQnSLax3ccjPr7+Hj9f//vOz3Ouznx+ztXVkzPLAw8PD6+69atjCshv6+rTuvcvr4WHh4d3jLe5/PO/naaQ/J3ounh4eHgf5XVl9/Pyevpw8fDw8P53XpIwcnZ3Jh4eHt6neEkzYtwIWJTIt90DHh4e3gHeZgD2qddvmu/h4eHhDafq+9btJtx3d/jtE/Dw8PAO8LrhVg7LFxE2K1kvzsfDw8O7ldeF8mkTdg+YPvpveQ8PDw/vVl4XyqcBvXsE0+WDsleNh4eHt+BtLpPX7/s0kGDw8PDwzvFu6GRUo6lpIinXwvDw8PAO8DYF62Y9q2tnJMngxW8FPDw8vDUv+biuRZtQp4E+Keh/2YzAw8PDO8C7q6jdj83ydBIV9Hh4eHgHeHlY7wb507HZJiVE3yQeHh7emjctc/PxWLdqkLQqBk0NPDw8vGO86Uh+OjabLiJsEs+LXgseHh7emjctfPdNh67qzxsT48IaDw8Pb8hLSurN8H46Kps+lBfn4+Hh4R3gdbtJm8fRtRumSWi8j4CHh4cX8/Iyetqc7VJLx46WrvDw8PAO8LqGwnRsliwNdItceHh4eO/hnQjcdzVt8/WF8WYZHh4e3k28LsTvb3RaiJfFOh4eHt5NvG4RKlp1WqScbqUg6rXg4eHhHeAlmKShcFcroSvuH5vvCg8PDy/tu7b/7r4of/PG7n6ohoeHh3cX72t45ME6CdxJWE8WCC7vFg8PD+8Abxru9wsE03fy19N0goeHh7fhbZLB6pnFyWPwywAPDw/vjbwkGSSkacnbFe5lTsPDw8N7Oy8P4pvWcLeuOuhP4+Hh4X2U1zV2u9BfphM8PDy8Y7x9MyKn5u2GrtTGw8PDO83rgvKUfVfzYsXAw8PD2/L+ACFxzxQPCN11AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>OpenCV 学习笔记 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="OpenCV">
+    <meta name="description" content="关于OpenCV-Python Tutorials、ROS By Example的学习笔记">
+<meta name="keywords" content="OpenCV">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV 学习笔记">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;09&#x2F;03&#x2F;0-OpenCV-%E5%AD%A6%E4%B9%A0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="关于OpenCV-Python Tutorials、ROS By Example的学习笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.972Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">OpenCV 学习笔记</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">OpenCV 学习笔记</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-09-03T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-09-03
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ROS和OpenCV"><span class="post-toc-number">1.</span> <span class="post-toc-text">ROS和OpenCV</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#摄像头的驱动"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">摄像头的驱动</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-Kinect"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">1.Kinect</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-IntelRealSense-Xtion"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">2. IntelRealSense/Xtion</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-webcam"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">3. webcam</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ROS处理图像"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">ROS处理图像</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-cv-bridge"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">1. cv_bridge</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-image-transport"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">2. image_transport</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-image-pipeline"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">3. image_pipeline</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-nodelet"><span class="post-toc-number">1.2.4.</span> <span class="post-toc-text">4. nodelet</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#ROS-By-Example的教程"><span class="post-toc-number">2.</span> <span class="post-toc-text">ROS By Example的教程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#人脸追踪Demo"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">人脸追踪Demo</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Haar分类器"><span class="post-toc-number">2.1.1.</span> <span class="post-toc-text">Haar分类器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#角点检测"><span class="post-toc-number">2.1.2.</span> <span class="post-toc-text">角点检测</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#特征点追踪"><span class="post-toc-number">2.1.3.</span> <span class="post-toc-text">特征点追踪</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">总结</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-0-OpenCV-学习"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">OpenCV 学习笔记</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-09-04 00:00:00" datetime="2019-09-03T16:00:00.000Z"  itemprop="datePublished">2019-09-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>关于<a href="https://docs.opencv.org/4.1.1/d6/d00/tutorial_py_root.html" target="_blank" rel="noopener">OpenCV-Python Tutorials</a>、ROS By Example的学习笔记</p>
+<a id="more"></a>
+
+<h1 id="ROS和OpenCV"><a href="#ROS和OpenCV" class="headerlink" title="ROS和OpenCV"></a>ROS和OpenCV</h1><p>在ROS中使用OpenCV进行图像处理是开发ROS程序的常见需要，以下是在Ros中使用OpenCV开发的一些随笔。</p>
+<h2 id="摄像头的驱动"><a href="#摄像头的驱动" class="headerlink" title="摄像头的驱动"></a>摄像头的驱动</h2><p>ROS中使用摄像机包括下面的情景：</p>
+<h3 id="1-Kinect"><a href="#1-Kinect" class="headerlink" title="1.Kinect"></a>1.Kinect</h3><p>在ROS上安装Kinect驱动有以下几种方案：</p>
+<ul>
+<li><p>freenect_stack：底层基于libfreenect，需要额外安装<a href="https://github.com/OpenKinect/libfreenect" target="_blank" rel="noopener">libfreenect</a>或者<a href="https://github.com/OpenKinect/libfreenect2" target="_blank" rel="noopener">libfreenect2</a></p>
+</li>
+<li><p>openni_camera：同样基于openni需要分别安装依赖OpenNI和SensorKinect，安装过程可以参考<a href="https://www.20papercups.net/programming/kinect-on-ubuntu-with-openni/" target="_blank" rel="noopener">博客</a></p>
+</li>
+<li><p>openni_kinect：基于openni是PrimeSense官方负责维护项目，包含：openni_camera、openni_launch、openni_tracker等多个模块。<strong>但是PrimeSense被收购之后，该项目的源码已经无法访问。</strong></p>
+</li>
+<li><p>kinect_aux: Kinect上accelerometer/tilt/led相关功能的独立驱动。</p>
+</li>
+</ul>
+<h3 id="2-IntelRealSense-Xtion"><a href="#2-IntelRealSense-Xtion" class="headerlink" title="2. IntelRealSense/Xtion"></a>2. IntelRealSense/Xtion</h3><p>IntelRealSense官方提供了ROS上的相关驱动，官方<a href="https://github.com/IntelRealSense/realsense-ros" target="_blank" rel="noopener">github</a>。</p>
+<p>Xtion使用<a href="http://wiki.ros.org/openni2_camera" target="_blank" rel="noopener">openni2_camera</a>驱动，使用相机是可以参考<a href="http://docs.ros.org/api/openni2_launch/html/" target="_blank" rel="noopener">openni2_launch</a>。</p>
+<h3 id="3-webcam"><a href="#3-webcam" class="headerlink" title="3. webcam"></a>3. webcam</h3><p> webcam是指通过USB接入的“即插即用”相机，此类相机没有专门的驱动程序，通过系统工具工作。</p>
+<ul>
+<li><a href="http://wiki.ros.org/libuvc_camera" target="_blank" rel="noopener">libuvc_camera</a></li>
+<li><a href="https://wiki.ros.org/usb_cam" target="_blank" rel="noopener">usb_cam</a></li>
+<li><a href="http://wiki.ros.org/gscam" target="_blank" rel="noopener">gscam</a></li>
+</ul>
+<h2 id="ROS处理图像"><a href="#ROS处理图像" class="headerlink" title="ROS处理图像"></a>ROS处理图像</h2><p>ROS中相机信息通过Topic进行发布，其中关键Topic包括：</p>
+<ul>
+<li>image_raw：摄像头拍摄的原始数据，格式为<a href="http://docs.ros.org/api/sensor_msgs/html/msg/Image.html" target="_blank" rel="noopener"><strong>sensor_msgs/Image.msg</strong></a></li>
+<li>camera_info：摄像头元数据信息，包括内参矩阵、对准系数等等，通常这个Topic中数据需要用户进行对准之后，进行人为设定。</li>
+</ul>
+<p>ROS图像处理方面涉及到下面这些工具：</p>
+<h3 id="1-cv-bridge"><a href="#1-cv-bridge" class="headerlink" title="1. cv_bridge"></a>1. <strong>cv_bridge</strong></h3><p><a href="http://wiki.ros.org/cv_bridge/Tutorials" target="_blank" rel="noopener">cv_bridge</a>用来在sensor_msgs/Image和numpy两种格式之间进行转换，使OpenCV能够处理Topic中的图像数据。</p>
+<p>目前cv_bridge提供C++/Python/JAVA 的接口。</p>
+<h3 id="2-image-transport"><a href="#2-image-transport" class="headerlink" title="2. image_transport"></a>2. <strong>image_transport</strong></h3><p>image_transport 可以将Image数据重新转发到新的topic中，其输入可以是Topic、图片、视频。</p>
+<h3 id="3-image-pipeline"><a href="#3-image-pipeline" class="headerlink" title="3. image_pipeline"></a>3. <strong>image_pipeline</strong></h3><p><a href="http://wiki.ros.org/image_pipeline" target="_blank" rel="noopener">image_pipeline</a>是ROS的图像处理工具包，包括以下几个部分：</p>
+<ul>
+<li><a href="http://wiki.ros.org/camera_calibration" target="_blank" rel="noopener">camera_calibration</a>：摄像头标定包</li>
+<li><a href="http://wiki.ros.org/image_proc" target="_blank" rel="noopener">image_proc</a>：图像校正包</li>
+<li><a href="http://wiki.ros.org/stereo_image_proc" target="_blank" rel="noopener">stereo_image_proc</a>：处理双目相机</li>
+<li><a href="http://wiki.ros.org/depth_image_proc" target="_blank" rel="noopener">depth_image_proc</a>：处理深度相机</li>
+<li>image_view、stereo_view：可视化</li>
+</ul>
+<p>简单介绍一下image_pipeline的各个组件：</p>
+<p><strong>image_proc</strong></p>
+<p>image_proc主要用来处理rgb图片，提供node、nodelet两种运行方式。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> node方式运行</span></span><br><span class="line">ROS_NAMESPACE=my_camera rosrun image_proc image_proc</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上述node会寻找/my_camera/image_raw和/my_camera/camera_info，并根据后者的参数去校正前者中的图像。最终输出以下（未）校正图像：灰度（去）畸变、彩色（去）畸变。</span></span><br></pre></td></tr></table></figure>
+
+<p>image_proc 还提供了四个nodelet：</p>
+<ul>
+<li>debayer：将image转换成灰度、彩色两个版本并输出</li>
+<li>rectify：校正图像</li>
+<li>crop_decimate：图像抽样，即将图像的像素减小</li>
+<li>resize：调整图像大小</li>
+</ul>
+<p><strong>depth_image_proc</strong></p>
+<p>depth_image_proc主要用来处理深度图像，其所有的功能通过nodelet来提供：</p>
+<ul>
+<li>convert_metric：量测值变换，将深度信息的单位从mm变为m</li>
+<li>disparity：将深度图重变为disparity格式（disparity是一种视差图，可以通过双目相机生成）</li>
+<li>point_cloud_xyz：将深度图转换成点云图像，输出格式为sensor_msgs/PointCloud2</li>
+<li>point_cloud_xyzrgb：将深度图和RGB合成，并转换成点云图像，输出格式为sensor_msgs/PointCloud2</li>
+<li>register：将深度相机的frame-id变换到另一个坐标系中。</li>
+</ul>
+<h3 id="4-nodelet"><a href="#4-nodelet" class="headerlink" title="4. nodelet"></a>4. <strong>nodelet</strong></h3><p>由于ROS使用Topic方式传输数据存在一定的延时和阻塞。在数据量小、频率低的情况下，传输耗费的时间可以忽略不计。但当传输图像流，点云等数据量较大的消息，或者执行有一定的实时性要求的任务时，因传输而耗费的时间就不得不考虑。nodelet的作用是让多个node在一个进程中用实现零拷贝通信。</p>
+<p>用户需要manager节点，该节点管理多个nodelet节点，并为它们提供高性能数据通信。用户需要根据实际需要开发nodelet（nodelet基于pluginlib插件机制），并将nodelet加载到nodelet manager中（<a href="https://www.cnblogs.com/21207-iHome/p/8213411.html" target="_blank" rel="noopener">blog关于nodelet的介绍</a>）。</p>
+<p>当前图像相关的包多数提供了node和nodelet两种运行模式，使用以下命令可以查看当前系统中所有可运行nodelet</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rosrun nodelet declared_nodelets</span><br></pre></td></tr></table></figure>
+
+<p>以下是调用了image_proc和depth_image_proc中的nodelet实例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">launch</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">group</span> <span class="attr">ns</span>=<span class="string">"camera"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">    <span class="tag">&lt;<span class="name">include</span> <span class="attr">file</span>=<span class="string">"$(find rgbd_launch)/launch/includes/manager.launch.xml"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">value</span>=<span class="string">"camera_nodelet_manager"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"debug"</span> <span class="attr">value</span>=<span class="string">"false"</span> /&gt;</span> <span class="comment">&lt;!-- Run manager in GDB? --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">arg</span> <span class="attr">name</span>=<span class="string">"num_worker_threads"</span>  <span class="attr">value</span>=<span class="string">"2"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- decimated to 160x120，将像素变为原来1/4 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">node</span> <span class="attr">pkg</span>=<span class="string">"nodelet"</span> <span class="attr">type</span>=<span class="string">"nodelet"</span> <span class="attr">name</span>=<span class="string">"crop_decimate"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">args</span>=<span class="string">"load image_proc/crop_decimate /camera/camera_nodelet_manager"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">output</span>=<span class="string">"screen"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remap</span> <span class="attr">from</span>=<span class="string">"camera/image_raw"</span> <span class="attr">to</span>=<span class="string">"rgb/image_raw"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remap</span> <span class="attr">from</span>=<span class="string">"camera/camera_info"</span> <span class="attr">to</span>=<span class="string">"rgb/camera_info"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remap</span> <span class="attr">from</span>=<span class="string">"camera_out"</span> <span class="attr">to</span>=<span class="string">"depth_downsample"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"decimation_x"</span> <span class="attr">value</span>=<span class="string">"4"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"decimation_y"</span> <span class="attr">value</span>=<span class="string">"4"</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">param</span> <span class="attr">name</span>=<span class="string">"queue_size"</span> <span class="attr">value</span>=<span class="string">"1"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">node</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--&amp;lt;!&amp;ndash; downsampled XYZ point cloud  &amp;ndash;&amp;gt;--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">node</span> <span class="attr">pkg</span>=<span class="string">"nodelet"</span> <span class="attr">type</span>=<span class="string">"nodelet"</span> <span class="attr">name</span>=<span class="string">"points_downsample"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">args</span>=<span class="string">"load depth_image_proc/point_cloud_xyz /camera/camera_nodelet_manager"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">ns</span>=<span class="string">"depth_cloud"</span></span></span><br><span class="line"><span class="tag">          <span class="attr">output</span>=<span class="string">"screen"</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remap</span> <span class="attr">from</span>=<span class="string">"image_rect"</span> <span class="attr">to</span>=<span class="string">"/camera/depth/image_raw"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remap</span> <span class="attr">from</span>=<span class="string">"camera_info"</span> <span class="attr">to</span>=<span class="string">"/camera/depth/camera_info"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">node</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;/<span class="name">group</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">launch</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="ROS-By-Example的教程"><a href="#ROS-By-Example的教程" class="headerlink" title="ROS By Example的教程"></a>ROS By Example的教程</h1><p>ROS By Example第十章介绍了以下内容：</p>
+<ol>
+<li>如何ROS中安装摄像头驱动。</li>
+<li>在ROS框架之中使用Python-OpenCV，并通过Topic实现数据交互。</li>
+<li>基于普通相机，使用OpenCV实现一个人脸追踪程序。</li>
+<li>基于OpenNI的Skeleton Tracking程序。</li>
+<li>PCL库的介绍</li>
+</ol>
+<p>上述内容的源码在Github的<a href="https://github.com/pirobot/rbx1/tree/indigo-devel/rbx1_vision" target="_blank" rel="noopener">pirobot/rbx1</a>项目中，使用官网这份代码有以下几点值得注意：</p>
+<ol>
+<li><p>rbx1中不少例子基于OpenCV1编写，由于OpenCV2以上版本和OpenCV1接口并非完全兼容，因此需要修改后才能正常使用。</p>
+<ul>
+<li>OpenCV2中完全整合numpy，如cv.CreateImage、cv.GetSize等接口已经完全取消，使用numpy的接口替代。</li>
+<li>cv2中不少常量的名称也和cv中不同</li>
+</ul>
+</li>
+<li><p><a href="https://github.com/pirobot/rbx1/blob/kinetic-devel-beta/rbx1_vision/nodes/video2ros.py" target="_blank" rel="noopener">video2ros.py</a>能够将avi格式的视频输出到ROS的指定topic中，使用这个脚本可以替代RGB摄像机，该脚本支持视频暂停、循环播放。</p>
+</li>
+<li><p><a href="https://github.com/pirobot/rbx1/blob/kinetic-devel-beta/rbx1_vision/src/rbx1_vision/ros2opencv2.py" target="_blank" rel="noopener">ros2opencv2.py</a>订阅指定Topic的图像输出，并在process_image函数中进行数据处理。编写视频处理程序时，可以继承该脚本中ROS2OpenCV2类，并复写process_image实现处理逻辑。</p>
+</li>
+<li><p>在catkin中如何编写python项目的makefile可以参考<a href="http://wiki.ros.org/cn/rospy_tutorials/Tutorials/Makefile" target="_blank" rel="noopener">catkin_python_setup</a></p>
+</li>
+</ol>
+<h2 id="人脸追踪Demo"><a href="#人脸追踪Demo" class="headerlink" title="人脸追踪Demo"></a>人脸追踪Demo</h2><p>ROS By Example 10.8 详细介绍了如何利用一个OpenCV的现成算法实现一个人脸追踪程序，该Demo<strong>识别/最终</strong>流程如下：</p>
+<ol>
+<li>通过 Haar分类器，在一帧图像中识别人脸（<a href="https://github.com/pirobot/rbx1/blob/kinetic-devel-beta/rbx1_vision/src/rbx1_vision/face_detector.py" target="_blank" rel="noopener">face_detector.py</a>）；</li>
+<li>通过 goodFeaturesToTrack方法在人脸区域提取KeyPoint（<a href="https://github.com/pirobot/rbx1/blob/kinetic-devel-beta/rbx1_vision/src/rbx1_vision/good_features.py" target="_blank" rel="noopener">good_features.py</a>）；</li>
+<li>通过 OpenCV’s Lucas-Kanade optical flow 的实现跟踪上述KeyPoint；</li>
+<li>验证当前追踪角点的有效性，添加新KeyPoint或移除失效KeyPoint；</li>
+</ol>
+<p>PS：上述方案基于灰度图像进行人脸追踪，教程中还提供了了一种基于图像色彩进行追踪的方案（基于CamShift算法）。</p>
+<h3 id="Haar分类器"><a href="#Haar分类器" class="headerlink" title="Haar分类器"></a>Haar分类器</h3><p>在图片中识别人脸是一个分类过程，OpenCV提供基于haar特征和lbp特征的分类器。</p>
+<p>使用Haar分类器，需要注意下面几点：</p>
+<ul>
+<li>需要提供训练好的xml格式的模型文件，每个模型文件可以初始化一个分类器（CascadeClassifier）</li>
+<li>对分类器调用detectMultiScale可以返回frame中的匹配结果，可以将多个分类器并联（串联）提高识别准确率</li>
+</ul>
+<p>OpenCV的Haar分类器实现：Haar-like特征 + AdaBoost + 积分图（用来加速计算特征）</p>
+<h3 id="角点检测"><a href="#角点检测" class="headerlink" title="角点检测"></a>角点检测</h3><p>OpenCV中的角点检测：</p>
+<ul>
+<li><p>cornerHarris：Harris角点检测，其检测原理、以及特征可以<a href="https://www.cnblogs.com/ronny/p/4009425.html" target="_blank" rel="noopener">参考blog</a></p>
+<ul>
+<li>参数α对角点检测的灵敏度成反比</li>
+<li>Harris角点检测算子对<strong>亮度</strong>和<strong>对比度</strong>的变化不敏感</li>
+<li>旋转不变性、尺度不变性、不具备仿射不变性(但是可以通过Harris-Affine实现)</li>
+</ul>
+</li>
+<li><p>goodFeaturesToTrack：Shi-Tomasijiao</p>
+</li>
+<li><p>FAST：SUSAN算法</p>
+</li>
+</ul>
+<p><a href="https://www.cnblogs.com/ronny/p/4260167.html" target="_blank" rel="noopener">参考: 图像局部特征点检测算法综述</a></p>
+<h3 id="特征点追踪"><a href="#特征点追踪" class="headerlink" title="特征点追踪"></a>特征点追踪</h3><p>ROS by Example 中使用calcOpticalFlowPyrLK追踪，人脸上的角点运动，从而实现人脸跟踪的目的。</p>
+<p>calcOpticalFlowPyrLK 是OpenCV提供的Lucas Kanade光流算法的实现，能够计算两帧图像之间特征点的位移。</p>
+<p>光流定义为：空间运动物体在观察成像平面上的像素运动的瞬时速度，是利用图像序列中像素在时间域上的变化以及相邻帧之间的相关性来找到上一帧跟当前帧之间存在的对应关系，从而计算出相邻帧之间物体的运动信息的一种方法。</p>
+<p>个人理解，光流可以认为是素点的瞬时位移向量，是世界中可以感觉到的明显的视觉运动。</p>
+<p>参考：<a href="https://blog.csdn.net/zouxy09/article/details/8683859" target="_blank" rel="noopener">对OpenCV中光流函数的介绍</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>ROS by Example 中人脸跟踪的Demo全都是基于传统CV算法的。由于我没有摄像头，输入使用的是一个清晰度很差的视频图像，最终导致识别和追踪效果全都差强任意。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://blog.csdn.net/u011722133/article/details/53337818" target="_blank" rel="noopener">ROS图像相关包</a></p>
+<p><a href="https://www.cnblogs.com/ello/archive/2012/04/28/2475419.html" target="_blank" rel="noopener">Haar分类器</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.972Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/" target="_blank" rel="external">https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenCV/" rel="tag">OpenCV</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/&title=《OpenCV 学习笔记》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/&title=《OpenCV 学习笔记》 — LQing的博客&source=关于OpenCV-Python Tutorials、ROS By Example的学习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《OpenCV 学习笔记》 — LQing的博客&url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/09/23/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- PostgreSQL</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/09/01/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">摄像头标定</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/&title=《OpenCV 学习笔记》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/&title=《OpenCV 学习笔记》 — LQing的博客&source=关于OpenCV-Python Tutorials、ROS By Example的学习笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《OpenCV 学习笔记》 — LQing的博客&url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/09/03/0-OpenCV-%E5%AD%A6%E4%B9%A0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACt0lEQVR42u3aQa4iMQwFQO5/aWY7EoL/np0gFtUrBK3uVBaxsf14xNfz5fr/+9d7Xn9995zP97x+/7hx4eHh4a2XnjA+f8436POd73jJmvHw8PBu8969Jjn0kyM+Wdx+K/Hw8PB+n5ezk4S7DQx4eHh4v89rQ0K7lKRIgYeHh/c7vOQQj/78f1x6G36+WmvBw8PD69YTdZF+5/OV/h4eHh7euqu+CQM3kvV6nXh4eHgXeLOXtVuQJ81tGh0Ne+Hh4eFd4OXt/7bQkNw/CyoJEg8PD+8GLznKz7amNuNZ9ebi4eHhfZ2X/5oPVN0IDG/fjoeHh/dFXl5UbccF8lA0Q0aBAQ8PD2/Ba1tNbRJ8Y3irfg4eHh7eUV5d6y2T2uTJyRYkK6lDAh4eHt6I1446tVtQtPYPjQ68jXt4eHh4R3mz8kQ+FpCUevMQkmxZ3RLDw8PDK3nti2dNrLyRtimIFLUWPDw8vBFvViCYLb0tbeQBo06g8fDw8Ba8tqGVJ7ibe/Yr/CP64eHh4S14eSm2/b4t8ubFjqQJh4eHh3ebt2/q5+2oU0NX0Tbh4eHhXeO17fy8MZbk8s/4Gs6U4eHh4V3jFanqaDSqLdoeaJXh4eHhXePNDuJZe2zGGw5d4eHh4V3jbQawksLrviTRjj5EL8bDw8Mb8fIyRN6mygcIZmNb9dbg4eHhHeWdamJtGlfJET8smuDh4eFd4M2GpfKjuR1H2AetVZcPDw8PL7jnWV77J+S8NiC9Tanx8PDwjvIOF0xHSXDya17yGCLx8PDwSl57fCdBIl/0LPku8Hh4eHjXeHmRYnbEtwd9myhHbTA8PDy8r/PaIsKsfLApi6wCAx4eHt4FXltUzY/+dvuKMi4eHh7eNd6sGDErtraF4NVW4uHh4V3gzV62SX/zMu6phhweHh7eId4/0dCxhoDGok4AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

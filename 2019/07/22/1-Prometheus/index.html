@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Prometheus API | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Prometheus">
+    <meta name="description" content="Prometheus 调研">
+<meta name="keywords" content="Prometheus">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prometheus API">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;07&#x2F;22&#x2F;1-Prometheus&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="Prometheus 调研">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-29T07:33:55.973Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Prometheus API</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Prometheus API</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-07-22T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-07-22
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Client-API"><span class="post-toc-number">1.</span> <span class="post-toc-text">Client API</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Push-Gateway"><span class="post-toc-number">2.</span> <span class="post-toc-text">Push Gateway</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#timestamps"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">timestamps</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Job-和-instance-标签"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Job 和 instance 标签</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-1-Prometheus"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Prometheus API</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-07-23 00:00:00" datetime="2019-07-22T16:00:00.000Z"  itemprop="datePublished">2019-07-23</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>Prometheus 调研</p>
+<a id="more"></a>
+
+<h1 id="Client-API"><a href="#Client-API" class="headerlink" title="Client API"></a>Client API</h1><p>核心对象：</p>
+<ul>
+<li>Collector：收集器，根据Metrics的类型</li>
+<li>CollectorRegistry：Collector在其中进行注册</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> prometheus_client <span class="keyword">import</span> start_http_server, Summary</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">创建一个Summary类型的指标，Summary是一个Collector对象;</span></span><br><span class="line"><span class="string">    1. 第一个参数是metric的name</span></span><br><span class="line"><span class="string">    2. 第二个参数是metric的Help信息</span></span><br><span class="line"><span class="string">    3. 第三个参数是指标的label名称</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">REQUEST_TIME = Summary(<span class="string">'request_processing_seconds'</span>, <span class="string">'Time spent processing request'</span>, [<span class="string">"program"</span>])</span><br><span class="line">REQUEST_TIME_WITH_LABEL = REQUEST_TIME.labels(program=<span class="string">"Test"</span>) <span class="comment"># 在指定的label上赋值</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 通过装饰器的方式对process_request的执行时间进行采样</span></span><br><span class="line"><span class="meta">@REQUEST_TIME_WITH_LABEL.time()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process_request</span><span class="params">(t)</span>:</span></span><br><span class="line">    <span class="string">"""A dummy function that takes some time."""</span></span><br><span class="line">    time.sleep(t)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="comment"># 创建http服务，将metric暴露给采集器</span></span><br><span class="line">    start_http_server(<span class="number">6789</span>)</span><br><span class="line">    <span class="comment"># Generate some requests.</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        process_request(random.random())</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> prometheus_client <span class="keyword">import</span> start_http_server, Gauge, CollectorRegistry, push_to_gateway</span><br><span class="line"></span><br><span class="line"><span class="comment"># 监控指标需要添加的Label</span></span><br><span class="line">LABELS = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 需要进行监控的指标</span></span><br><span class="line">SERVICE_MAP = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># Metrics_MAP</span></span><br><span class="line">Metrics_MAP = &#123;&#125;</span><br><span class="line">Registry = CollectorRegistry()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init_metric</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    初始化量测值</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> key <span class="keyword">in</span> SERVICE_MAP.keys():</span><br><span class="line">        gauge_metric = Gauge(<span class="string">"memory_usage_"</span> + key.lower(), key + <span class="string">" service use memory"</span>, set(LABELS.keys()),registry=Registry)</span><br><span class="line">        Metrics_MAP.update(&#123;key: gauge_metric&#125;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">update_metric</span><span class="params">(sample)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    更新测量值</span></span><br><span class="line"><span class="string">    :param sample:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">for</span> key <span class="keyword">in</span> sample.keys():</span><br><span class="line">        gauge_metric = Metrics_MAP.get(key)</span><br><span class="line">        gauge_metric.labels(**LABELS).set(sample[key])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line"></span><br><span class="line">    init_metric()</span><br><span class="line">    <span class="keyword">if</span> exporter_config.get(<span class="string">"http_endpoint"</span>):</span><br><span class="line">		<span class="comment"># 创建一个http服务暴露采样信息</span></span><br><span class="line">        start_http_server(exporter_config.get(<span class="string">"http_port"</span>), registry=Registry)</span><br><span class="line">		<span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        	sample = metric() <span class="comment"># metric()获取采样值</span></span><br><span class="line">        	update_metric(sample=sample)</span><br><span class="line">        	time.sleep(<span class="number">30</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">elif</span> exporter_config.get(<span class="string">"push"</span>):</span><br><span class="line">		<span class="comment"># Gateway发送采样信息</span></span><br><span class="line">        push_to_gateway(exporter_config.get(<span class="string">"gateway"</span>),</span><br><span class="line">            job=exporter_config.get(<span class="string">"job"</span>),</span><br><span class="line">            grouping_key=LABELS,</span><br><span class="line">            registry=Registry)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        exit(<span class="number">-1</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Push-Gateway"><a href="#Push-Gateway" class="headerlink" title="Push Gateway"></a>Push Gateway</h1><p>Push Gateway的主要用于Batch Job、网络隔离等场景的数据采集。</p>
+<ul>
+<li>Gateway不会Cache目标的采样数据，只是将即时数据暴露给prometheus，可以将最近一次的采样数据保存到文件中，用来在Gateway重启时恢复数据。</li>
+<li>对于一些分布式计数的需求GateWay无法实现（可以使用<a href="https://github.com/weaveworks/prom-aggregation-gateway" target="_blank" rel="noopener">weaveworks/prom-aggregation-gateway</a>）。</li>
+<li>Gateway 没有实现TimeOut或者TTL机制。</li>
+</ul>
+<p>Gateway 中采样的URL地址和label地址相关，格式为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;IP&#125;:&#123;Port&#125;/job/&#123;job_name&#125;/instance/&#123;instance_value&#125;/&#123;label_1&#125;/&#123;value_1&#125;/...</span><br></pre></td></tr></table></figure>
+<p>label相同的采样被合并为一个Group。</p>
+<h2 id="timestamps"><a href="#timestamps" class="headerlink" title="timestamps"></a>timestamps</h2><p>使用Gateway时，metrics中的timestamps会产生歧义，即：Client推送到Gateway的时间和Prometheus从Gateway获得sample的时间。</p>
+<p>当Prometheus超过5min无法从target获取采样数据或者得到新采样（只时间变动的采样）时，认为target出现故障或者不存在。为了避免上述问题，Prometheus从Gateway得到的采样信息，以实际抓取的时间为timestamp，而push时间被保存在一个独立的metric中（push_time_seconds ）。</p>
+<h2 id="Job-和-instance-标签"><a href="#Job-和-instance-标签" class="headerlink" title="Job 和 instance 标签"></a>Job 和 instance 标签</h2><p>当prometheus从gateway中获取数据时会将sample中的job和instance标签配置为Gateway服务对应的值，因此需要在配置honor_labels为true。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用curl发送采样到gateway</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 发送一个untyped类型的采样，对应到的Group为&#123;job=<span class="string">"some_job"</span>&#125;</span></span><br><span class="line">echo "some_metric 3.14" | curl --data-binary @- http://pushgateway.example.org:9091/metrics/job/some_job</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 发送两个采样到gateway，Group为&#123;job=<span class="string">"some_job"</span>,instance=<span class="string">"some_instance"</span>&#125;</span></span><br><span class="line">  cat &lt;&lt;EOF | curl --data-binary @- http://pushgateway.example.org:9091/metrics/job/some_job/instance/some_instance</span><br><span class="line"><span class="meta">  #</span><span class="bash"> TYPE some_metric counter</span></span><br><span class="line">  some_metric&#123;label="val1"&#125; 42</span><br><span class="line"><span class="meta">  #</span><span class="bash"> TYPE another_metric gauge</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> HELP another_metric Just an example.</span></span><br><span class="line">  another_metric 2398.283</span><br><span class="line">  EOF</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除指定group</span></span><br><span class="line"></span><br><span class="line">curl -X DELETE http://pushgateway.example.org:9091/metrics/job/some_job/instance/some_instance</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://prometheus.github.io/client_java/io/prometheus/client/exporter/PushGateway.html" target="_blank" rel="noopener">Pushgateway Java API</a></p>
+<p><a href="https://github.com/prometheus/client_python#exporting-to-a-pushgateway" target="_blank" rel="noopener">Pushgateway Python API</a></p>
+<p><a href="https://prometheus.io/docs/instrumenting/pushing/" target="_blank" rel="noopener">Pushgateway Go API</a></p>
+<p><a href="https://github.com/prometheus/client_ruby#pushgateway" target="_blank" rel="noopener">Pushgateway Ruby API</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-10-29T07:33:55.973Z" itemprop="dateUpdated">2019-10-29 15:33:55</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/07/22/1-Prometheus/" target="_blank" rel="external">https://linqing2017.github.io/2019/07/22/1-Prometheus/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Prometheus/" rel="tag">Prometheus</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/22/1-Prometheus/&title=《Prometheus API》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/22/1-Prometheus/&title=《Prometheus API》 — LQing的博客&source=Prometheus 调研" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/22/1-Prometheus/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Prometheus API》 — LQing的博客&url=https://linqing2017.github.io/2019/07/22/1-Prometheus/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/22/1-Prometheus/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/07/30/2-Prometheus/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Prometheus Alarm</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/07/15/0-Prometheus/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- Prometheus</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/22/1-Prometheus/&title=《Prometheus API》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/22/1-Prometheus/&title=《Prometheus API》 — LQing的博客&source=Prometheus 调研" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/22/1-Prometheus/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Prometheus API》 — LQing的博客&url=https://linqing2017.github.io/2019/07/22/1-Prometheus/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/22/1-Prometheus/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACJ0lEQVR42u3aMW7DMAwF0Nz/0i7QqYucTzIpYOlpMlxH8vPAiqRer3hcv2N1/+9fr8VIZk6eHw0MDIzHMq7bsVpsxavCVjPk74aBgXEOIw+F969+H0DvrxPk8j4GBgZGcereMxgYGBifCriTjDKZGQMDA2OSxE62eknBLk+AMTAwTmNUGwP/ef3F/gYGBsZDGFdx9H77qfC6/C0GBsbWjKSJ2CuW9Q5YVFsLb/JaDAyMLRjVEDkp6FePZSSfFQMD4xxGHkzzxSYJahKsl5tCDAyMTRnJVuxTBy8mzYPlBhQDA2NrRi/YVdPR3svlBTsMDIy9Gd/YqOUbx+ohjOW7YWBgbM2oJpZ5+X7+IcqfAAMDY1NGNYlNwL1yW6+Eh4GBcQIjby7myOpRiV6wxsDAOI0xaUBOjn9NCnxRvRADA2MjRm8jWGX3mgSFZzAwMDZlJA3CPHHNQ2RygKOQTmNgYBzA6G3gJkG2d2jsTScWAwNjU0a1bVkoexWbo/md8r8BDAyMhzOqDctJGS6Zs8rDwMA4h5GE2t7RsWoS22x2YmBgbM3ohdF5gK42IaI5MTAwNmVcxTFJPic7OgwMjJMZvcbkfNs3aRtgYGCcyUiCbO/IRR6+ew2JwpIYGBhbMJIgm4fOPOzOgz4GBgZGr0mZBO7qobQ3gRgDAwOjdZ3D5gEdAwPjBEa+WC/tzNfK2wbNXBwDA+OBjF4Cmae4vfLcVzAYGBjPY/wAbEP6CGShbnIAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
