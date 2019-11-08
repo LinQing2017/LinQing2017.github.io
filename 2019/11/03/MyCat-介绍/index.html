@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- MyCat | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,MyCat">
+    <meta name="description" content="数据库调研笔记 – MyCat">
+<meta name="keywords" content="数据库,MyCat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- MyCat">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;11&#x2F;03&#x2F;MyCat-%E4%BB%8B%E7%BB%8D&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="数据库调研笔记 – MyCat">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-08T10:58:23.128Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- MyCat</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- MyCat</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-03T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-11-03
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#介绍"><span class="post-toc-number">1.</span> <span class="post-toc-text">介绍</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#安装"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">安装</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#配置信息"><span class="post-toc-number">2.</span> <span class="post-toc-text">配置信息</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#schema-xml文件"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">schema.xml文件</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#1-schema标签"><span class="post-toc-number">2.1.1.</span> <span class="post-toc-text">1. schema标签</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#2-table标签"><span class="post-toc-number">2.1.2.</span> <span class="post-toc-text">2. table标签</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#3-childTable标签"><span class="post-toc-number">2.1.3.</span> <span class="post-toc-text">3.childTable标签</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#4-dataNode-dataHost标签"><span class="post-toc-number">2.1.4.</span> <span class="post-toc-text">4. dataNode/dataHost标签</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#server-xml文件"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">server.xml文件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#rule-xml文件"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">rule.xml文件</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Mycat的join操作"><span class="post-toc-number">3.</span> <span class="post-toc-text">Mycat的join操作</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#全局表"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">全局表</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#E-R-Join"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">E-R Join</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他Join方式"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">其他Join方式</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#全局序列号"><span class="post-toc-number">4.</span> <span class="post-toc-text">全局序列号</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#总结"><span class="post-toc-number">5.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-MyCat-介绍"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- MyCat</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-04 00:00:00" datetime="2019-11-03T16:00:00.000Z"  itemprop="datePublished">2019-11-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>数据库调研笔记 – MyCat</p>
+<a id="more"></a>
+
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>MyCat基于Ali的开源组件cobar演变而来，是一款知名度较高的SQL中间件。</p>
+<p>当前<a href="https://github.com/MyCATApache/Mycat-Server" target="_blank" rel="noopener">MyCATApache/Mycat-Server</a>项目有7.2K Star，89个贡献者。</p>
+<p>当前的稳定版本是<a href="http://dl.mycat.io/1.6.5/" target="_blank" rel="noopener">MyCat 1.6.5</a>，另外社区还有<a href="https://github.com/MyCATApache/Mycat2/blob/master/doc/00-mycat-readme.md" target="_blank" rel="noopener">Mycat2</a>项目，但是当前还没有正式发行版。</p>
+<p>目前，MySQL后端支持以下数据库： Mysql、SQL Server、Oracle、 DB2、PostgreSQL、部分NoSQL</p>
+<p>PS：”MyCat目前在Github上有655个open状态的issue，绝大数issue没有人回应。”</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>第一次安装使用MySQL 8.0作为后端，但是安装完成后发现存在兼容性问题：Mysql 8.0自带的mysql客户端无法正常连接mycat，但是使用低版本的mysql客户端可以正常连接（这个问题Github上有<a href="https://github.com/MyCATApache/Mycat-Server/issues/1842" target="_blank" rel="noopener">issues</a>，但是没有修复）。</p>
+<p>mysql 8.0 安装过程如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装mysql 8.0</span></span><br><span class="line">wget -i -c  https://repo.mysql.com//mysql80-community-release-el7-1.noarch.rpm</span><br><span class="line">yum -y install mysql80-community-release-el7-1.noarch.rpm</span><br><span class="line">yum -y install mysql-community-server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装mysql5.7</span></span><br><span class="line"><span class="meta">#</span><span class="bash">wget -i -c https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.28-1.el7.x86_64.rpm-bundle.tar</span></span><br><span class="line"><span class="meta">#</span><span class="bash">tar -xvf mysql-5.7.28-1.el7.x86_64.rpm-bundle.tar</span></span><br><span class="line"><span class="meta">#</span><span class="bash">yum -y localinstall mysql-community-*5.7.28-1*.rpm</span></span><br><span class="line"></span><br><span class="line">echo "lower_case_table_names=1" &gt;&gt; /etc/my.cnf</span><br><span class="line">echo "default-authentication-plugin=mysql_native_password" &gt;&gt;  /etc/my.cnf  # 安装低版本mysql时无需配置</span><br><span class="line">systemctl enable mysqld.service &amp;&amp; systemctl start mysqld.service</span><br><span class="line"></span><br><span class="line">grep "password" /var/log/mysqld.log</span><br><span class="line">mysql -uroot -p</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接mysql修改默认密码，以及认证加密方式，并创建数据库</span></span><br><span class="line"></span><br><span class="line">ALTER USER 'root'@'localhost' IDENTIFIED BY 'Ruijie@123';</span><br><span class="line">ALTER USER 'root'@'%' IDENTIFIED BY 'Ruijie@123' PASSWORD EXPIRE NEVER;       # 使用低版本mysql时无需执行</span><br><span class="line">ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'Ruijie@123';  # 使用低版本mysql时无需执行</span><br><span class="line"></span><br><span class="line">use mysql;</span><br><span class="line"><span class="meta">#</span><span class="bash">GRANT ALL PRIVILEGES ON *.* TO <span class="string">'root'</span>@<span class="string">'%'</span> IDENTIFIED BY <span class="string">'Ruijie@123'</span>;         </span></span><br><span class="line">UPDATE USER SET HOST = '%' where USER = 'root'; </span><br><span class="line">flush privileges;</span><br><span class="line">CREATE DATABASE mycat_db;</span><br></pre></td></tr></table></figure>
+
+<p>部署mycat</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">groupadd -g 550 mycat</span><br><span class="line">useradd -g 550 -u 550 -m -d /home/mycat -s /bin/bash mycat</span><br><span class="line">echo "ruijie" | passwd --stdin mycat</span><br><span class="line"></span><br><span class="line">wget http://dl.mycat.io/1.6.7.3/20190927161129/Mycat-server-1.6.7.3-release-20190927161129-linux.tar.gz</span><br><span class="line">tar -xzvf Mycat-server-1.6.7.3-release-20190927161129-linux.tar.gz -C /usr/local</span><br><span class="line">chown -R mycat:mycat /usr/local/mycat</span><br><span class="line"></span><br><span class="line">echo "export MYCAT_HOME=/usr/local/mycat" &gt; /etc/profile.d/mycat.sh</span><br><span class="line">echo "export PATH=$PATH:$MYCAT_HOME/bin" &gt;&gt; /etc/profile.d/mycat.sh</span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果后端数据库使用的是mysql 8.0需要替换lib目录下的驱动文件</span></span><br></pre></td></tr></table></figure>
+
+<p>安装过程中，注意schema.xml和server.xml文件：</p>
+<ul>
+<li>schema.xml定义mycat的逻辑表和逻辑库信息，以及后端mysql信息；</li>
+<li>server.xml文件定义连接信息和用户信息，安装包中默认提供二个用户 root/123456 和 user/user；</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- </span></span><br><span class="line"><span class="comment">    PS：该配置文件中mycat规划了2个shard，小于默认的三个，需要修改autopartition-long.txt，将最后一行配置删掉</span></span><br><span class="line"><span class="comment">--&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE mycat:schema SYSTEM "schema.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mycat:schema</span> <span class="attr">xmlns:mycat</span>=<span class="string">"http://io.mycat/"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"TESTDB"</span> <span class="attr">checkSQLschema</span>=<span class="string">"true"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"travelrecord"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2"</span> <span class="attr">rule</span>=<span class="string">"auto-sharding-long"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">schema</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"dn1"</span> <span class="attr">dataHost</span>=<span class="string">"mycat71"</span> <span class="attr">database</span>=<span class="string">"mycat_db"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"dn2"</span> <span class="attr">dataHost</span>=<span class="string">"mycat72"</span> <span class="attr">database</span>=<span class="string">"mycat_db"</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"mycat71"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"0"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"1"</span>  <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>select user()<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"mycat71"</span> <span class="attr">url</span>=<span class="string">"mycat71:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"Ruijie@123"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"mycat72"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"0"</span> <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"1"</span>  <span class="attr">slaveThreshold</span>=<span class="string">"100"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>select user()<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"mycat72"</span> <span class="attr">url</span>=<span class="string">"mycat72:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"Ruijie@123"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mycat:schema</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>安装完成后执行mycat start启动mycat服务。</p>
+<h1 id="配置信息"><a href="#配置信息" class="headerlink" title="配置信息"></a>配置信息</h1><p>Mycat的配置信息主要位于schema.xml、server.xml、rule.xml三个文件中。</p>
+<p><a href="chrome-extension://ikhdkkncnoglghljlkmcimlnlhkeamad/pdf-viewer/web/viewer.html?file=http%3A%2F%2Fwww.mycat.io%2Fdocument%2Fmycat-definitive-guide.pdf" target="_blank" rel="noopener">MyCat权威指南</a>第七章详细说明了这三个配置文件。</p>
+<h2 id="schema-xml文件"><a href="#schema-xml文件" class="headerlink" title="schema.xml文件"></a>schema.xml文件</h2><h3 id="1-schema标签"><a href="#1-schema标签" class="headerlink" title="1. schema标签"></a>1. schema标签</h3><p>该标签用来定义mycat中的逻辑数据库，对于一个mycat实例可以配置多个逻辑数据库。</p>
+<p>schema字段包含以下属性：</p>
+<ul>
+<li>name：逻辑库名称</li>
+<li>dataNode：将逻辑库绑定到后端一个具体的数据库，此时没有配置分片的表落在该数据库中</li>
+<li>checkSQLschema：将发送到后端DB的schema关键字去除</li>
+<li>sqlMaxLimit：自动加上limit语句</li>
+</ul>
+<h3 id="2-table标签"><a href="#2-table标签" class="headerlink" title="2. table标签"></a>2. table标签</h3><p>该标签是schema的子标签，所有需要拆分的表在该标签中定义，形成一张拆分逻辑表。</p>
+<ul>
+<li>name：逻辑表名</li>
+<li>dataNode：逻辑表分片到的实际数据库，可以定义多个，或者通配符定义</li>
+<li>rule：逻辑表遵循的分片规则，规则在rule.xml中定义（tableRule标签中的name属性一一对应）</li>
+<li>ruleRequired：该属性用于指定表是否绑定分片规则，如果配置为true</li>
+<li>primaryKey：该逻辑表对应真实表的主键。使用非主键分片时，指定实际主键会使Mycat缓存查询结果，提高性能</li>
+<li>type：表属性，包括全局表、普通表两种</li>
+<li>autoIncrement：指定这个表有使用自增长主键</li>
+<li>subTables：启用分表属性（指对大表宽表进行垂直拆分），分表放在一个数据库中，并且不支持各种条件的join</li>
+<li>needAddLimit：自动的在每个语句后面加上limit 限制（默认为true）</li>
+</ul>
+<h3 id="3-childTable标签"><a href="#3-childTable标签" class="headerlink" title="3.childTable标签"></a>3.childTable标签</h3><p>childTable用于定义E-R分片的子表</p>
+<h3 id="4-dataNode-dataHost标签"><a href="#4-dataNode-dataHost标签" class="headerlink" title="4. dataNode/dataHost标签"></a>4. dataNode/dataHost标签</h3><p>dataNode 标签定义了MyCat中的数据节点。一个dataNode 标签就是一个独立的数据分片，对应一个后端数据库。</p>
+<p>dataHost 标签定义了一个数据库的具体链接方式，读写分离配置、和心跳语句。dataHost 标签比较重要的参数包括：</p>
+<ul>
+<li>maxCon/minCon：连接池配置</li>
+<li>balance ：读操作负载均衡配置，当前支持单点读、读写分离、双主双从、随机分发</li>
+<li>writeType ：写操作的服务负载均衡</li>
+<li>switchType：主备切换配置</li>
+<li>dbType：数据库类型，目前实际上mycat只支持mysql的二进制协议，但是这里可以填写MongoDB、Oracle、Spark等类型的数据库，但本质上都是通过jdbc连接的后端。</li>
+<li>dbDriver：驱动类型支持natvie、jdbc两种</li>
+<li>heartbeat 标签：心跳语句</li>
+<li>writeHost标签、readHost标签</li>
+</ul>
+<h2 id="server-xml文件"><a href="#server-xml文件" class="headerlink" title="server.xml文件"></a>server.xml文件</h2><p>server.xml几乎保存了所有mycat需要的系统配置信息。其在代码内直接的映射类为SystemConfig类。其中最为重要的标签是：</p>
+<ul>
+<li>user标签：定义mycat的连接用户和权限。</li>
+<li>system标签：定义mycat的系统配置，如字符集、sql解析器、线程数据等等</li>
+</ul>
+<h2 id="rule-xml文件"><a href="#rule-xml文件" class="headerlink" title="rule.xml文件"></a>rule.xml文件</h2><p>该文件定义了一些分片策略，在schema.xml文件中指定表分片时可以指定这些分片策略。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">tableRule</span> <span class="attr">name</span>=<span class="string">"rule1"</span>&gt;</span>    <span class="comment">&lt;!--表规则名称--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">rule</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">columns</span>&gt;</span>id<span class="tag">&lt;/<span class="name">columns</span>&gt;</span>   <span class="comment">&lt;!--片键名称--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">algorithm</span>&gt;</span>func1<span class="tag">&lt;/<span class="name">algorithm</span>&gt;</span> <span class="comment">&lt;!--路由算法名称--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">rule</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tableRule</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--分片算法通过java类实现，配置指定在文件中--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">function</span> <span class="attr">name</span>=<span class="string">"hash-int"</span><span class="attr">class</span>=<span class="string">"io.mycat.route.function.PartitionByFileMap"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"mapFile"</span>&gt;</span>partition-hash-int.txt<span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">function</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>常用分片算法：参考<a href="chrome-extension://ikhdkkncnoglghljlkmcimlnlhkeamad/pdf-viewer/web/viewer.html?file=http%3A%2F%2Fwww.mycat.io%2Fdocument%2Fmycat-definitive-guide.pdf" target="_blank" rel="noopener">MyCat权威指南</a>第10.5章节！</p>
+<h1 id="Mycat的join操作"><a href="#Mycat的join操作" class="headerlink" title="Mycat的join操作"></a>Mycat的join操作</h1><p>Mycat支持以下几种场景的Join：</p>
+<h2 id="全局表"><a href="#全局表" class="headerlink" title="全局表"></a>全局表</h2><p>全局表在所有节点保存完整副本，具备以下特性：</p>
+<ul>
+<li><p>全局表的插入、更新操作会实时在所有节点上执行，保持各个分片的数据一致性</p>
+</li>
+<li><p>全局表的查询操作，只从一个节点获取</p>
+</li>
+<li><p>全局表可以跟任何一个表进行JOIN操作</p>
+</li>
+<li><p>Mycat通过在MYSQL中额外添加内部列进行全局一致性检查</p>
+<ul>
+<li>检查全局表是否存在内部列</li>
+<li>检查全局表的记录总数</li>
+<li>检查全局表的时间戳最大值</li>
+</ul>
+</li>
+<li><p>插入全局表时必须带列名插入</p>
+</li>
+</ul>
+<h2 id="E-R-Join"><a href="#E-R-Join" class="headerlink" title="E-R Join"></a>E-R Join</h2><p>E-R Join是在schema.xml文件中预先定义两张的关联key，使分片时关联键相同的数据分布在同一个数据库中，从而保证不会发生跨跨库join。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- customer 和 orders 的关联关系为 orders.customer_id=customer.id --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"customer"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2"</span> <span class="attr">rule</span>=<span class="string">"sharding-by-intfile"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">childTable</span> <span class="attr">name</span>=<span class="string">"orders"</span>  <span class="attr">joinKey</span>=<span class="string">"customer_id"</span> <span class="attr">parentKey</span>=<span class="string">"id"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他Join方式"><a href="#其他Join方式" class="headerlink" title="其他Join方式"></a>其他Join方式</h2><ul>
+<li>Share Join：ShareJoin是一个简单的跨分片Join,基于HBT的方式实现，目前支持两个表join，官方文档称只在开发版中有该功能。</li>
+<li>Catlet Join：通过自定义接口实现Join操作。</li>
+<li>Spark/Storm对join扩展：还没有实现！！</li>
+</ul>
+<h1 id="全局序列号"><a href="#全局序列号" class="headerlink" title="全局序列号"></a>全局序列号</h1><p>Mycat中全局序列号主要用来为表提供自增组件，用户可以通过：本地文件、数据库配置、时间戳配置、以及分布式ZK ID生成器。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>经过几天的测试，对 MyCat 使用总结以下几点：</p>
+<p>优势：</p>
+<ul>
+<li>使用较为简便，主要因为是，原理简单（就是SQL变换），并且是国产软件有很多中文资料；</li>
+<li>预留了很多API进行自定义开发；</li>
+<li>纯java实现，有进行源码级别Debug、自定义开发的可能；</li>
+</ul>
+<p>劣势：</p>
+<ul>
+<li>并非真正意义上的分布式数据库，相比Greenplum、TiDB这种真正的分布式方案架构上有先天缺陷（个人认为，Mycat的发展方向路子走偏了）</li>
+<li>有很多功能性的限制，以下是官方权威指南中提到的功能限制（不包括网络上其他人发现的）</li>
+</ul>
+<pre><code>- 跨库Join 功能太弱，只能支持全局表Join或者片内join（Share join支持2个表的跨库join，但是性能堪忧），考虑以下场景MyCat很难胜任：</code></pre><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- A表：id1 、id2</span></span><br><span class="line"><span class="comment">-- B表: 片键id</span></span><br><span class="line"><span class="comment">-- C表: 片键id</span></span><br><span class="line"><span class="comment">--</span></span><br><span class="line"><span class="comment">-- E-R join无法同时满足下面二个Join，只能选择将一张表设定成全局表：</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> A , B <span class="keyword">where</span> A.id1 = B.id;</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> A , B <span class="keyword">where</span> A.id2 = C.id;</span><br></pre></td></tr></table></figure>
+
+<pre><code>- Mycat的全局表的一致性检查机制比较简单，且出现不一致时没有自动恢复机制（个人认为：误操作、掉电等场景都有可能出现不一致，Mycat的一致性检查太low了）
+
+- 官方文档提到MyCat不支持复杂子查询，但没有给出具体说明（很迷！！）
+
+- 保证高可用需要用户自行设计组网方案：MyCat本身不提供后端数据库的HA能力，也不提供MyCat服务本身的HA功能。每个接入的MySQL都需要进行主从复制的配置，而MyCat本身使用HAProxy避免单点故障。（这一点实际上又引申出如何保障mysql高可用的问题，从IData的应用场景来看还是比较复杂的）
+
+- Mycat没有提供备份和恢复方案，只能使用mysql的备份工具备份每一个mysql数据库，并且为了保证数据一致性每一次备份需要业务停止写入；
+
+- MyCat使用配置文件定义分片策略，如果分片规则变更数据无法同步更新。换句话说，如果生产中发现之前定义的分片不均衡或者节点扩容，那么需要重写整张表。
+
+- 分布式事务能力较弱，官方文档提到：Mycat 目前没有出来跨分片的事务强一致性支持，目前单库内部可以保证事务的完整性，如果跨库事务，在执行的时候任何分片出错，可以保证所有分片回滚，但是一旦应用发起commit 指令，无法保证所有分片都成功考虑到某个分片挂的可能性不大所以称为弱xa。（看到一篇blog说MyCat基于 Mysql XA 接口实现分布式事务，但是 Mysql XA 接口本身用户不多，因此性能和可用性都可能存在问题！）</code></pre>
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-11-08T10:58:23.128Z" itemprop="dateUpdated">2019-11-08 18:58:23</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/" target="_blank" rel="external">https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MyCat/" rel="tag">MyCat</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- MyCat》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- MyCat》 — LQing的博客&source=数据库调研笔记 – MyCat" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- MyCat》 — LQing的博客&url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/10/24/Greenplum-%E5%88%86%E5%8C%BA%E8%A1%A8%E4%BB%8B%E7%BB%8D/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- MyCat》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- MyCat》 — LQing的博客&source=数据库调研笔记 – MyCat" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- MyCat》 — LQing的博客&url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsklEQVR42u3awW6DMBAE0Pz/T7eXHiq1gRmvHXF4nCICwY9Ktju7r1d8fP062jN/v70+n9y1+cDDw8MbDL19TPLI9vp3VyYv5Z/fx8PDwzvGy4e1xkum+Otrkufi4eHhPZnXbp2TIU6+xcPDw3syr90Kz19cvpXHw8PD+yQvCSOS66+XhPx88lI2Zy14eHh4Ma+d7p/w+Uh9Dw8PD29cVV8r518Pog0p1hakn7vw8PDwDvDWiljztoM2Vmi33Xh4eHif4a1FqHnJao5ZW07w8PDw9vJ2PT6ZuOdBcNumgIeHh3eOl5em8tar6PGDhq1ks46Hh4d3gtcuD3tbtVr2YkMYHh4e3gHepPKeg/OYo12KFluv8PDw8Aa81p0z8k1zvjVvR4WHh4d3mrerbD9plmpHchOL4OHh4R3grU3uyedJi9V8PHh4eHgneMlUm4ekyVY7DzWSBePmJeLh4eEd4E3WkF1b5F1x7c02Gg8PD28Tr52U22k9n8TzklgSEOPh4eGd4y1eWoa2a6FDUhIrGrnw8PDwNvEmZaddw23vKpYQPDw8vAO8ZBOcNz/l366VypKFqmi6wsPDwxvw8im43Tony8lajNs2s+Lh4eHt5a390OSufAFImhiKrBoPDw9vE28yZefstr21Lc7h4eHhfZI3Kf9fT/GTV9aGxfVfDA8PD28Tby08baPbtTG05TE8PDy807yblHcQLqyVrNpRvf1NPDw8vK28r/KYt0btjYNvlhY8PDy8A7x2wp2Ur/JYYe3e1+TAw8PDK3ltRJtPym2zVL4gFaEJHh4e3jFeG63uDRT2hho3rQN4eHh4D+Alha5k+ZlED29/DQ8PD+8xvCRmXQt/k5HkrwkPDw/vHK8dXL4hXiuJTcB4eHh4p3ntP/xtODthtMvSqL6Hh4eHd3/mG4VaiL3r0iiCAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

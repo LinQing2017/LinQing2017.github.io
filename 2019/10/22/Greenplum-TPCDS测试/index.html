@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- GreenPlum | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,GreenPlum">
+    <meta name="description" content="GreenPlum 调研笔记">
+<meta name="keywords" content="数据库,GreenPlum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- GreenPlum">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;10&#x2F;22&#x2F;Greenplum-TPCDS%E6%B5%8B%E8%AF%95&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="GreenPlum 调研笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-08T10:58:23.105Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- GreenPlum</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- GreenPlum</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-10-22T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-10-22
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#测试工具"><span class="post-toc-number">1.</span> <span class="post-toc-text">测试工具</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#安装步骤"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">安装步骤</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#pivotalguru-TPC-DS"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">pivotalguru/TPC-DS</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">2.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Greenplum-TPCDS测试"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- GreenPlum</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-10-23 00:00:00" datetime="2019-10-22T16:00:00.000Z"  itemprop="datePublished">2019-10-23</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>GreenPlum 调研笔记</p>
+<a id="more"></a>
+
+<h1 id="测试工具"><a href="#测试工具" class="headerlink" title="测试工具"></a>测试工具</h1><p>使用<a href="https://github.com/pivotalguru/TPC-DS/blob/master/rollout.sh" target="_blank" rel="noopener">pivotalguru/TPC-DS</a> 工具进行测试，该工具是一个包含：数据生成、执行SQL、输入报告等功能。</p>
+<h2 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在master节点安装以下工具</span></span><br><span class="line">yum -y install git gcc bc</span><br><span class="line"><span class="meta">#</span><span class="bash"> 切换到gpadmin用户，<span class="built_in">clone</span>工具的执行脚本</span></span><br><span class="line">git clone https://github.com/pivotalguru/TPC-DS</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 编辑gpadmin用户的.bashrc文件，指定Greenplum的环境变量</span></span><br></pre></td></tr></table></figure>
+
+<p>在gpadmin用户目录中，创建脚本测试脚本tpcds.sh，并执行即可以开始测试：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">set -e</span><br><span class="line">REPO="TPC-DS"                         </span><br><span class="line">ADMIN_USER="gpadmin"</span><br><span class="line">INSTALL_DIR="/home/gpadmin/pivotalguru"  # 存放TPC-DS工程的目录</span><br><span class="line">EXPLAIN_ANALYZE="false"</span><br><span class="line">RANDOM_DISTRIBUTION="false"              </span><br><span class="line">MULTI_USER_COUNT="0"                    </span><br><span class="line">GEN_DATA_SCALE="10"                      # 1000 约等于生成1T原始数据</span><br><span class="line">SINGLE_USER_ITERATIONS="1"</span><br><span class="line">RUN_COMPILE_TPCDS="false"</span><br><span class="line">RUN_GEN_DATA="false"</span><br><span class="line">RUN_INIT="true"</span><br><span class="line">RUN_DDL="true"</span><br><span class="line">RUN_LOAD="true"</span><br><span class="line">RUN_SQL="true"</span><br><span class="line">RUN_SINGLE_USER_REPORT="true"</span><br><span class="line">RUN_MULTI_USER="true"</span><br><span class="line">RUN_MULTI_USER_REPORT="true"</span><br><span class="line">RUN_SCORE="true"</span><br><span class="line"></span><br><span class="line">su --session-command="cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS" $ADMIN_USER</span><br></pre></td></tr></table></figure>
+
+<h2 id="pivotalguru-TPC-DS"><a href="#pivotalguru-TPC-DS" class="headerlink" title="pivotalguru/TPC-DS"></a>pivotalguru/TPC-DS</h2><p>测试工具的入口是rollout.sh，该脚本顺序调用每个子目录下的rollout.sh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 00_compile_tpcds: tpcds源码脚本会编译该目录的C语言源码，用于生成原始数据</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 01_gen_data：数据生成脚本、SQL生成脚本</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#      - 工具会在每一个Segment实例安装目录（xxx/pivotalguru）中并行生成原始数据，原始数据的格式为" XXX_&#123;id&#125;_&#123;num_seg&#125;.dat "</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#      - 由于SQL脚本中需要处理表的分区信息，因此每次生成数据都会生成相应SQL脚本，生成的SQL被保存到05_sql目录中（sql的模板时TPC-DS本身提供的，位于00_compile_tpcds\query_templates）</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 02_init：测试开始前的一些准备工作，包括生成Seg信息、保存配置等</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># </span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 03_ddl：创建表</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#      - 工具会创建schema：tpcds、ext_tpcds</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#      - 默认根据03_ddl\distribution.txt文件进行分片，也可以指定RANDOM_DISTRIBUTION</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 04_load：将外部表导入到Greenplum中</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#      - 工具会为每个SegmentHost启动gpfdist服务，并执行SQL直接将外部表导入</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># </span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 05_sql：执行单用户测试</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 06_single_user_reports：生成单用户测试报告</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#      - 测试信息在schemaname是tpcds_reports的表中</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 07_multi_user：执行多用户测试</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 08_multi_user_reports：生成多用户测试报告</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># </span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - 09_score：生成测试评分</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - functions.sh：环境准备脚本，由rollout.sh调用</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># - rollout.sh：测试入口脚本</span></span></span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1>
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-11-08T10:58:23.105Z" itemprop="dateUpdated">2019-11-08 18:58:23</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/" target="_blank" rel="external">https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GreenPlum/" rel="tag">GreenPlum</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/10/24/Greenplum-%E5%88%86%E5%8C%BA%E8%A1%A8%E4%BB%8B%E7%BB%8D/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/10/16/Yarn%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Yarn磁盘管理</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/10/22/Greenplum-TPCDS%E6%B5%8B%E8%AF%95/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsElEQVR42u3aQW7CQAwFUO5/6XbbSk34tseAqpcVKjAzL5ViY/vxiK+vi+vnu/evr/5ytdfVvo+NCw8PD+/Q0a+2qR4oQd7fsnyXP06Ih4eHt8ZLDl19Aie3pndTkjPj4eHhfRqvsEExdc4DAx4eHt7/4N0nytUQkpQ/8PDw8N7Fywu1vSPmZYheefdArQUPDw8v5vXS3/e+Xunv4eHh4Y276vmgQDUtnqTRhdPi4eHhLfAmza1qQ6u6TrWFdvlJPDw8vGXe5DE9Hyw4uyYeHh7eHq/3IJ4kynmKXC3mNucU8PDw8GJer9HVa3rdHzfh5Svg4eHhbfOSsapqY35SsDg18oWHh4e3wUta9b00dzJ80Gu2lcMDHh4e3oBXXfr+UV5OfA+FgajWgoeHhzfm5ZslmDyEJCWPasjBw8PDew3v/sFa+MFfbFPlgaEXSPDw8PBeyZsfZRIGeul79I/Bw8PDO8SrlhWq5dpqAbeXxJe7cHh4eHhjXp4K94qz1RhVHVmIOnt4eHh4h3jV9lK1RDspOpxaBw8PD2+Pl7Sg8gJuvmZv6KrQfsPDw8Nb4OXbJJvN1+k15AqFCTw8PLwFXjV57bEnN7da8sDDw8M7xZskrHmTrJegJ6QnZQs8PDy8BV6vhZ+PF/TS8clQwpMqNR4eHt4Cr/ezPxkayPG9MHC5Ah4eHt4yrzcC1Wti5WcYlYDx8PDw1niTY1VDy4GGVl7CwMPDwzvK+ypevdbXvKmWv/vrNR4eHt4Cr/fATQCTVLtaeuiFEDw8PLwJrzcmNcefugXRfAQeHh7eAm8y2NRrcU1uaKFsgYeHh/cBvF6BIP/WJAz8sRoeHh7ex/CqD/Feg61XtsDDw8N7DS9vevW+VQ0Dp4oUeHh4eBu86g/+fON5wbdKHfX38PDw8J7v+A1/xQMnIoioWwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

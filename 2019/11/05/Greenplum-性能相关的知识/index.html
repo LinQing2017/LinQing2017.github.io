@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- GreenPlum | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,GreenPlum">
+    <meta name="description" content="GreenPlum 调研笔记">
+<meta name="keywords" content="数据库,GreenPlum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- GreenPlum">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;11&#x2F;05&#x2F;Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="GreenPlum 调研笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-08T10:58:23.105Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- GreenPlum</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- GreenPlum</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-05T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-11-05
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#收集统计信息"><span class="post-toc-number">1.</span> <span class="post-toc-text">收集统计信息</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#分析执行计划"><span class="post-toc-number">2.</span> <span class="post-toc-text">分析执行计划</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#EXPLAIN"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">EXPLAIN</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#EXPLAIN-ANALYZE"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">EXPLAIN ANALYZE</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#执行计划中的重要关键字"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">执行计划中的重要关键字</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#优化器开销的计算"><span class="post-toc-number">2.3.1.</span> <span class="post-toc-text">优化器开销的计算</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Join的广播和重分布"><span class="post-toc-number">3.</span> <span class="post-toc-text">Join的广播和重分布</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Greenplum-性能相关的知识"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- GreenPlum</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-06 00:00:00" datetime="2019-11-05T16:00:00.000Z"  itemprop="datePublished">2019-11-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>GreenPlum 调研笔记</p>
+<a id="more"></a>
+
+<h1 id="收集统计信息"><a href="#收集统计信息" class="headerlink" title="收集统计信息"></a>收集统计信息</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- ANALYZE无参数数时收集整个数据库的统计信息；</span></span><br><span class="line"><span class="comment">-- 可以收集单个表，或表的单个列的统计信息；</span></span><br><span class="line"><span class="comment">-- 不收集外表的统计信息；</span></span><br><span class="line"><span class="comment">-- 通常建议每天运行一次 VACUUM 和 ANALYZE；</span></span><br><span class="line"><span class="comment">-- ANALYZE 在表中产生 UPDATE EXCLUSIVE 锁，因此一些查询语句可能为产生冲突；</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ANALYZE</span> [VERBOSE] [ROOTPARTITION [<span class="keyword">ALL</span>] ] </span><br><span class="line">   [<span class="keyword">table</span> [ (<span class="keyword">column</span> [, ...] ) ]];</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 收集分区表的根表信息，该命令不会收集普通表的信息</span></span><br><span class="line"><span class="keyword">ANALYZE</span> ROOTPARTITION <span class="keyword">ALL</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 审定test表的note列不收集统计信息；</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> <span class="keyword">test</span> <span class="keyword">alter</span> note <span class="keyword">SET</span> <span class="keyword">STATISTICS</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>相关配置：</p>
+<ul>
+<li>optimizer_analyze_root_partition：为on，ANALYZE命令同样会收集分区表的统计信息</li>
+<li>default_statistics_target：ANALYZE命令进行随机抽样时的采样系数，值越大采样越准确，所花的时间更长。一些特定的列可以单独设定这个值（ALTER TABLE … ALTER COLUMN … SET STATISTICS）</li>
+<li>gp_enable_relsize_collection：没有统计值时，使用表的大小进行估计</li>
+<li>gp_autostats_mode：NONE（不收集）、ON_CHANGE（变化收集）、no_no_stats（建表时收集一次）</li>
+<li>gp_autostats_on_change_threshold：自动收集阈值，默认是20亿</li>
+</ul>
+<h1 id="分析执行计划"><a href="#分析执行计划" class="headerlink" title="分析执行计划"></a>分析执行计划</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPLAIN</span> [<span class="keyword">ANALYZE</span>] [VERBOSE] <span class="keyword">statement</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="EXPLAIN"><a href="#EXPLAIN" class="headerlink" title="EXPLAIN"></a>EXPLAIN</h2><p>EXPLAIN语句不会实际执行语句，只是根据当前收集的统计信息生成<strong>执行计划树</strong>来评估SQL运行成本。</p>
+<p>计划树中每一个节点代表SQL需要进行的操作，并包含以下信息：</p>
+<ul>
+<li>cost：当前节点以及子节点需要读取的磁盘页，格式为：cost=xxx..xxx(第一行输出时..输出完成时)</li>
+<li>rows: 表示该节点需要读取的行数</li>
+<li>width：平均每行的字节数</li>
+</ul>
+<h2 id="EXPLAIN-ANALYZE"><a href="#EXPLAIN-ANALYZE" class="headerlink" title="EXPLAIN ANALYZE"></a>EXPLAIN ANALYZE</h2><p>EXPLAIN ANALYZE 会实际执行SQL语句并且提供一些额外的统计信息：</p>
+<ul>
+<li>actual time：实际执行时间，单位是ms，格式和cost相同</li>
+<li>rows：实际返回的行数</li>
+<li>loops：？？？</li>
+<li>每个Slice使用的内存情况（应该包括：work_mem和statement_mem的内存使用情况，<strong>测试中只要statement_mem够大就不会发生磁盘IO能一定程度提高性能</strong>）</li>
+</ul>
+<h2 id="执行计划中的重要关键字"><a href="#执行计划中的重要关键字" class="headerlink" title="执行计划中的重要关键字"></a>执行计划中的重要关键字</h2><ul>
+<li><p>数据扫描（Scan）：</p>
+<ul>
+<li>Seq Scan：顺序扫描，有时候可能带有Dynamic前缀，表示分区顺序扫描</li>
+<li>Shared Scan：扫描shared_buffer中的某个slice</li>
+<li>Index Scan：索引扫描</li>
+<li>其他扫描子句：Bitmap Heap Scan、Tid Scan、Subquery Scan、Function Scan</li>
+</ul>
+</li>
+<li><p>数据移动（Motion）：</p>
+<ul>
+<li><p>Gather Motion(N:1)：在master上聚合</p>
+</li>
+<li><p>Broadcast Motion(N:N)：所有Segment上广播</p>
+</li>
+<li><p>Redistribute Motion(N:N)：重分布，常见关联、Group by、开窗函数中发生。</p>
+<ul>
+<li>重分布除了IO开销之外，还会带来数据不均衡的问题！！</li>
+<li>union合并表时，去重会导致重分布，并且此时以整行（所有列）进行重分布，因此慎用union（整行重分布 –&gt; 排序 –&gt; 去重 –&gt; 插入结果集），另外union all虽然和并时不涉及去重，但是在写入结果集时任然会引发重分布，需要注意。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>Slice：将SQL拆分多个切片，Montion操作都会产生一个切片，通常Montion操作后会表名其切片号，以及涉及的segment数目。</p>
+</li>
+<li><p>数据聚合：</p>
+<ul>
+<li>HashAggregate：基于Group By字段的hash值维护内存hash表，hash表的长度正比于聚合字段的distinct值，对n个聚合字段Greenplum需要维护n个hash表。</li>
+<li>GroupAggregate：基于聚合字段排序后，对数据进行一次全扫描从而得到聚合结果。</li>
+<li>建议：GroupAggregate的性能相比HashAggregate较为稳定，当聚合函数的种类较多并且聚合键的重复性较差时会使HashAggregate使用的内存急剧上升，此时应该选择GroupAggregate方式聚合。</li>
+</ul>
+</li>
+<li><p>关联：涉及到广播和重分布</p>
+<ul>
+<li>Hash join：通过内存中的Hash表来实现关联</li>
+<li>NestLoop：效率最低，执行笛卡尔积时使用该方式</li>
+<li>Merge Join：两表按照关联键排序，之后通过归并排序的方式关联（性能不如hash join）</li>
+</ul>
+</li>
+<li><p>开窗函数：</p>
+<ul>
+<li>当开窗函数的分布键不是表的分布键时，会引起表<strong>多次</strong>的重分布。</li>
+<li>如果开窗函数没有partition字段，只有Order字段那么为了维护一个全局序列，所有数据必须汇聚到Master上进行排序操作，此时Master会成为系统瓶颈。</li>
+</ul>
+</li>
+</ul>
+<p>有些参数可以控制优化器的执行计划,参考<a href="https://gpdb.docs.pivotal.io/6-0/ref_guide/config_params/guc-list.html" target="_blank" rel="noopener">enable_xxx配置</a>!</p>
+<h3 id="优化器开销的计算"><a href="#优化器开销的计算" class="headerlink" title="优化器开销的计算"></a>优化器开销的计算</h3><p>优化器通过开销的计算结果选择SQL的执行步骤，其Cost值的计算方式是可以用参数控制的。</p>
+<p>通常以抓取顺序页的开销作为基准单位(seq_page_cost取值为1)，以下是不同开销的默认值：</p>
+<ul>
+<li>seq_page_cost：磁盘顺序读的开销</li>
+<li>random_page_cost：磁盘随机读取的开销</li>
+<li>cpu_tuple_cost：处理一行数据的开销</li>
+<li>cpu_index_tuple_cost：索引扫描每个索引行的开销</li>
+<li>cpu_operator_cost：一次查询中执行一个操作符或者函数的开销</li>
+<li>gp_motion_cost_per_row：motion操作的开销</li>
+<li>effective_cache_size</li>
+</ul>
+<p>Greenplum优化器会根据pg_class表中的relname、relpages、reltuples的值每种运行方式的cost成本，之后选择cost最小值做为执行方案。</p>
+<p>调整经验：</p>
+<ul>
+<li>如果内存充足random_page_cost可以适当降低；</li>
+<li>seq_page_cost和 random_page_cost同时降低时，会使CPU开销上升；</li>
+</ul>
+<h1 id="Join的广播和重分布"><a href="#Join的广播和重分布" class="headerlink" title="Join的广播和重分布"></a>Join的广播和重分布</h1><p>Join通常涉及单库关联、以及跨库关联：</p>
+<ul>
+<li>单库关联：关联键和分布键一致，此时没有数据重分布</li>
+<li>跨库关联：关联键和分布键不一致，数据重新分布，装换为单库关联</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>字段</th>
+<th>分布键</th>
+<th>数据量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>id，id2</td>
+<td>id</td>
+<td>M</td>
+</tr>
+<tr>
+<td>B</td>
+<td>id，id2</td>
+<td>id</td>
+<td>N</td>
+</tr>
+</tbody></table>
+<p>以下是A、B表进行内连接时的场景，左连接和其原理类似（PS：左连接时一般不广播左表）。</p>
+<p>遇到全连接时，Greenplum中使用Merge Join方式实现（即排序方式实现Join），全连接通常进行重分布。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 由于A，B表的分布键均是id，且此关联的关联键也是id，此时A，B中id取值相同的行在同一个pg库中，可以直接关联</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> A,B <span class="keyword">where</span> A.id=B.id</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 表A的关联键是分布键，但是表B的关联键不是分布键</span></span><br><span class="line"><span class="comment">-- 方式一：将表B按照id2字段重分布到每一个节点上 ———— 重分布（处理数据量是N）；</span></span><br><span class="line"><span class="comment">-- 方式二：将表A广播到每个节点中 ———— 广播（处理数据量是M*节点数）；</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> A,B <span class="keyword">where</span> A.id=B.id2</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 表A、B的关联键都不是分布键</span></span><br><span class="line"><span class="comment">-- 方式一：将表A和表B都按照id2字段，将数据重分布到每个节点，代价是M+N</span></span><br><span class="line"><span class="comment">-- 方式二：将小表广播</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> A,B <span class="keyword">where</span> A.id1=B.id2</span><br></pre></td></tr></table></figure>
+
+<p>PS：<strong>Greenplum判断表的大小是通过统计信息决定的，因此如果统计信息不准确可能会使重分布策略选择错误</strong>。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-11-08T10:58:23.105Z" itemprop="dateUpdated">2019-11-08 18:58:23</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/" target="_blank" rel="external">https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GreenPlum/" rel="tag">GreenPlum</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/11/05/Greenplum-%E5%8E%86%E5%8F%B2%E6%8B%89%E9%93%BE%E8%A1%A8/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQ4AAAEOCAAAAABd2qZ5AAAD5ElEQVR42u3aS27cUAwEQN//0s7WQCKhm2QcByitDI8weiwtOPx8fMTX55fr/dPfr9t7vt75fsKn0x5cOHDgwIEjDjU5aPL4lu8p1JwmP+37t+HAgQMHjiuOp0Mnf88Ce4d7T5Pty0hixIEDBw4c/5bjPbz80O2dm4SNAwcOHDh+JkdylLyxmHfnomBw4MCBA8eP4cjTZ36sPA3nr2ST/o97pThw4MCBo8t3w0bhz/z7r+x34MCBAweOuFhqlxtmj98kvDbdRtHhwIEDB441Rx5GTrApBd+/MykOZ8/CgQMHDhxXHMlX5COlPIwcetY0fD/bY0Q4cODAgWPN0T7gKjW2Y6q8jLz6uYADBw4cOGYc+fi/HfDkCXvWImwTbfQfHDhw4MCx5shLpjaB7RGToit/bXWqxoEDBw4cR1XPZpyTHGj2xJxvttyAAwcOHDiuONoE2RZL+85lfsJNSo4WGnDgwIEDR8zRljrtUsJsvWC20LBZqsCBAwcOHFccV+toM75ZQZgUafX9OHDgwIFjzTEbILVJd9O2y5PoLGEfzNNw4MCBA8di8NOWTEmK3Q+l8kQeFZ84cODAgWPNcbt21gbZ7ly0QDkKDhw4cOC44siP0pZt+XJDi7WqU99PiAMHDhw4FhzJwKYdOM2ahknaLt7w6DXjwIEDB47v4ZitFOTHbYdGs++MCjwcOHDgwPEtHHnDbjYE2iTyhCNP1Thw4MCBY88RfVA2CpPDbRb4Zi+sXcvAgQMHDhxXHHkA+ULDFUGSwvfLDThw4MCB45Yjp5mFnQc2S9j7EhQHDhw4cNxytCOldokhLwJnw61Z+7L+3YEDBw4cOMo65T3V5csEs5WFWQmXLzE8xosDBw4cOI44ro7SjoiSBNy2/PKfBX/4Pw4cOHDgOOLIy7k29eYpfNaInN3zWLvhwIEDB44jjllSzNcXZmsHbamWv7DHO3HgwIEDx5pjNqGapbF9MXa7ZvH4KQ4cOHDgWHMU7bPgGj4+5khe5KaNiAMHDhw4NhxtKy050CaAtnWY4w4rWhw4cODAMeLYfN3m77aR16bwHBEHDhw4cFxxzMY27UAoKfDaMIraNH4KDhw4cODYc3yWV5s42xHRJsUmixSREA4cOHDgWHDkV9tGTEZNV0OjvHGZNyVx4MCBA8eGY5Zc81Bn5Vk7mmrT8PDXBw4cOHDgWC+3bRqFm2Pl5d+mCsOBAwcOHD+Ho11caEdE7SJd29zEgQMHDhz/F0deUOUrDpvVvTwKHDhw4MBxxTFLTnmjMGnttWsTLUoUFw4cOHDgWHOsWmnrNl9e8s0WJpImJg4cOHDgOOL4Bc/gFqjrMzz0AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

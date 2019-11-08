@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- GreenPlum | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,GreenPlum">
+    <meta name="description" content="GreenPlum 调研笔记">
+<meta name="keywords" content="数据库,GreenPlum">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- GreenPlum">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;11&#x2F;05&#x2F;Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="GreenPlum 调研笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-08T10:58:23.106Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- GreenPlum</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- GreenPlum</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-11-05T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-11-05
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#数据字典"><span class="post-toc-number">1.</span> <span class="post-toc-text">数据字典</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#oid"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">oid</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#数据库集群信息"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">数据库集群信息</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Greenplum-数据字典"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- GreenPlum</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-11-06 00:00:00" datetime="2019-11-05T16:00:00.000Z"  itemprop="datePublished">2019-11-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>GreenPlum 调研笔记</p>
+<a id="more"></a>
+
+<p>《Greenplum企业应用实战》一书第四章读书笔记。</p>
+<h1 id="数据字典"><a href="#数据字典" class="headerlink" title="数据字典"></a>数据字典</h1><p>这里的数据字典指的是 Greenplum 中元数据信息，包括：pg_ 和 gp_ 开头的一些系统表。</p>
+<h2 id="oid"><a href="#oid" class="headerlink" title="oid"></a>oid</h2><p>oid 是 PG/GP 中用来表示对象（包括：表、函数、操作符等等）的全局递增 id （是32位数字），GP 中绝大多数数据字典通过oid相互关联。</p>
+<p>表名、函数名、操作符名可以和 oid 相互转换：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 类似的还有</span></span><br><span class="line"><span class="comment">-- regclass : pg_class中的oid关联</span></span><br><span class="line"><span class="comment">-- regproc/regprocedure : pg_proc 中的oid关联</span></span><br><span class="line"><span class="comment">-- regoper/regoperator：pg_operator中的oid关联</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- pg_class表的oid是1259</span></span><br><span class="line"><span class="keyword">select</span> <span class="number">1259</span>::regclass ; </span><br><span class="line"><span class="keyword">select</span> <span class="keyword">oid</span>,relname <span class="keyword">from</span> pg_class <span class="keyword">where</span> <span class="keyword">oid</span>=<span class="string">'pg_class'</span>::regclass;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库集群信息"><a href="#数据库集群信息" class="headerlink" title="数据库集群信息"></a>数据库集群信息</h2><p>gp_configuration<br>gp_segment_configuration</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-11-08T10:58:23.106Z" itemprop="dateUpdated">2019-11-08 18:58:23</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" target="_blank" rel="external">https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GreenPlum/" rel="tag">GreenPlum</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/11/05/Greenplum-%E6%80%A7%E8%83%BD%E7%9B%B8%E5%85%B3%E7%9A%84%E7%9F%A5%E8%AF%86/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/11/03/MyCat-%E4%BB%8B%E7%BB%8D/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- MyCat</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/&title=《数据库调研笔记 -- GreenPlum》 — LQing的博客&source=GreenPlum 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- GreenPlum》 — LQing的博客&url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/11/05/Greenplum-%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADL0lEQVR42u3aMZLjMAwEwP3/p33pBmd5BqS3LLoZXbn2JDYVoDjAz0+8Hr/W9S8rf5+8/fo5mxc2Njb2TdiPyzV7dMtL9tAe9/VzsLGxsc9j51t/9oL8L5P1jmPFxsbGxk4elxe/5ODa4oSNjY2Nfc1ONrFScpJDXDlibGxs7LPZSWFomwGzUCk5+j/N0rCxsbE/nr0r7v+Ef7+lv42NjY39wexZZP+OKH89MCoU2NjY2AexZ6+8voTk4PzCsDeEwsbGxj6JPRuvSWKgJB6a3R1mzYP/1G1sbGzs49i7ytLeQ2zLYdQGxsbGxj6I3T4uvzashFOzwaD2I2FjY2N/D3sF1o7prI8BFXEVNjY29hHstpy0J7pr621Dty5d2NjY2LdlJ2VmpRnwl/HTEI+NjY19EPt6Q0UbNd5KDsubx/m1BxsbG/sMdhvZr7Rp86GcXS3np79gY2NjH8pu1/p2W1J0qUgqNjY2NvZB7LbAtO3hvOWQH0cbhLXHhI2NjX0vdl5I8rCpjYHyIGmliGJjY2Ofzc4LQ9IMyAci22vG7FBeTCphY2NjH8ReCZKScZxZGZt9kqjRi42NjX0Q+3rUpm2vzqKl9jq0MlqEjY2NfR47D4auS1fyyrxktq3o4u3Y2NjYx7GTApZcJ9ry845Bn6hkYmNjYx/Hbi8PsxKy3kJu46qnT8PGxsY+jj0LldbLVd4SeDFMefnLUt3GxsbG/nh2svJLyCwwmj2zvZzUCxsbG/sm7JUi1AZS+eDO7JMk5e1FVwQbGxv7huz1QZzZiE/euE2OOKlNSyeHjY2NfSv23hGc9UgoL3Vt6wIbGxv7JPYsuJmVn5VrzOw5T48MGxsb+zj2rtbpbKNtW3d2ucLGxsY+j/0o1+xQcmTb3J2VWGxsbOyT2LMUvQ2S1reYB1Kb28nY2NjYN2G38VAS0ydH1rYc1gdA634CNjY29q3Y7ahNey2Z1dL8uOvWNTY2NvbXs6//V16E2nK1q+xhY2NjfzO7GIsprzp5fUni/hefChsbG/s49q5wZ735ml9s8kbCtiwNGxsb+yPZ7SBjOy65PojTfqQ6YMLGxsa+K/sf+q9Ldu8gEu8AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
