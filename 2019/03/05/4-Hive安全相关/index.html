@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Hive 安全认证相关 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Cloudera,Hive,安全">
+    <meta name="description" content="Hive的Kerberos接入方案，以及ACLs！">
+<meta name="keywords" content="Cloudera,Hive,安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hive 安全认证相关">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;03&#x2F;05&#x2F;4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="Hive的Kerberos接入方案，以及ACLs！">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.278Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Hive 安全认证相关</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Hive 安全认证相关</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-04T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-03-05
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#认证"><span class="post-toc-number">1.</span> <span class="post-toc-text">认证</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HiveServer2的认证方式"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">HiveServer2的认证方式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#MetaStore的认证方式"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">MetaStore的认证方式</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#HIVE访问HBase外表"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">HIVE访问HBase外表</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#授权"><span class="post-toc-number">2.</span> <span class="post-toc-text">授权</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#用户类型"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">用户类型</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#授权方式"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">授权方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基于文件系统的授权"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">基于文件系统的授权</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#标准SQL授权"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">标准SQL授权</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#权限模型"><span class="post-toc-number">2.2.2.1.</span> <span class="post-toc-text">权限模型</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#相关SQL命令"><span class="post-toc-number">2.2.2.2.</span> <span class="post-toc-text">相关SQL命令</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#限制"><span class="post-toc-number">2.2.2.3.</span> <span class="post-toc-text">限制</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#配置项"><span class="post-toc-number">2.2.2.4.</span> <span class="post-toc-text">配置项</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#在CDH上配置SQLstd授权"><span class="post-toc-number">2.2.2.5.</span> <span class="post-toc-text">在CDH上配置SQLstd授权</span></a></li></ol></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-4-Hive安全相关"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Hive 安全认证相关</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-03-05 00:00:00" datetime="2019-03-04T16:00:00.000Z"  itemprop="datePublished">2019-03-05</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>Hive的Kerberos接入方案，以及ACLs！</p>
+<a id="more"></a>
+
+<h1 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h1><p>通过 Cloudera 接入Kerberos之后，Hive 默认已经完成了用户认证的配置。无论使用 hive-cli 或 beeline ，在用户连接之前均需要手工执行kinit登录一个principal。</p>
+<p>默认情况下，通过以下方式连接：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">kinit -kt /opt/idata_security/ktable/idata.keytab idata</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过hive-cli</span></span><br><span class="line">hive</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过beeline，principal 指的是用户启动HS2的principal，而非实际用户</span></span><br><span class="line">beeline -u "jdbc:hive2://bdnode3:10000/;principal=hive/_HOST@IDATA.RUIJIE.COM"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果需要模拟任意用户，那么可以使用HDFS操作用户（组）的票据</span></span><br><span class="line">kinit -kt /opt/idata_security/ktable/hdfs.keytab hdfs</span><br><span class="line">beeline -u "jdbc:hive2://bdnode3:10000/;principal=hive/_HOST@IDATA.RUIJIE.COM;hive.server2.proxy.user=&#123;&#123;任意用户&#125;&#125;"</span><br></pre></td></tr></table></figure>
+
+<h2 id="HiveServer2的认证方式"><a href="#HiveServer2的认证方式" class="headerlink" title="HiveServer2的认证方式"></a>HiveServer2的认证方式</h2><p>HiveServer2的认证方式通过 hive.server2.authentication 配置，默认情况下为None，即不进行认证。</p>
+<p>HS2支持：NONE (uses plain SASL), NOSASL, KERBEROS, LDAP, PAM, CUSTOM 。配置为KERBEROS时需要指定下面两个配置：</p>
+<ul>
+<li>hive.server2.authentication.kerberos.principal</li>
+<li>hive.server2.authentication.kerberos.keytab</li>
+</ul>
+<p>配认证之后，需要将HS2的hive.server2.enable.doAs打开！并且将hadoop.proxyuser.hive.hosts/groups配置为*！</p>
+<h2 id="MetaStore的认证方式"><a href="#MetaStore的认证方式" class="headerlink" title="MetaStore的认证方式"></a>MetaStore的认证方式</h2><p>参考下面的配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.metastore.sasl.enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.metastore.kerberos.principal<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">value</span>&gt;</span>hive/_HOST@IDATA.RUIJIE.COM<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.metastore.kerberos.keytab.file<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">value</span>&gt;</span>hive.keytab<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="HIVE访问HBase外表"><a href="#HIVE访问HBase外表" class="headerlink" title="HIVE访问HBase外表"></a>HIVE访问HBase外表</h2><p>配置HBase的security之后，如果需要由Hive访问外表，那么需要添加以下环境变量（客户端以及hs2的hive-env.sh）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HIVE_OPTS="-hiveconf hbase.security.authentication=kerberos -hiveconf hbase.master.kerberos.principal=hbase/_HOST@IDATA.RUIJIE.COM -hiveconf hbase.regionserver.kerberos.principal=hbase/_HOST@IDATA.RUIJIE.COM -hiveconf hbase.zookeeper.quorum=bdnode1,bdnode2,bdnode3"</span><br></pre></td></tr></table></figure>
+
+<p>并且需要将上面的三个配置加入到HS2的白名单中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase\.security\.authentication|hbase\.master\.kerberos\.principal|hbase\.regionserver\.kerberos\.principal|hbase\.zookeeper\.quorum</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h1><p>默认情况下Cloudera只会完成 Hive 的认证配置，不会进行授权相关配置。</p>
+<p>当用户操作Hive中的数据时，需要元数据和数据文件的相关权限。默认情况下：</p>
+<ul>
+<li><p>metastore没有ACLs控制，用户可以任意通过drop、alter等命令修改元数据；</p>
+</li>
+<li><p>数据文件处在hadoop的权限控制之下，hive client用户只能修改自己在HDFS被授权的部分；</p>
+</li>
+</ul>
+<p>由于操作元数据是没有ACLs控制的，因此可以认为默认情况下所有HIVE都是有最大权限的！！！</p>
+<p>HIVE创建DB、表、分区、执行load/insert等命令时，在HDFS中创建的文件（夹）遵循hdfs的权限集成规则：</p>
+<ul>
+<li>user identity 为客户端的用户ID</li>
+<li>group identity 继承父目录的group信息</li>
+<li>权限信息集成HDFS的umask配置</li>
+</ul>
+<p>通过hive.warehouse.subdir.inherit.perms配置可以改变上面的集成策略：</p>
+<ul>
+<li>DB目录的权限继承warehouse的权限</li>
+<li>Table目录的权限继承DB目录的权限（或者warehouse的权限）</li>
+<li>外部表的权限继承父目录的权限</li>
+<li>Partition目录的权限继承表目录的权限</li>
+<li>table文件的权限继承父文件夹的权限</li>
+</ul>
+<p>在CDH6.1中。Cloudera将/user/hive/warehouse的权限设置为777t，并且hive.warehouse.subdir.inherit.perms配置为True。</p>
+<p>当hive.warehouse.subdir.inherit.perms打开时，权限继承可能失败，但是这不会让HIVE操作失败，文件会回退到HDFS的默认继承规则。</p>
+<h2 id="用户类型"><a href="#用户类型" class="headerlink" title="用户类型"></a>用户类型</h2><p>安全模式下，Hive的授权主要有以下两种场景：</p>
+<ol>
+<li>直接操作HDFS类型，包括：同通过 HCatalog API 操作的各类组价，如 Apache Pig、MR、Impala、Spark SQL等等。这类用户需要同时满足HDFS和metastore的用户认证</li>
+<li>Hive作为SQL引擎的类型：主要指通过HiveServer2进行JDBC、ODBC操作的用户</li>
+</ol>
+<h2 id="授权方式"><a href="#授权方式" class="headerlink" title="授权方式"></a>授权方式</h2><p>Hive的授权方式当前包括以下几种：</p>
+<table>
+<thead>
+<tr>
+<th>认证方式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://cwiki.apache.org/confluence/display/Hive/Storage+Based+Authorization+in+the+Metastore+Server" target="_blank" rel="noopener">Storage Based Authorization in the Metastore Serve</a></td>
+<td>这种方式基于HDFS的文件权限来控制用户的行为，适合直接操作HDFS文件的用户。<br> 如果用户通过HiveServer2来访问Hive数据，那么需要配置hive.server2.enable.doAs为true。<br>这种方式可以提供Database、Table、Partition级别的控制,并且能够对所有的用户起作用。<br>该模式下，在Hive中进行授权的是metastore服务。</td>
+</tr>
+<tr>
+<td><a href="https://cwiki.apache.org/confluence/display/Hive/SQL+Standard+Based+Hive+Authorization" target="_blank" rel="noopener">SQL Standards Based Authorization in HiveServer2</a></td>
+<td>主要针对使用HiveServer2场景的权限控制，能够提供row、column的权限控制。<br> 对直接访问HDFS数据的用户，这种安全方式没有作用。<br> 这种模式中进行授权的是HiveServer2</td>
+</tr>
+<tr>
+<td>Ranger &amp; Sentry</td>
+<td>Ranger和Sentry是两款安全相关的插件，提供动态row、column的acls，以及审计等功能。Ranger是基于策略的管理，而Sentry是基于传统的RBAC管理</td>
+</tr>
+<tr>
+<td><a href="(https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=45876173)">Legacy Mode</a></td>
+<td>hive 2.0.0之前的默认授权方式，当前已经被废弃。官方文档中介绍这是一种不完善的认证机制？</td>
+</tr>
+</tbody></table>
+<h3 id="基于文件系统的授权"><a href="#基于文件系统的授权" class="headerlink" title="基于文件系统的授权"></a>基于文件系统的授权</h3><p>这是一个简陋授权系统，主要包括：</p>
+<ul>
+<li>基于HDFS的权限控制对数据库、表、分区进行授权</li>
+<li>metastore基于HDFS的文件（夹）权限，对元数据进行保护</li>
+</ul>
+<p>涉及的配置项为：</p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>hive.metastore.pre.event.listeners</td>
+<td>org.apache.hadoop.hive.ql.security.authorization.AuthorizationPreEventListener</td>
+</tr>
+<tr>
+<td>hive.security.metastore.authorization.manager</td>
+<td>org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider</td>
+</tr>
+<tr>
+<td>hive.security.metastore.authenticator.manager</td>
+<td>org.apache.hadoop.hive.ql.security.HadoopDefaultMetastoreAuthenticator</td>
+</tr>
+<tr>
+<td>hive.security.metastore.authorization.auth.reads</td>
+<td>true</td>
+</tr>
+</tbody></table>
+<p>下面的例子简要说明文件系统授权的Demo：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 通过idata用户创建一张外部表</span></span><br><span class="line"></span><br><span class="line">create EXTERNAL table idata_acls ( id int, name string)</span><br><span class="line">row format delimited</span><br><span class="line">fields terminated by ','</span><br><span class="line">LOCATION '/tmp/idata_acls';</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 上传表数据到hdfs的/tmp/idata_acls目录，修改test.txt文件权限</span></span><br><span class="line">hdfs dfs -put test.txt /tmp/idata_acls</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改文件的所有组为idata:idata, 权限为600。 、</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 这时候idata用户可以正常删表、读表，使用root用户登录，执行select、drop表等操作会发生错误</span></span><br><span class="line">hdfs dfs -chmod 600 /tmp/idata_acls/test.txt</span><br><span class="line">hdfs dfs -chown idata:idata /tmp/idata_acls/test.txt</span><br></pre></td></tr></table></figure>
+
+<p>这种ACLs机制，有以下特点：</p>
+<ol>
+<li>可以保护metastore中的元数据不被误删，在无ACLs控制时任意用户都能删除metastore的元数据；</li>
+<li>需要手工调用HDFS命令，来控制DB、Table、Partition的文件夹，实现ACLs；</li>
+<li>配合HDFS的ACLs功能，能够一定程度的提高灵活性（dfs.namenode.acls.enabled配置为true）；</li>
+<li>对于Spark SQL、Impala等服务，只能通过这种方式控制权限；</li>
+<li>hdfs的超级用户，有所有表权限；</li>
+<li>除了MetaStore，HCatalog同样支持该方式（可以参考应用中的文档）</li>
+</ol>
+<h3 id="标准SQL授权"><a href="#标准SQL授权" class="headerlink" title="标准SQL授权"></a>标准SQL授权</h3><p>标准SQL授权主要针对使用HS2的用户进行授权，提供细粒度的权限控制，HiveServer2在编译过程中，进行权限识别。对 Hive Cli、Spark SQL、Impala等直接通过元数据操作 HDFS 文件的client，这种授权模式不起作用。</p>
+<p>HS2的标准SQL授权可以和metastore文件系统的授权同时使用。通常情况下 Hive 的安全控制遵循以下方式：</p>
+<ul>
+<li>通过Kerberos提供权限认证，任意用户需要获得TGT才可使用；</li>
+<li>metastore 使用文件系统的授权，Impala、Spark SQL、MR 集群内部用户各自作为特权用户管理各自账户下的数据；</li>
+<li>HS2提供标准SQL授权，对集群外部用户实行严格的分级授权，用户不应该使用 Hive-Cli 操作HIVE；</li>
+</ul>
+<h4 id="权限模型"><a href="#权限模型" class="headerlink" title="权限模型"></a>权限模型</h4><p>HS2使用标准的RBAC授权，通过Role和User绑定进行授权。</p>
+<p>通常情况下，一个用户可以关联多个Role。但是用户在执行hive查询时，只拥有当前用户的的权限。用户使用”show current roles;” 命令可以查询当前的role，通过”set role”命令可以切换到其他用户。</p>
+<p>Hive中包括以下两个特殊Role：public 和 admin</p>
+<ul>
+<li>所有用户都属于public角色，如果需要给所有用户赋权，那么可以将权限和public角色绑定</li>
+<li>通常情况下database的管理员和admin绑定，admin用户可以创建/删除role，默认情况下用户需要通过”set role admin;”获取admin权限</li>
+</ul>
+<p>在HIVE中，用户名和组名有以下特定：</p>
+<ul>
+<li>role不是大小写敏感的，user是大小写敏感的；</li>
+<li>角色/用户名，可以包含任意Unicode字符（前提是使用 hive.support.quoted.identifiers 配置的转义符转义）</li>
+</ul>
+<p>Hive包括以下Privileges，用户相关操作需要的权限可以参考官网的<a href="https://cwiki.apache.org/confluence/display/Hive/SQL+Standard+Based+Hive+Authorization" target="_blank" rel="noopener">Privileges Required for Hive Operations</a>：</p>
+<table>
+<thead>
+<tr>
+<th>Privileges</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SELECT</td>
+<td>对象的读权限</td>
+</tr>
+<tr>
+<td>INSERT</td>
+<td>对象的追加写权限</td>
+</tr>
+<tr>
+<td>UPDATE</td>
+<td>对象的update权限</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>对象的删除权限</td>
+</tr>
+<tr>
+<td>ALL PRIVILEGES</td>
+<td>上述所有权限集合</td>
+</tr>
+</tbody></table>
+<p>涉及的对象包括：</p>
+<ul>
+<li>表</li>
+<li>视图</li>
+</ul>
+<ol>
+<li>table、view 的创建者默认拥有所有权限</li>
+<li>权限模型不涉及Database的权限管理，只有部分操作时会考虑DB的所有权。通过 alter database 命令可以将数据库的owner指定为用户或者组</li>
+</ol>
+<h4 id="相关SQL命令"><a href="#相关SQL命令" class="headerlink" title="相关SQL命令"></a>相关SQL命令</h4><p>ROLE相关命令</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">--- admin 相关命令</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> role_name;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">ROLE</span> role_name;</span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">ROLES</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">--- 关联roles到用户（或者其他role）,使用WITH ADMIN OPTION配置时，用户可以将获得role转售</span></span><br><span class="line"><span class="keyword">GRANT</span> role_name [, role_name] ...</span><br><span class="line"><span class="keyword">TO</span> <span class="keyword">USER</span> linqing, <span class="keyword">ROLE</span> idata ...</span><br><span class="line">[ <span class="keyword">WITH</span> <span class="keyword">ADMIN</span> <span class="keyword">OPTION</span> ];</span><br><span class="line"></span><br><span class="line"><span class="comment">--- 收回roles，ADMIN OPTION FOR 表示回收有用户的role转售权限</span></span><br><span class="line"><span class="keyword">REVOKE</span> [<span class="keyword">ADMIN</span> <span class="keyword">OPTION</span> <span class="keyword">FOR</span>] role_name [, role_name] ...</span><br><span class="line"><span class="keyword">FROM</span> <span class="keyword">USER</span> linqing, <span class="keyword">ROLE</span> idata ... ;</span><br><span class="line"></span><br><span class="line"><span class="comment">--- 查询用户/Role当前关联的role</span></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">ROLE</span> <span class="keyword">GRANT</span> (<span class="keyword">USER</span>|<span class="keyword">ROLE</span>) principal_name;</span><br><span class="line"></span><br><span class="line"><span class="comment">--- 查询所有关联到role的用户/role</span></span><br><span class="line"><span class="keyword">SHOW</span> PRINCIPALS role_name;</span><br><span class="line"></span><br><span class="line"><span class="comment">--- 普通用户相关命令</span></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">CURRENT</span> <span class="keyword">ROLES</span>;</span><br><span class="line"><span class="keyword">SET</span> <span class="keyword">ROLE</span> (role_name|<span class="keyword">ALL</span>|<span class="keyword">NONE</span>);</span><br></pre></td></tr></table></figure>
+
+<p>对象相关命令</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- 给予表/视图的相关权限</span></span><br><span class="line"><span class="keyword">GRANT</span></span><br><span class="line">    priv_type [, priv_type ] ...</span><br><span class="line">    <span class="keyword">ON</span> <span class="keyword">table</span>/<span class="keyword">view</span> table_or_view_name</span><br><span class="line">    <span class="keyword">TO</span> principal_specification [, principal_specification] ...</span><br><span class="line">    [<span class="keyword">WITH</span> <span class="keyword">GRANT</span> <span class="keyword">OPTION</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">--- 从用户上回收表/视图的相关权限</span></span><br><span class="line"><span class="keyword">REVOKE</span> [<span class="keyword">GRANT</span> <span class="keyword">OPTION</span> <span class="keyword">FOR</span>]</span><br><span class="line">    priv_type [, priv_type ] ...</span><br><span class="line">    <span class="keyword">ON</span> <span class="keyword">table</span>/<span class="keyword">view</span> table_or_view_name</span><br><span class="line">    <span class="keyword">FROM</span> principal_specification [, principal_specification] ... ;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">--- 展示当前用户在某张表（或者所有表）上的权限</span></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">GRANT</span> [principal_specification] <span class="keyword">ON</span> (<span class="keyword">ALL</span> | [<span class="keyword">TABLE</span>] table_or_view_name);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">principal_specification</span></span><br><span class="line"><span class="comment">  : USER user</span></span><br><span class="line"><span class="comment">  | ROLE role</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment">priv_type</span></span><br><span class="line"><span class="comment">  : INSERT | SELECT | UPDATE | DELETE | ALL</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><p>HS2配置标准SQL授权之后，部分命令在beeline中被限制使用：</p>
+<ul>
+<li>dfs、add、delete、compile、reset 命令在权限模式下被禁用，通过配置 hive.security.command.whitelist 可以解除禁用；</li>
+<li>set 命令能够设定的参数会被部分限制，参考配置hive.security.authorization.sqlstd.confwhitelist 、hive.security.authorization.sqlstd.confwhitelist.append、hive.conf.restricted.list ；</li>
+<li>默认情况下允许执行所有内建udf，配置hive.server2.builtin.udf.whitelist、hive.server2.builtin.udf.blacklist可以限制用户可以执行的udf；</li>
+<li>只有管理员角色，才能添加、删除函数或者宏。通过hive.users.in.admin.role可以指定管理员用户；</li>
+<li>无法使用 transform 函数</li>
+</ul>
+<h4 id="配置项"><a href="#配置项" class="headerlink" title="配置项"></a>配置项</h4><p>全局配置项：</p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>hive.server2.enable.doAs</td>
+<td>false</td>
+<td>禁止使用代理，所有操作通过HS2完成。<br> 但是在HS2中是以实际的Client用户ID进行Check的！！</td>
+</tr>
+<tr>
+<td>hive.users.in.admin.role</td>
+<td>hive,idata</td>
+<td>需要配置为admin角色的用户</td>
+</tr>
+<tr>
+<td>hive.security.<br>metastore.authorization.manager</td>
+<td>org.apache.hadoop.<br>hive.ql.security.authorization.<br>MetaStoreAuthzAPIAuthorizerEmbedOnly</td>
+<td>添加该配置后，所有访问远程metastore的authorization api 调用会被拒绝。<br>此时，HS2使用一个内嵌的metastore工作，拥有authorization api的调用权限</td>
+</tr>
+<tr>
+<td>hive.security.<br>authorization.manager</td>
+<td>org.apache.hadoop.<br>hive.ql.security.authorization.<br>plugin.sqlstd.<br>SQLStdConfOnlyAuthorizerFactory</td>
+<td>配置所有table、view的创建者有所有的权限</td>
+</tr>
+</tbody></table>
+<p>HS2服务端配置项：</p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>hive.security.authorization.manager</td>
+<td>org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory</td>
+</tr>
+<tr>
+<td>hive.security.authorization.enabled</td>
+<td>true</td>
+</tr>
+<tr>
+<td>hive.security.authenticator.manager</td>
+<td>org.apache.hadoop.<br>hive.ql.security.<br>SessionStateUserAuthenticator</td>
+</tr>
+<tr>
+<td>hive.metastore.uris</td>
+<td>‘ ‘</td>
+</tr>
+</tbody></table>
+<h4 id="在CDH上配置SQLstd授权"><a href="#在CDH上配置SQLstd授权" class="headerlink" title="在CDH上配置SQLstd授权"></a>在CDH上配置SQLstd授权</h4><p>由于CDH魔改了HIVE的几个配置导致开启授权后，有两个配置hive.query.redaction.rules和hive.exec.query.redactor.hooks无法用set命令修改，当用户使用beeline连接HS2失败。</p>
+<p>出现下面的异常：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">19/03/07 19:21:38 [main]: WARN jdbc.HiveConnection: Failed to connect to bdnode3:10000</span><br><span class="line">Error: Could not open client transport with JDBC Uri: jdbc:hive2://bdnode3:10000/;principal=hive/_HOST@IDATA.RUIJIE.COM: Failed to open new session: java.lang.IllegalArgumentException: Cannot modify hive.query.redaction.rules at runtime. It is not in list of params that are allowed to be modified at runtime (state=08S01,code=0)</span><br><span class="line">Beeline version 2.1.1-cdh6.1.0 by Apache Hive</span><br></pre></td></tr></table></figure>
+
+<p>在HS2日志也会出现，下面的异常：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cannot modify hive.exec.query.redactor.hooks at runtime. It is not in list of params that are allowed to be modified at runtime</span><br></pre></td></tr></table></figure>
+
+<p>可以将hive.query.redaction.rules和hive.exec.query.redactor.hooks添加到白名单，解决该问题。在HS2的hive-site.xml配置下面的参数开启sqlstd授权。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 注意：hive.server2.enable.doAs 需要配置为false --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.users.in.admin.role<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>idata<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.security.authorization.manager<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>org.apache.hadoop.hive.ql.security.authorization.plugin.sqlstd.SQLStdHiveAuthorizerFactory<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.security.authenticator.manager<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>org.apache.hadoop.hive.ql.security.SessionStateUserAuthenticator<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.security.authorization.enabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hive.security.authorization.sqlstd.confwhitelist.append<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hive\.exec\.query\.redactor\.hooks|hive\.query\.redaction\.rules<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Authorization" target="_blank" rel="noopener">LanguageManual+Authorization</a></p>
+<p><a href="https://cwiki.apache.org/confluence/display/Hive/HCatalog+Authorization" target="_blank" rel="noopener">HCatalog Authorization</a></p>
+<p><a href="https://cwiki.apache.org/confluence/display/Hive/Setting+Up+HiveServer2" target="_blank" rel="noopener">Setting Up HiveServer2</a></p>
+<p><a href="https://www.cloudera.com/documentation/enterprise/6/6.1/topics/cdh_sg_hive_query_secure_hbase.html" target="_blank" rel="noopener">Using Hive to Run Queries on a Secure HBase Server</a></p>
+<p><a href="https://www.cloudera.com/documentation/enterprise/6/6.1/topics/cdh_sg_hiveserver2_security.html#topic_9_1" target="_blank" rel="noopener">HiveServer2 Security Configuration</a></p>
+<p><a href="https://www.cloudera.com/documentation/enterprise/5-16-x/topics/cdh_sg_hive_metastore_security.html#topic_9_2" target="_blank" rel="noopener">Hive Metastore Server Security Configuration</a></p>
+<p><a href="https://cwiki.apache.org/confluence/display/Hive/Permission+Inheritance+in+Hive" target="_blank" rel="noopener">Permission Inheritance in+Hive</a></p>
+<p><a href="https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties" target="_blank" rel="noopener">Configuration Properties</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.278Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" target="_blank" rel="external">https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Cloudera/" rel="tag">Cloudera</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hive/" rel="tag">Hive</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Hive 安全认证相关》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Hive 安全认证相关》 — LQing的博客&source=Hive的Kerberos接入方案，以及ACLs！" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Hive 安全认证相关》 — LQing的博客&url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/03/10/hdfs%E7%9A%84%E5%9D%97%E6%A3%80%E6%9F%A5/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">HDFS 的块检查</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/03/04/%E8%BF%90%E8%A1%8C%E4%BB%BB%E5%8A%A1/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">在Kerberos环境中运行Spark On Yarn</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Hive 安全认证相关》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&title=《Hive 安全认证相关》 — LQing的博客&source=Hive的Kerberos接入方案，以及ACLs！" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Hive 安全认证相关》 — LQing的博客&url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/03/05/4-Hive%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACr0lEQVR42u3aQZLbMAwEwP3/p5Pr5mB5BiBdrlTr5JJsis0DQQP4+YmvP7+u56evvvn7zqtxXn3z+e0HLjw8PLzF1F8Nl0z9+bfPsOdfJeyXS4CHh4d3jZds0O32Hb3+aGjBw8PD+07eM+P5CN6OiYeHh/c/8WbszQh4eHh438bLEwqzJEKepMiX+3CuBQ8PDy/m5VWk7/l8pb6Hh4eHt66qt+nX/FjcHrKHs8XDw8O7wMs33LNFrHy0pOXrTXMYHh4e3lFeO9FZyuA5zZqHouTOP/fx8PDwrvE2L5iFlvyI3CZz62QEHh4e3ojX/ix/OhutDQxRGgIPDw/vEC8veu0bCGaLmMzkQLsAHh4eXszbJBRmpak8IOVP39T38PDw8K7xWlJUW1u3DrRvrzvF8PDw8ErebLtPEhM3xtm0NeDh4eHd4yUbcV6m2idt20BSFMPw8PDw1rxNiWvWsLVJ9ebJDjw8PLyzvLzcvg8GsyP4rMxW5DDw8PDwJv/li5Rum8xNQkIy6TYI4eHh4X2G1x5h9yf3WQhp27/w8PDwzvLyxEE7xbYkNgO/CVp4eHh4l3mzZESyZedH6uJwnPeU4eHh4R3lbVK3SfLi7BLsk9F4eHh4e96shL9ZufyAniNfLhYeHh7eBV5yqJ0NmicOZuMUc8bDw8O7xms39M2dnJq3MkQ9EXh4eHgXeHWRaTFOApgV1fDw8PA+ycvDQ50VHiV/Z2/Bw8PDu8eb/b3ftBpsjsj1Uzw8PLwLvBttBMnOnOzbeSDZhys8PDy8lncqGLSL0rYL5IEBDw8P7zO8WdkpKW61AWOTIike4+Hh4X0Nr03jnm3MwsPDw/tO3mybHhb+40XBw8PD+zyvbbfKC055SiKfdDETPDw8vAu82XZfHGoXjOTtq8oeHh4eXnfnL5cdAyeuODLeAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

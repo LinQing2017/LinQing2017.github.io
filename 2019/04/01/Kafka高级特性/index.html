@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Kafka 功能调研 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Kafka">
+    <meta name="description" content="Kafka StreamKafka Streams是一个客户端lib库，其中输入和输出数据存储在Kafka集群中，主要应用在简单、轻量的流式ETL操作。 Kafka Stream的特点包括：  简单轻巧的客户端库，可以非常方便的嵌入的任意JAVA程序中，并且无需依赖任何kafka之外的服务。  通过Kafka的Partition机制水平扩展  支持有状态操作，如包括 Aggregate算子、W">
+<meta name="keywords" content="Kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka 功能调研">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;04&#x2F;01&#x2F;Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="Kafka StreamKafka Streams是一个客户端lib库，其中输入和输出数据存储在Kafka集群中，主要应用在简单、轻量的流式ETL操作。 Kafka Stream的特点包括：  简单轻巧的客户端库，可以非常方便的嵌入的任意JAVA程序中，并且无需依赖任何kafka之外的服务。  通过Kafka的Partition机制水平扩展  支持有状态操作，如包括 Aggregate算子、W">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;kafka.apache.org&#x2F;23&#x2F;images&#x2F;streams-stateful_operations.png">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.312Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;kafka.apache.org&#x2F;23&#x2F;images&#x2F;streams-stateful_operations.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Kafka 功能调研</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Kafka 功能调研</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-03-31T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-04-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Kafka-Stream"><span class="post-toc-number">1.</span> <span class="post-toc-text">Kafka Stream</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#分布式实现"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">分布式实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Streams-DSL"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Streams DSL</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Stateless常用算子"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">Stateless常用算子</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Stateful算子"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">Stateful算子</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Aggregating"><span class="post-toc-number">1.2.2.1.</span> <span class="post-toc-text">Aggregating</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Join"><span class="post-toc-number">1.2.2.2.</span> <span class="post-toc-text">Join</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Windows"><span class="post-toc-number">1.2.2.3.</span> <span class="post-toc-text">Windows</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#开发Tips"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">开发Tips</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#依赖"><span class="post-toc-number">1.2.3.1.</span> <span class="post-toc-text">依赖</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#配置项"><span class="post-toc-number">1.2.3.2.</span> <span class="post-toc-text">配置项</span></a></li></ol></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Kafka-Connect"><span class="post-toc-number">2.</span> <span class="post-toc-text">Kafka Connect</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#总结"><span class="post-toc-number">3.</span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Kafka高级特性"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Kafka 功能调研</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-04-01 00:00:00" datetime="2019-03-31T16:00:00.000Z"  itemprop="datePublished">2019-04-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <a id="more"></a>
+
+<h1 id="Kafka-Stream"><a href="#Kafka-Stream" class="headerlink" title="Kafka Stream"></a>Kafka Stream</h1><p>Kafka Streams是一个客户端lib库，其中输入和输出数据存储在Kafka集群中，主要应用在简单、轻量的流式ETL操作。</p>
+<p>Kafka Stream的特点包括：</p>
+<ul>
+<li><p>简单轻巧的客户端库，可以非常方便的嵌入的任意JAVA程序中，并且无需依赖任何kafka之外的服务。</p>
+</li>
+<li><p>通过Kafka的Partition机制水平扩展</p>
+</li>
+<li><p>支持有状态操作，如包括 Aggregate算子、Windows算子、Join算子等</p>
+</li>
+<li><p>支持 exactly-once 语义（可以按照需要配置为at-least-once）</p>
+</li>
+<li><p>毫秒级延时，支持基于event-time的窗口操作</p>
+</li>
+<li><p>提供必要的流处理元语、high-level Streams DSL（提供Map、Filter、Join等高级API） 、 low-level Processor API（提供API用于用户定制功能）</p>
+</li>
+</ul>
+<h2 id="分布式实现"><a href="#分布式实现" class="headerlink" title="分布式实现"></a>分布式实现</h2><p>Kafka Stream 利用 Kafka 本身的分区机制来实现并行任务，Streaming 中任务被分成多个 Task，每个Task处理一个或者多个Partition上的数据。</p>
+<p>用户可以对同一个任务启动多个实例，这些实例中通过 application.id 来辨识是否属于同一个任务。一旦某个实例失败，该实例上的task会在其他实例上恢复，并且继续工作。</p>
+<p>Kafka Streaming在不同task之间不进行数据共享，因此进行聚合等操作时Stream任务会发生re-partition，同时join等操作也会有一些限制。</p>
+<h2 id="Streams-DSL"><a href="#Streams-DSL" class="headerlink" title="Streams DSL"></a>Streams DSL</h2><p>Streams DSL是在进行Kafka Stream开发中使用的主要API，包括了以下三个抽象概念：</p>
+<p><strong>KStream</strong>：KStream是record stream的抽象，表示对一个或多个partition中的数据。</p>
+<p><strong>KTable</strong>：KTable本质上是一个<strong>changelog stream</strong>，每条流入的记录相当于对KTalbe进行一次Update、INSERT操作。当一条记录的value为null时，表示删除DELETE记录操作。<strong>在KTable中Key是唯一的！</strong></p>
+<p><strong>GlobalKTable</strong>：与KTable的区别在于GlobalKTable获取所有partition中的数据，保存到Application的本地，而KTable只保存当前Application中处理的partition数据。GlobalKTable可以用作Application中的broadcast功能。</p>
+<h3 id="Stateless常用算子"><a href="#Stateless常用算子" class="headerlink" title="Stateless常用算子"></a>Stateless常用算子</h3><p>Stream中算子是强类型操作，进行所有Transform操作时均需要指明算子的输入/输出类型。</p>
+<p>Stateless 算子，不要求State Store来存储中间状态，用户可以将结果转换为一张无状态的KTable中来进行交互式的查询。</p>
+<table>
+<thead>
+<tr>
+<th>算子</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Branch</td>
+<td>根据指定逻辑将Stream分成一个或者多个，应用的场景类似于代码中的switch语法</td>
+</tr>
+<tr>
+<td>Filter</td>
+<td>过滤KStream或者KTable对象中的Record</td>
+</tr>
+<tr>
+<td>Inverse Filter</td>
+<td>和Filter相反，删除返回True的元素</td>
+</tr>
+<tr>
+<td>FlatMap</td>
+<td>将一条Record变为多条，如果flatMap之后的操作是join或者group，那么让Stream发生repartition</td>
+</tr>
+<tr>
+<td>FlatMap (values only)</td>
+<td>在key不变的情况下将一条Record分为多条，通常不会造成re-partitioning</td>
+</tr>
+<tr>
+<td>Peek</td>
+<td>遍历每条记录，但是不改变其值，应用该操作的边际效应</td>
+</tr>
+<tr>
+<td>Foreach</td>
+<td>Terminal operation.返回值为void</td>
+</tr>
+<tr>
+<td>Print</td>
+<td>Terminal operation.打印（key+”, “+value）</td>
+</tr>
+<tr>
+<td>Map</td>
+<td>改变Stream的Key和Value</td>
+</tr>
+<tr>
+<td>Map (values only)</td>
+<td>改变Stream和Ktable的Value取值</td>
+</tr>
+<tr>
+<td>Merge</td>
+<td>合并两个Stream的每条记录，保证合并的相对顺序</td>
+</tr>
+<tr>
+<td>SelectKey</td>
+<td>改变Key的值或者类型</td>
+</tr>
+<tr>
+<td>GroupByKey</td>
+<td>KStream → KGroupedStream</td>
+</tr>
+<tr>
+<td>GroupBy</td>
+<td>相比GroupByKey可以改变Key的取值和类型（对于Stream可以改变Key的类型，对于Table既能改变类型和取值）,相当于selectKey(…).groupByKey()的连续应用</td>
+</tr>
+</tbody></table>
+<h3 id="Stateful算子"><a href="#Stateful算子" class="headerlink" title="Stateful算子"></a>Stateful算子</h3><p>Stateful算子需要使用“state store”来存储中间数据，state stores 的实际实现可以是kv存储、内存中的hashmap、某种数据结构。Kafka允许Stream之外的程序访问该 stream 程序创建的 state stores，这种能力是Kafka实现 Interactive Queries 的基础。</p>
+<p>DSL中包括以下几种有状态算子：</p>
+<ul>
+<li>Aggregating</li>
+<li>Joining</li>
+<li>Windowing</li>
+<li>其他自定义类型</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://kafka.apache.org/23/images/streams-stateful_operations.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<h4 id="Aggregating"><a href="#Aggregating" class="headerlink" title="Aggregating"></a>Aggregating</h4><p>Aggregating对于KGroupedStream和KGroupedTable由groupBy算子产生，可以在其后使用聚合类型的算子。这一类算子基于KV类型进行操作，并在相同的Key的Record上进行操作，最终生成一个KTable类型的对象。</p>
+<p>Aggregating包括：Aggregate算子、Reduce算子、Count算子三种类型，并且支持窗口操作。</p>
+<p>Aggregate算子对 KGroupedStream、KGroupedTable 进行滚动聚合操作，并产生KTable。使用时提供initializer 、adder、subtractor（只有操作KGroupedTable时需要提供）三种接口。</p>
+<p>对象为 KGroupedStream 遵循下面的逻辑：</p>
+<ul>
+<li>null keys 的记录直接被丢弃</li>
+<li>first Keys 到达时先调用initializer，之后调用adder</li>
+<li>随后相同Key到达时调用adder</li>
+</ul>
+<p>对象为 KGroupedTable 遵循下面的逻辑：</p>
+<ul>
+<li>null keys 的记录直接被丢弃</li>
+<li>first Keys 到达时先调用initializer，之后调用adder（相当于INSERT操作）</li>
+<li>随后相同Key到达时先调用subtractor，之后调用adder（相当于UPDATE操作）</li>
+<li>null value 相当于DELETE操作，调用subtractor，并且移除表的KEY</li>
+</ul>
+<p>Aggregate算子如果跟在windowedBy操作之后，则变为窗口形式。只针对当前窗口Record进行聚合。</p>
+<h4 id="Join"><a href="#Join" class="headerlink" title="Join"></a>Join</h4><p>在Kafka中执行Join操作基于 leftRecord.key == rightRecord.key 来进行。</p>
+<p>由于Kafka Stream的Task中只能获取部分Partition的数据，所以如果想要获取正确的Topic结果需要满足data co-partitioning条件，即：</p>
+<ul>
+<li>输入的Topic要有相同数目的分区</li>
+<li>所有Input Topic的分区策略必须稳定，并且能够保证相同Key被路由到相同分区</li>
+</ul>
+<p>支持的Join类型包括：join、leftJoin、outerJoin，并且根据左右对象的不同可以分为以下场景：</p>
+<ul>
+<li>KStream之间Join</li>
+<li>KTable之间Join</li>
+<li>KStream和KTable之间Join</li>
+<li>KStream-GlobalKTable Join（无需满足data co-partitioning条件）</li>
+</ul>
+<p>对Kafka来说整个Join过程是流式进行的，并非在窗口内缓存数据一批执行一次join。</p>
+<p>官方文档给出了各种情况下join结果的表格（<a href="https://kafka.apache.org/23/documentation/streams/developer-guide/dsl-api.html#joining" target="_blank" rel="noopener">参考</a>）。</p>
+<h4 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h4><p>windows的作用和group算子类似，group算基于key对record分类，而windows则基于时间对record进行分类。同一个窗口的数据被保存在state store中，直到该窗口过期。</p>
+<p>Windows并非在要失效后触发操作，而是每当有数据进入窗口时触发一次action。但是也可以使用suppress来抑制窗口的action</p>
+<p>Kafka支持以下四种窗口：</p>
+<ul>
+<li>Tumbling time window：翻滚窗口</li>
+<li>Hopping time window：实际意义上滑动窗口</li>
+<li>Sliding time window：特殊的滑动窗口，是非对齐的，只能用在join操作上</li>
+<li>Session window：根据相同Key记录出现的时间间隔来划分窗口</li>
+</ul>
+<p>大部分类型的windows划分基于时间，Stream在KafkaStream中包括以下三种时间：</p>
+<ul>
+<li>Event time：事件时间</li>
+<li>Processing time：Stream处理记录的时间</li>
+<li>Ingestion time：摄入时间，即数据被写入到Kafka的时间</li>
+</ul>
+<p>Kafka会自动为记录嵌入一个时间戳，用户可以在broker或者topic上配置该时间的含义。</p>
+<p>在Kafka Stream中，Processor会根据实际情况为生成的records分配时间戳，包括：继承原有timestamp、以当前时间生成新timestamp、聚合操作中继承最后一条record的timestamp。</p>
+<p>在Kafka Stream中按照Offset而不是TimeStamp顺序来处理数据，因此对于有状态操作不能保证Record是按照时间顺序来处理的。</p>
+<h3 id="开发Tips"><a href="#开发Tips" class="headerlink" title="开发Tips"></a>开发Tips</h3><h4 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h4><p>使用Kafka Streaming时需要包括以下三个依赖，其中最后一个依赖只有使用scala开发时需要添加（CDH版本同样有这三个依赖）。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupid</span>&gt;</span>org.apache.kafka<span class="tag">&lt;/<span class="name">groupid</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactid</span>&gt;</span>kafka-streams<span class="tag">&lt;/<span class="name">artifactid</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupid</span>&gt;</span>org.apache.kafka<span class="tag">&lt;/<span class="name">groupid</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactid</span>&gt;</span>kafka-clients<span class="tag">&lt;/<span class="name">artifactid</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- Optionally include Kafka Streams DSL for Scala for Scala 2.12 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupid</span>&gt;</span>org.apache.kafka<span class="tag">&lt;/<span class="name">groupid</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactid</span>&gt;</span>kafka-streams-scala_2.12<span class="tag">&lt;/<span class="name">artifactid</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="配置项"><a href="#配置项" class="headerlink" title="配置项"></a>配置项</h4><p>参考<a href="http://kafka.apache.org/documentation/streams/developer-guide/config-streams.html" target="_blank" rel="noopener">官方文档</a></p>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>application.id</strong></td>
+<td>用于标识Streaming的应用名称。在整个kafka集群中，相同application.id的进程视为一个集群，任务在这些进程中自动均衡。该配置还被用于充当任务的group.id，client.id的前缀，内部topic的前缀，以及一些streaming子目录的前缀。</td>
+</tr>
+<tr>
+<td><strong>default.deserialization.exception.handler</strong></td>
+<td>处理序列化异常</td>
+</tr>
+<tr>
+<td><strong>default.production.exception.handler</strong></td>
+<td>处理Streaming程序和Kafka broker的交互异常</td>
+</tr>
+<tr>
+<td><strong>default.key.serde/default.value.serde</strong></td>
+<td>默认序列化类</td>
+</tr>
+<tr>
+<td><strong>num.standby.replicas</strong></td>
+<td>task的副本数目，指local state stores的副本数目，对于n个部分的实例，需要配置n+1个Kafka Stream实例。</td>
+</tr>
+<tr>
+<td><strong>partition.grouper</strong></td>
+<td>决定task和partition的映射机制</td>
+</tr>
+<tr>
+<td><strong>processing.guarantee</strong></td>
+<td>at_least_once、exactly_once</td>
+</tr>
+<tr>
+<td><strong>replication.factor</strong></td>
+<td>streaming 内部topic的副本数目</td>
+</tr>
+<tr>
+<td><strong>state.dir</strong></td>
+<td>用来存储local states的目录</td>
+</tr>
+<tr>
+<td><strong>timestamp.extractor</strong></td>
+<td>从Record中抽取时间戳的Class，支持FailOnInvalidTimestamp、LogAndSkipOnInvalidTimestamp、UsePreviousTimeOnInvalidTimestamp、 WallclockTimestampExtractor</td>
+</tr>
+<tr>
+<td>rocksdb.config.setter</td>
+<td>rocksdb的配置，rocksdb被用来作为Kafka Streaming的持久化存储工具</td>
+</tr>
+</tbody></table>
+<h1 id="Kafka-Connect"><a href="#Kafka-Connect" class="headerlink" title="Kafka Connect"></a>Kafka Connect</h1><p>Kafka Connect 是Kafka和其他系统间的数据管道，支持分布式、单机两种模式部署。用户在配置文件中指定Connectors类，Kafka通关这些Connectors类连接外部系统来传输数据（做的事实际上有点像Flume）。</p>
+<p>Kafka 中包括 SourceConnectors 、SinkConnectors 两种类型的Connectors，每个Connectors中包含多个Task，这些Task映射到外部系统的一批数据（比如一张表、文件），是实际的工作执行者。</p>
+<p>官网说明了用户应该如何开发一个Connectors，内容包括：接口实现、Offset管理、动态配置、配置文件校验、Schemas、任务启停等等。</p>
+<p>相比用户直接用Consumer、Producer的SDK去开发业务，使用Kafka Connect有下面几个优势：</p>
+<ul>
+<li>实现一个统一框架，遵循框架来开发能提高代码的质量</li>
+<li>有一套 REST API 接口，可以实现传输任务的启动、停止、删除的操作</li>
+<li>自动化的Offset管理</li>
+<li><a href="https://www.confluent.io/hub/" target="_blank" rel="noopener">Confluent.IO</a>可以获取许多线程实现</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>当业务以Kafka作为主要数据源（Kafka流处理平台）时，KStream、Kafka Connect能发挥最大价值，对当前IData来说这两个功能比较鸡肋。</p>
+<ul>
+<li><p>KStream 是一种较为轻量的流处理框架（功能更少的Flink or Spark），可以用于取代当前IData的部分Spark Streaming业务，能够获得一定的性能提升。但是要在IData中完全引入流式处理的框架，可能需要对业务有大量的修改。</p>
+</li>
+<li><p>Kafka Connect 生态比较丰富，一些ETL、南北向接口的场景可能值得一用。</p>
+</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://kafka.apache.org/23/documentation/streams/developer-guide/dsl-api.html" target="_blank" rel="noopener">DSL API</a></p>
+<p><a href="https://kafka.apache.org/23/documentation/streams/developer-guide/dsl-api.html#scala-dsl" target="_blank" rel="noopener">Kafka Streaming Scala</a> </p>
+<p><a href="https://kafka.apache.org/23/documentation/streams/developer-guide/processor-api.html" target="_blank" rel="noopener">Processor API</a></p>
+<p><a href="https://kafka.apache.org/23/documentation/streams/developer-guide/interactive-queries.html" target="_blank" rel="noopener">interactive-queries</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.312Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/" target="_blank" rel="external">https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/&title=《Kafka 功能调研》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/&title=《Kafka 功能调研》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kafka 功能调研》 — LQing的博客&url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/04/01/Offset%E4%BF%A1%E6%81%AF%E4%BF%9D%E5%AD%98/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Kafka 如何保存 Offset</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/03/12/kafka%E5%AE%89%E5%85%A8%E7%9B%B8%E5%85%B3/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Kafka 安全认证</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/&title=《Kafka 功能调研》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/&title=《Kafka 功能调研》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kafka 功能调研》 — LQing的博客&url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/01/Kafka%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuklEQVR42u3cQW4jMQwEQP//01lgr2s73aSUeIGaU+B4xiofJKZJ5PGIr6+/16vX/72Su1695+vt9bhx4eHh4Y2Wni909jE5Pvkiiq8ADw8P7xoveXSyQb+6K/nt7DnfWPDw8PB+lbfaoOPnvC+18fDw8P4vXvvK+095X77/2rmHh4eHF/OSMKINbRPw++Nksx48PDy8e7y2AfYJP1/s7+Hh4eEtuuptdJuU1+3QwGq1eHh4eBd4SWDalsjtM9u9vR5EwMPDwzvK22zBUYRatq/aoOGbleDh4eFd4OVx6mxoYLahb8KIlyU1Hh4e3lFeHg3MxgU2JfixlhseHh7eId77jX4W2uZFcPvOOtrAw8PDu8BLStgWU+THZfMsV+Dh4eHd481C0k2PaXO0tIU1Hh4e3j1eezy0h8EGlg9yPbkLDw8P7wJvNnSV33UqnlgFx3h4eHhHeUlk0BbW+zCiLcrrlAUPDw9vwduEDi1gVri3jTc8PDy827w8Es0r9OSdOaMNI16m1Hh4eHiHeEkokJfRs8mFdrvPvw48PDy8G7z8SJgdD7MhgFnZXfT38PDw8LbPPPavRtrSPG+JbUa18PDw8O7x9tt0PhDQBhN5OPLkLjw8PLyjvHZc4Ozi8jI9b79FJx4eHh7eId6m9dUuogXnJXsxU4aHh4e35uXDUm1wMLu3bZsVJTUeHh7egjd7RJt25EMJySe2oQkeHh7eWV4LmIUCSUF8qhWHh4eH95O8PKItytm8wT8a5IpiXDw8PLyjvHbznQ0QzNpd+8ACDw8P7x6vbWW1Da2iCC4jiegT8fDw8K7xksNgU0bvm2RtJIGHh4f3CbxkiZsCOn9P/tXj4eHhfQIv/3t/k4vMSvwnVDw8PLxrvLzplRwA+4NkVtDj4eHh/Qxv0wBr44PNGMFsPXh4eHhHeX8A+5uIveiXDnIAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

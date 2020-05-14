@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Spark调优笔记 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="">
+    <meta name="description" content="基础概念每一个Spark任务，从不同的角度、从大到小涉及到以下概念：  按照占用的资源：Application –&amp;gt; Driver&#x2F;若干Executor –&amp;gt; 每一个Executor 运行多个 Task（线程） 按照任务的逻辑：Application –&amp;gt; 若干连续执行的Job –&amp;gt; 每个Job划分为多个Stage  知识点：  从JVM角度每个Executor是一个独立进">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark调优笔记">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2020&#x2F;05&#x2F;14&#x2F;Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="基础概念每一个Spark任务，从不同的角度、从大到小涉及到以下概念：  按照占用的资源：Application –&amp;gt; Driver&#x2F;若干Executor –&amp;gt; 每一个Executor 运行多个 Task（线程） 按照任务的逻辑：Application –&amp;gt; 若干连续执行的Job –&amp;gt; 每个Job划分为多个Stage  知识点：  从JVM角度每个Executor是一个独立进">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.314Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Spark调优笔记</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Spark调优笔记</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-05-14T07:59:03.314Z" itemprop="datePublished" class="page-time">
+  2020-05-14
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#基础概念"><span class="post-toc-number">1.</span> <span class="post-toc-text">基础概念</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Shuffle-操作"><span class="post-toc-number">2.</span> <span class="post-toc-text">Shuffle 操作</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#内存管理"><span class="post-toc-number">3.</span> <span class="post-toc-text">内存管理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#堆内存"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">堆内存</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#堆外内存"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">堆外内存</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#分区"><span class="post-toc-number">4.</span> <span class="post-toc-text">分区</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Spark-SQL-自动调整-Shuffle-Partition"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">Spark SQL 自动调整 Shuffle Partition</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Spark-Web-UI"><span class="post-toc-number">5.</span> <span class="post-toc-text">Spark Web UI</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Oom"><span class="post-toc-number">6.</span> <span class="post-toc-text">Oom</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Spark调优笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Spark调优笔记</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-05-14 15:59:03" datetime="2020-05-14T07:59:03.314Z"  itemprop="datePublished">2020-05-14</time>
+
+            
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><p>每一个Spark任务，从不同的角度、从大到小涉及到以下概念：</p>
+<ul>
+<li>按照占用的资源：Application –&gt; Driver/若干Executor –&gt; 每一个Executor 运行多个 Task（线程）</li>
+<li>按照任务的逻辑：Application –&gt; 若干连续执行的Job –&gt; 每个Job划分为多个Stage</li>
+</ul>
+<p>知识点：</p>
+<ul>
+<li>从JVM角度每个Executor是一个独立进程，每个task是该进程的一个子线程。</li>
+<li>Job 中划分 Stage 以shuffle操作作为边界，而划分 Job 边界的是代码中的 action。</li>
+<li>每个数据 partition 由一个 Task 处理，因此每个 Task 处理的数据量和 partition num 的大小成反比，控制 partition num 可以防止 Executor 发生 Oom。</li>
+<li>Task 的并行度由 slot 决定，slots = spark.num.executors * spark.executor.cores / spark.task.cpus。</li>
+</ul>
+<h1 id="Shuffle-操作"><a href="#Shuffle-操作" class="headerlink" title="Shuffle 操作"></a>Shuffle 操作</h1><p>Shuffle描述着数据从map task输出到reduce task输入的这段过程。在分布式情况下，每个 Reduce task 从不同 Map task 输出中拉取相同 Key 的 Records，这一过程会产生网络资源、内存、磁盘IO的消耗。</p>
+<p>通常情况下，Shuffle 分成两个部分， 每个 Stage 从上一个 Stage Shuffle Read 得到数据，处理后进行 Shuffle Write 输出给下一个任务</p>
+<ul>
+<li>Map阶段的数据准备：Shuffle Write</li>
+<li>Reduce阶段的数据拷贝：Shuffle Read</li>
+</ul>
+<p>在Spark的中负责shuffle的主要组件是ShuffleManager。</p>
+<p>ShuffleManager随着Spark的发展有两种实现的方式：</p>
+<ul>
+<li><p>HashShuffleManager：Hash Shuffle</p>
+<ul>
+<li>Spark 1.2以前默认配置</li>
+<li>会产生大量的中间磁盘文件，影响磁盘性能</li>
+</ul>
+</li>
+<li><p>SortShuffleManager：Sort Shuffle</p>
+<ul>
+<li>从1.2 开始成为默认配置，并且在 Spark 2.0 时成为唯一的选择</li>
+<li>每个Task在进行shuffle后，将所有的临时文件合并(merge)成一个磁盘文件，因此每个Task就只有一个磁盘文件。Reduce Task 根据索引读取每个磁盘文件中的部分数据</li>
+</ul>
+</li>
+</ul>
+<p>参考资料：</p>
+<p> <a href="https://www.jianshu.com/p/4c5c2e535da5" target="_blank" rel="noopener">Spark Shuffle的技术演进</a></p>
+<p> <a href="http://bigdatatn.blogspot.com/2017/05/spark-performance-optimization-shuffle.html" target="_blank" rel="noopener">Spark performance optimization: shuffle tuning</a></p>
+<h1 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h1><p>Spark中一个Executor对应一个JVM进程，Executor占用的内存分为两部分：ExecutorMemory和MemoryOverhead。ExecutorMemory是堆区内存，MemoryOverhead是Spark的堆外内存。</p>
+<p>在Spark1.6以前的版本中，heap内存是静态管理的，而新版中内存使用动态管理方案进行管理。通过配置项spark.memory.useLegacyMode可以在两种方式中进行切换。</p>
+<h2 id="堆内存"><a href="#堆内存" class="headerlink" title="堆内存"></a>堆内存</h2><p>动态配置的情况下，Heap内存包括以下几个部分：</p>
+<ul>
+<li>Reserved Memory：预留给系统使用，是固定不变的。默认300MB，并且这一部分是不可变的。</li>
+<li>User Memory：临时数据或者是自己维护的一些数据结构使用的内存空间， 默认大小：(Java Heap - Reserved Memory) x （1-spark.memory.fraction）（默认情况下1GB大小的Executor为289MB）。</li>
+<li>Spark Memory：系统框架运行时需要使用的空间，这是从两部份构成的分别是 Storage Memeory 和 Execution Memory。前者用来进行RDD缓存，后者用来Shuffle缓存。Storage 和 Execution (Shuffle) 采用了 Unified 的方式共同使用一个内存区域，默认情况下两者各站这一部分内存的50%，当一方内存不足时两者会相互占用对方内存，但是通常情况下Execution (Shuffle)的优先级更高！</li>
+</ul>
+<h2 id="堆外内存"><a href="#堆外内存" class="headerlink" title="堆外内存"></a>堆外内存</h2><p>Spark的堆外内存称为Memory-Overhead是JVM进程中除Java堆以外占用的空间大小，包括方法区（永久代）、Java虚拟机栈、本地方法栈、JVM进程本身所用的内存、直接内存（DirectMemory）等。通过spark.yarn.executor.memoryOverhead设置，单位MB。</p>
+<p>默认情况下，spark.yarn.executor.memoryOverhead的大小按照下面的方式决定：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MEMORY_OVERHEAD_FACTOR = 0.07 </span><br><span class="line">MEMORY_OVERHEAD_MIN = 384</span><br><span class="line">min（MEMORY_OVERHEAD_FACTOR*spark.executor.memory，MEMORY_OVERHEAD_MIN）</span><br></pre></td></tr></table></figure>
+<p>默认情况下，spark单个Executor占用的内存资源为Spark堆外内存和Heap内存，当堆外内存超出限制时会产生OOM，使Yarn直接杀死容器，这时候没有任何异常。</p>
+<p><a href="https://juejin.im/post/5cac122ef265da0356320f09" target="_blank" rel="noopener">浅析 Spark Shuffle 内存使用</a></p>
+<h1 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h1><p>Spark任务的输入在绝大多数场景下存在分区的概念，默认情况下一个分区的数据在一个Task线程中执行。</p>
+<p>可以使用以下两个参数，控制 Spark 任务的分区：</p>
+<ul>
+<li>spark.default.parallelism：控制RDD的分区数量</li>
+<li>spark.sql.shuffle.partitions：控制SQL的分区数量</li>
+</ul>
+<p>需要注意，进行Shuffle时分区的数目是会发生变化的。</p>
+<h2 id="Spark-SQL-自动调整-Shuffle-Partition"><a href="#Spark-SQL-自动调整-Shuffle-Partition" class="headerlink" title="Spark SQL 自动调整 Shuffle Partition"></a>Spark SQL 自动调整 Shuffle Partition</h2><p>这个特性可以将Spark SQL执行Shuffle时，较小的连续分区进行合并，从而自适应 shuffle 时的分区数目。</p>
+<p>该特性是 Intel 在<a href="https://github.com/Intel-bigdata/spark-adaptive" target="_blank" rel="noopener">Intel-bigdata/spark-adaptive</a>中设计，并且合入了Spark 2.3.1(<a href="https://issues.apache.org/jira/browse/SPARK-23128" target="_blank" rel="noopener">SPARK-23128</a>)。</p>
+<p>spark-adaptive 针对 Spark 有下面三个优化：</p>
+<ul>
+<li>在Spark SQL下，自适应 Shuffle Partition 的数量</li>
+<li>动态调整执行计划（基于一些中间结果的数据量大小，动态的改变执行计划）</li>
+<li>自动处理数据倾斜</li>
+</ul>
+<p>参考: </p>
+<p><a href="http://www.jasongj.com/spark/adaptive_execution/" target="_blank" rel="noopener">Adaptive Execution 让 Spark SQL 更高效更智能</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzA4Mzc0NjkwNA==&mid=2650784030&idx=1&sn=2c61e166b535199ee53e579a5092ff80&chksm=87faa829b08d213f55dab289bf5a12cfe376be0c944e03279a1c93e0f0d2164f1c6a6c7c880a&mpshare=1&scene=1&srcid=0111fEEzMCuhKozD4hsN4EE5&pass_ticket=WwOAQGxxBX9z63UyuFIXnWVm%2FSJhHkYwdsKplVDbaiA66ueqnDOtzgq86NgTgqvt#rd" target="_blank" rel="noopener">Spark SQL在100TB上的自适应执行实践</a></p>
+<h1 id="Spark-Web-UI"><a href="#Spark-Web-UI" class="headerlink" title="Spark Web UI"></a>Spark Web UI</h1><p>Spark UI 的页面中，对检查任务的运行状态最有意义的是 Executors 和 Stages：</p>
+<ul>
+<li><p>Executors 可以查看以下内容</p>
+<ul>
+<li>Task 运行情况，包括：正在运行数、失败数目、已经完成数目、以及 Task 的总数；</li>
+<li>Task 累积运行时间，以及累积的GC时间</li>
+<li>executor的Input（累积输入）、Shuffle Read（Reduce端读）、Shuffle Write（Map端写）</li>
+<li>driver和executor的聚合日志</li>
+</ul>
+</li>
+<li><p>Stages 可以查看以下内容</p>
+<ul>
+<li>每个Stages的持续时间（Duration）</li>
+<li>Stages 的输入/ 输出数据大小（Input/Output）,这个指读写到Hadoop等外部存储的数据，以及从Spark Storage读到的数据</li>
+<li>Shuffle Read / Shuffle Write 序列化后，shuffle读写的数据量</li>
+<li>Stages 中每个 Task 的统计细节<ul>
+<li>Shuffle Read Size / Records : 序列化的shuffle读数据大小</li>
+<li>Shuffle Write Size / Records : 序列化的shuffle写数据大小</li>
+<li>Shuffle Spill (Memory) ： shuffle 过程中spill到disk的数据大小，这里指的是反序列化后数据大小</li>
+<li>Shuffle Spill (Disk) ： shuffle 过程中spill到disk的数据大小，这里指的是序列化后数据大小</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="Oom"><a href="#Oom" class="headerlink" title="Oom"></a>Oom</h1><p>处理Oom的一些手段：</p>
+<ul>
+<li><p>Driver Oom 时通常有以下可能：</p>
+<ul>
+<li>Executor 返回的序列化结果集太小，而 spark.driver.maxResultSize（默认1g） 太小</li>
+</ul>
+</li>
+<li><p>Executor Oom 时通常有以下可能：</p>
+<ul>
+<li>分区数量过小，那么单个Executor需要处理数据量会增多，使Executor的压力过大。</li>
+<li>spark.yarn.executor.memoryOverhead太小，这时候堆外内存溢出，yarn会直接杀死容器，可能spark上可能看不到任何异常。</li>
+<li>由于Spark executor中多个Task并行时是共享内存的，因此减少slot可以改善Oom的情况；</li>
+<li>数据倾斜造成 OOM（主要原因是，堆内对象的分配和释放是由 JVM 管理的，而 Spark 是通过采样获取已经使用的内存情况，有可能因为采样不准确而不能及时 Spill，导致OOM）；</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.314Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/" target="_blank" rel="external">https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/&title=《Spark调优笔记》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/&title=《Spark调优笔记》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spark调优笔记》 — LQing的博客&url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/11/07/Greenplum-pxf%E4%BD%BF%E7%94%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- GreenPlum</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/&title=《Spark调优笔记》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/&title=《Spark调优笔记》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spark调优笔记》 — LQing的博客&url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2020/05/14/Spark%E8%B0%83%E4%BC%98%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvklEQVR42u3a0WrDQAwEwPz/T6fQpxR6zkq6q1MYPxkn2B4HrMtKj0e8Pb+31/3XI6vvXJ+nenz1nQ0bHh4eXuvWV9vq1Amyeuur6ybHV/eDh4eHd46Xv5SvX9CTEnK93yw8eHh4eLfyklf2ZIF+XX7w8PDw/iOv+rpP2M/ihoeHh/c5vOR018eTSCKJD27LWvDw8PBiXm8RfO/+8f4eHh4e3qblbDXAzQOFeWn55Sp4eHh4B3jV4CCJdJPvT0a18mACDw8P7wSvt5CtvsSTQpIcz3k/6h4eHh7eMd68wT9PAPICE8XHeHh4eMd48/ZSHjckL/ScUfivgIeHh7eJVx2WmkSrvXgiX8q/mYzAw8PDO8zrDVpNBqfyECRf1uPh4eGd4/X+6k/C3N4rvtDTmycZeHh4eK1tHgfkoW3vWiMkHh4eXos3X87mg1Z58DovUXh4eHjneJOotNrcqg5UVZtqSaMODw8PbxdvshKftLJ6DyVZmhd+MTw8PLwiLw9Po6rSind7bTY8PDy8z+RNRgomoUN+hjfFBg8PD+8Ar9em6rX8ewUjv8PltfDw8PD+hNeLdKsXzsOIyagWHh4e3l5e9RbzMLfauOoNNDwma3Y8PDy8Fq96uyfaYBNSM7zAw8PDG/Oqra9eiDAZU8jHC94srPHw8PA28Sbr0rwwVGOOvIRsW2rj4eHhxbxeA2wyatAbt8rHCzb09/Dw8PAC3ukUtNpsmxSq7AM8PDy8Du9Z3HZFAPlYVfXR/PgUDw8P7wBvHj1US0J1v7dk35as4OHh4S3upzd6lYSt1WKTXLHcZsPDw8M7xuu91hNwdSk8WaAvCwMeHh7eB/Cq+Gq6nCzWo2vh4eHh3cpLmvrVDlT1gebxLh4eHt5p3uQUvVZZ/rAK0UPvwnh4eHhF3mhiKygt89ZX9YfBw8PDO8b7AkB05ClgzolmAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

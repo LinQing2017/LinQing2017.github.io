@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- Prometheus | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,Prometheus">
+    <meta name="description" content="数据库调研笔记 – Prometheus">
+<meta name="keywords" content="数据库,Prometheus">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- Prometheus">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;07&#x2F;16&#x2F;0-Prometheus&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="数据库调研笔记 – Prometheus">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;prometheus.io&#x2F;assets&#x2F;architecture.png">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.204Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;prometheus.io&#x2F;assets&#x2F;architecture.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- Prometheus</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- Prometheus</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-07-15T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-07-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Prometheus"><span class="post-toc-number">1.</span> <span class="post-toc-text">Prometheus</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#概念"><span class="post-toc-number">2.</span> <span class="post-toc-text">概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Data-Model"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">Data Model</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Time-Series"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Time-Series</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Metric-Types"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Metric Types</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Histogram"><span class="post-toc-number">2.3.1.</span> <span class="post-toc-text">Histogram</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#summary"><span class="post-toc-number">2.3.2.</span> <span class="post-toc-text">summary</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#JOBS-AND-INSTANCES"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">JOBS AND INSTANCES</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#安装"><span class="post-toc-number">3.</span> <span class="post-toc-text">安装</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#QuickStart"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">QuickStart</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#PromQL"><span class="post-toc-number">4.</span> <span class="post-toc-text">PromQL</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#查询时间序列"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">查询时间序列</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#聚合、操作符运算"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">聚合、操作符运算</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#运算符操作"><span class="post-toc-number">4.2.1.</span> <span class="post-toc-text">运算符操作</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#聚合函数"><span class="post-toc-number">4.2.2.</span> <span class="post-toc-text">聚合函数</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#其他内置函数"><span class="post-toc-number">4.2.3.</span> <span class="post-toc-text">其他内置函数</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#例子"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">例子</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#存储"><span class="post-toc-number">5.</span> <span class="post-toc-text">存储</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#本地存储"><span class="post-toc-number">5.0.1.</span> <span class="post-toc-text">本地存储</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#远程存储"><span class="post-toc-number">5.0.2.</span> <span class="post-toc-text">远程存储</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#集群模式"><span class="post-toc-number">6.</span> <span class="post-toc-text">集群模式</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#常用管理员命令"><span class="post-toc-number">7.</span> <span class="post-toc-text">常用管理员命令</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">8.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-0-Prometheus"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- Prometheus</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-07-16 00:00:00" datetime="2019-07-15T16:00:00.000Z"  itemprop="datePublished">2019-07-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>数据库调研笔记 – Prometheus</p>
+<a id="more"></a>
+
+<h1 id="Prometheus"><a href="#Prometheus" class="headerlink" title="Prometheus"></a>Prometheus</h1><p>Prometheus 是SoundCloud公司开源的一款监控框架，提供包括：告警工具、时序数据库、图表展示等功能，主要包括以下Feature：</p>
+<ul>
+<li>支持PromQL来查询数据</li>
+<li>支持多维时间序列数据存储</li>
+<li>集群不依赖共享存储，单个服务器节点是自治的</li>
+<li>支持Pull、Push（通过gateway组件）两种方式获取数据</li>
+<li>支持动态发现的模式配置服务</li>
+<li>高效：单一实例可以处理百万个监控指标、每秒处理数十万的数据点</li>
+</ul>
+<p>Prometheus主要包括： </p>
+<ul>
+<li>Prometheus server：提供TSD能力，以及Pull数据的能力，以及基于PromQL的查询</li>
+<li>client libraries：多种语言的客户端接口</li>
+<li>Push gateway：数据网关，服务将数据Push到gateway，Server从gateway pull数据</li>
+<li>exporters：Exporter将监控数据采集的端点通过HTTP服务的形式暴露给Prometheus Server。一些符本身及支持Prometheus，因此这些服务天生就是exporters，此外还有的exporters以插件的形式被安装到client端。</li>
+<li>alertmanager：告警模块</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://prometheus.io/assets/architecture.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><h2 id="Data-Model"><a href="#Data-Model" class="headerlink" title="Data Model"></a>Data Model</h2><p>Prometheus的数据模型基于time series， 由一个Metric名称和若干labels构成，表示为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;metric name&gt;&#123;&lt;label name&gt;=&lt;label value&gt;, ...&#125;**</span><br></pre></td></tr></table></figure>
+<p>Prometheus 基于time series存储数据，并且可能会因查询而生成临时派生时间序列。</p>
+<h2 id="Time-Series"><a href="#Time-Series" class="headerlink" title="Time-Series"></a>Time-Series</h2><p>Time-Series由若干样本组成，每个Sample包含以下三个部分：</p>
+<ul>
+<li>指标（metric）：metric name + 描述当前样本特征的labelsets</li>
+<li>时间戳（timestamp）：一个精确到毫秒的时间戳</li>
+<li>样本值（value）：一个folat64的浮点型数据表示当前样本的值</li>
+</ul>
+<p>以下几点可以注意：</p>
+<ul>
+<li>metric name实际上是一个特殊的label，名称为<strong>name</strong>，以“__”作为前缀的标签是系统内置标签</li>
+<li>形式上所有metric格式为：&lt;\metric name&gt;{&lt;label name&gt;=&lt;label value&gt;, …}</li>
+<li>一个Time-Series包含多个metric</li>
+</ul>
+<h2 id="Metric-Types"><a href="#Metric-Types" class="headerlink" title="Metric Types"></a>Metric Types</h2><p>Prometheus当前只支持四种数据类型，并且在不同的API中稍有区别：</p>
+<ul>
+<li>Counter：只增不减的计数器，只能在重启时将其设置为0</li>
+<li>Gauge：常规测量值类型</li>
+<li>Histogram：直方图统计类型</li>
+<li>Summary：类似Histogram，区别<a href="https://prometheus.io/docs/practices/histograms/" target="_blank" rel="noopener">参考</a></li>
+</ul>
+<p>Histogram 和 Summary 本质上都是统计指标，不会保存原始数据。</p>
+<h3 id="Histogram"><a href="#Histogram" class="headerlink" title="Histogram"></a>Histogram</h3><p>Histogram 指标对每个采样点进行统计，并根据bucket将数据划分到不同区域。</p>
+<p>假设bucket配置为[1,5,10], Prometheus观察到的数据被划分到[0,1],[1,5],[5,10]，[5,+inf] 四个不同的区间。</p>
+<p>对每个Histogram 可以获取以下信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[basename]_bucket&#123;le=“1”&#125; # 观测小于1的次数</span><br><span class="line">[basename]_bucket&#123;le=“5”&#125;   # 观测小于5的次数</span><br><span class="line">[basename]_bucket&#123;le=“10”&#125;   # 观测小于10的次数</span><br><span class="line">[basename]_count         # 所有观测值的个数</span><br><span class="line">[basename]_sum   # 所有观测值之和</span><br></pre></td></tr></table></figure>
+
+<p>Prometheus 只会存储每个区间内观测值的个数，并且histogram_quantile使用分段线性近似的方式绘制分布曲线。</p>
+<h3 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h3><p>summary是精度更高的直方图测量，可以获取以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. [basename]&#123;quantile=&quot;φ&quot;&#125; (0 ≤ φ ≤ 1) # 获取百分之φ数据的最小值，基于第三方库perk</span><br><span class="line">2. [basename]_sum   #指所有观察值的总和</span><br><span class="line">3. [basename]_count #指已观察到的事件计数值</span><br></pre></td></tr></table></figure>
+
+<h2 id="JOBS-AND-INSTANCES"><a href="#JOBS-AND-INSTANCES" class="headerlink" title="JOBS AND INSTANCES"></a>JOBS AND INSTANCES</h2><p> Instances 表示能够pull到数据的一个endpoint通过 Host:Port 表示，多个类型一致 Instances 组成 job。</p>
+<p> 在Prometheus拉取数据时，会自动为time series添加job和instance的名称到labels，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">job: api-server</span><br><span class="line">	instance 1: 1.2.3.4:5670</span><br><span class="line">	instance 2: 1.2.3.4:5671</span><br><span class="line">	instance 3: 5.6.7.8:5670</span><br><span class="line">	instance 4: 5.6.7.8:5671</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p><a href="https://prometheus.io/docs/prometheus/latest/installation/" target="_blank" rel="noopener">官方</a>提供了包括：二进制安装包、Docker、Ansible等多种安装方式。</p>
+<p><a href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank" rel="noopener">Exporters</a></p>
+<p>Prometheus 使用命令行和配置文件指定服务的配置项，其中：</p>
+<ul>
+<li>命令行参数：指定数据目录、memory配置等服务配置，使用./prometheus -h可以查看相关配置。</li>
+<li>配置文件：配置文件基于yaml格式，用于指定jobs、instances、rules，启动时通过–config.file指定配置文件，官方提供配置项有<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#configuration-file" target="_blank" rel="noopener">详细说明</a>，以及<a href="https://prometheus.io/docs/prometheus/latest/configuration/template_examples/" target="_blank" rel="noopener">模板</a>。</li>
+</ul>
+<p>Prometheus支持动态刷新配置，用户可以通过向进程发送 SIGHUP 或者 HTTP POST 方式重载配置项。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 执行配置文件动态刷新</span><br><span class="line"></span><br><span class="line">kill -HUP &#123;pid&#125;</span><br><span class="line">curl -X POST http://localhost:9090/-/reload</span><br></pre></td></tr></table></figure>
+
+<p>比较关键的启动配置包括：</p>
+<ul>
+<li>storage.tsdb.path：决定数据目录的存储位置</li>
+<li>config.file：读取的配置文件位置</li>
+</ul>
+<h2 id="QuickStart"><a href="#QuickStart" class="headerlink" title="QuickStart"></a>QuickStart</h2><p>官方网站的QuickStart展示了使用Node Exporter采集主机数据的例子。</p>
+<p>Node Exporter是Golang编写，主机系统测量值采集工具，不存在任何的第三方依赖，只需要<a href="https://github.com/prometheus/node_exporter" target="_blank" rel="noopener">下载</a>后即可直接运行。</p>
+<p>主机启动Node Exporter命令后，会在 9100 端口暴露采集到的监控数据，每次metrics请求会返回多个指标，其格式如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash">PS:每个指标的开头包含HELP和TYPE两行，HELP解释指标的内容、TYPE解释指标的类型</span></span><br><span class="line"><span class="meta">#</span><span class="bash">PS:每个指标&#123;&#125;中的内容是lable信息，</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> HELP node_cpu Seconds the cpus spent <span class="keyword">in</span> each mode. </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> TYPE node_cpu counter</span></span><br><span class="line">node_cpu&#123;cpu="cpu0",mode="idle"&#125; 362812.7890625</span><br><span class="line"><span class="meta">#</span><span class="bash"> HELP node_load1 1m load average.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> TYPE node_load1 gauge</span></span><br><span class="line">node_load1 3.0703125</span><br></pre></td></tr></table></figure>
+
+<p>以下配置文件中，包含了两个job：prometheus是服务自身的监控，node是我们定义的主机运行情况监控，共包含三个instance。</p>
+<p>重启prometheus后，在console页面执行up函数可以看到每个instance的运行情况（1表示正在运行）。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">global:</span></span><br><span class="line"><span class="attr">  scrape_interval:</span>     <span class="number">15</span><span class="string">s</span> <span class="comment"># Set the scrape interval to every 15 seconds. Default is every 1 minute.</span></span><br><span class="line"><span class="attr">  evaluation_interval:</span> <span class="number">15</span><span class="string">s</span> <span class="comment"># Evaluate rules every 15 seconds. The default is every 1 minute.</span></span><br><span class="line">  <span class="comment"># scrape_timeout is set to the global default (10s).</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># A scrape configuration containing exactly one endpoint to scrape:</span></span><br><span class="line"><span class="comment"># Here it's Prometheus itself.</span></span><br><span class="line"><span class="attr">scrape_configs:</span></span><br><span class="line"><span class="attr">  - job_name:</span> <span class="string">'prometheus'</span></span><br><span class="line"><span class="attr">    static_configs:</span></span><br><span class="line"><span class="attr">    - targets:</span> <span class="string">['localhost:9090']</span></span><br><span class="line">  </span><br><span class="line"><span class="attr">  - job_name:</span> <span class="string">'node'</span></span><br><span class="line"><span class="attr">    scrape_interval:</span> <span class="number">1</span><span class="string">s</span></span><br><span class="line"><span class="attr">    static_configs:</span></span><br><span class="line"><span class="attr">      - targets:</span> <span class="string">['bdnode1:9100','bdnode2:9100','bdnode3:9100']</span></span><br></pre></td></tr></table></figure>
+
+
+<h1 id="PromQL"><a href="#PromQL" class="headerlink" title="PromQL"></a>PromQL</h1><h2 id="查询时间序列"><a href="#查询时间序列" class="headerlink" title="查询时间序列"></a>查询时间序列</h2><p>查询时间序列的基本格式为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">metric_name&#123;label_name OP label_value, ...&#125;[duration] offset offset time</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>OP可以支持完全匹配、正则匹配，允许以下符号：=、!=、=<del>、!</del></li>
+<li>duration表示访问指定时间范围的数据，尺度为s、m、h、d、w、y</li>
+<li>offset表示从当前时间向前位移</li>
+</ul>
+<h2 id="聚合、操作符运算"><a href="#聚合、操作符运算" class="headerlink" title="聚合、操作符运算"></a>聚合、操作符运算</h2><p>Prometheus支持对序列进行聚合、以及运算符操作。</p>
+<h3 id="运算符操作"><a href="#运算符操作" class="headerlink" title="运算符操作"></a>运算符操作</h3><p>运算符操作包括：数学运算符，逻辑运算符，布尔运算符。</p>
+<p>运算符的操作对象包括：序列、标量</p>
+<ul>
+<li>数学运算符：+、-、*、/、%、^</li>
+<li>布尔运算符：=、！=、&gt;、&lt;、&gt;=、&lt;= 将过滤掉不满足条件的采样，这些运算符用bool修饰之后，不会进行采样过滤，而是返回0或1</li>
+<li>逻辑运算符：and、or、unless 根据情况产生两个时间序列的交集、并集、补集</li>
+</ul>
+<p>需要注意的是：</p>
+<ul>
+<li>操作符之间存在优先级</li>
+<li>序列的运算遵循匹配规则：<ul>
+<li>标签完全一致的元素之间进行计算，没找到匹配元素，则直接丢弃。</li>
+<li>通过on、ignoreing可以限定匹配的标签、或者忽略特定标签。</li>
+<li>当出现一对多、一对一匹配时，可以通过group运算符使唯一值被匹配多次。</li>
+</ul>
+</li>
+</ul>
+<h3 id="聚合函数"><a href="#聚合函数" class="headerlink" title="聚合函数"></a>聚合函数</h3><p>基本用法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;aggr-op&gt;([parameter,] &lt;vector expression&gt;) [without|by (&lt;label list&gt;)]</span><br><span class="line"></span><br><span class="line"># without：表示排除特定标签</span><br><span class="line"># by：只考虑特定标签</span><br></pre></td></tr></table></figure>
+<p>支持的聚合函数包括：</p>
+<ul>
+<li>sum (求和)</li>
+<li>min (最小值)</li>
+<li>max (最大值)</li>
+<li>avg (平均值)</li>
+<li>stddev (标准差)</li>
+<li>stdvar (标准差异)</li>
+<li>count (计数)</li>
+<li>count_values (对value进行计数)</li>
+<li>bottomk (后n条时序)</li>
+<li>topk (前n条时序)</li>
+<li>quantile (分布统计)</li>
+</ul>
+<h3 id="其他内置函数"><a href="#其他内置函数" class="headerlink" title="其他内置函数"></a>其他内置函数</h3><ul>
+<li>increase(v range-vector)：返回区间的增长量</li>
+<li>rate(v range-vector)：返回区间的平均增长率</li>
+<li>irate(v range-vector)：返回区间的瞬时增长率</li>
+<li>predict_linear(v range-vector, t scalar)：基于简单线性回归，预测序列在t秒后的值</li>
+<li>histogram_quantile(0.5, http_request_duration_seconds_bucket)：计算histogram的分位数值</li>
+<li>label_replace：动态替换标签</li>
+</ul>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;instance="bdnode3:9100"&#125;                           # 返回节点3的所有量测信息</span><br><span class="line">node_hwmon_temp_celsius                             # 查询所有CPU核心的温度</span><br><span class="line">node_hwmon_temp_celsius&#123;chip="platform_coretemp_0"&#125; #所有节点CPU0上的核心温度</span><br><span class="line">node_hwmon_temp_celsius&#123;chip="platform_coretemp_0",instance="bdnode3:9100"&#125;[10s] offset 30s                  # 之前40s到30s的温度数据</span><br><span class="line">avg(node_hwmon_temp_celsius&#123;chip=~"platform_coretemp_[0-9]*" &#125;) by (instance)         #查询每个节点CPU的平均温度</span><br><span class="line">avg(node_hwmon_temp_celsius&#123;chip=~"platform_coretemp_[0-9]*" &#125;) by (instance,chip) #查询每个节点的所有CPU的平均温度</span><br></pre></td></tr></table></figure>
+
+<h1 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h1><h3 id="本地存储"><a href="#本地存储" class="headerlink" title="本地存储"></a>本地存储</h3><p>对于本地存储，Prometheus 2.x 采用自定义的存储格式将样本数据保存在本地磁盘当中。</p>
+<p>Prometheus按照两个小时为一个时间窗口，将两小时内产生的数据存储在一个块(Block)中，每一个块中包含该时间窗口内的所有样本数据(chunks)，元数据文件(meta.json)以及索引文件(index)。</p>
+<p>写入数据时，Prometheus先写内存，并且通过WAL进行重播进行数据会，API对数据删除同样通过tombstone进行标记删除。</p>
+<p>Prometheus或周期合并时间窗内的数据，并删除垃圾数据。</p>
+<h3 id="远程存储"><a href="#远程存储" class="headerlink" title="远程存储"></a>远程存储</h3><p>远程存储的目的是要使Prometheus<strong>存储大量历史数据</strong>、以及进行<strong>灵活扩展</strong>和<strong>迁移</strong>。</p>
+<p>通过remote_write/remote_read，Prometheus可以将数据存放到其他<a href="https://prometheus.io/docs/prometheus/latest/storage/#remote-storage-integrations" target="_blank" rel="noopener">存储服务</a>中</p>
+<p>远程存储是一种附加功能（可以和本地存储同时工作），部分存储服务Prometheus只支持写入，不支持读取，作为一种长期数据备份工具。</p>
+<p>当前支持的远程存储包括：</p>
+<table>
+<thead>
+<tr>
+<th>Storage</th>
+<th>操作</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://github.com/cortexproject/cortex" target="_blank" rel="noopener">Cortex</a></td>
+<td>读写</td>
+<td>这个项目专门为Prometheus提供可扩展的长期存储，并且是 CNCF 的孵化项目github上有1500+的star</td>
+</tr>
+<tr>
+<td><a href="https://m3db.github.io/m3/" target="_blank" rel="noopener">M3DB</a></td>
+<td>读写</td>
+<td>Uber开源的分布式时序数据库,github上有两千多个stars，支持PromQL和Prometheus本身有非常好的兼容性</td>
+</tr>
+<tr>
+<td><a href="https://github.com/improbable-eng/thanos" target="_blank" rel="noopener">thanos</a></td>
+<td>写入</td>
+<td>专门为Prometheus设计的集群方案，提供了全局查询、降准采样等能力、以及数据转存到对象存储的能力。Github上有4000+star</td>
+</tr>
+<tr>
+<td><a href="https://github.com/VictoriaMetrics/VictoriaMetrics" target="_blank" rel="noopener">VictoriaMetrics</a></td>
+<td>写</td>
+<td>开源分布式时序数据库，支持 PromQL 接口、号称相比TimeScale和Influxdb相比有20以上的性能</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ChronixDB" target="_blank" rel="noopener">Chronix</a></td>
+<td>写入</td>
+<td>基于Lucene的一款时序数据库，支持单机集群方式部署。单机模式基于纯Lucene实现可以嵌入到应用程序中，集群模式基于solr实现分布式能力。同时该项目有Spark接口。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/crate/crate" target="_blank" rel="noopener">CrateDB</a></td>
+<td>读写</td>
+<td>分布式数据库，主要的应用场景是IoT场景（智能工厂、智能驾驶等等），涵盖了一整套IoT场景的平台方案（平台不是开源的）。</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pruthvikar/irondb" target="_blank" rel="noopener">irondb</a></td>
+<td>读写</td>
+<td>一个连官网都没有、Github上只有五个Star的keyvalue数据库</td>
+</tr>
+<tr>
+<td><a href="https://signalfx.github.io/" target="_blank" rel="noopener">SignalFx</a></td>
+<td>写</td>
+<td>SignalFx本身也是一个监控平台</td>
+</tr>
+<tr>
+<td>Wavefront</td>
+<td>写入</td>
+<td>VMware的企业级监控平台</td>
+</tr>
+<tr>
+<td>Splunk</td>
+<td>读写</td>
+<td>商业日志分析工具</td>
+</tr>
+<tr>
+<td>AppOptics</td>
+<td>写入</td>
+<td>商业APM工具，用在应用性能监控场景</td>
+</tr>
+<tr>
+<td>Gnocchi</td>
+<td>写入</td>
+<td>从OpenStack的孵化出的项目，本质上是一个中间件，用来将metric数据进行时序封装，并写入到后端存储中。</td>
+</tr>
+<tr>
+<td><a href="https://graphiteapp.org/" target="_blank" rel="noopener">graphite</a></td>
+<td>写入</td>
+<td>时序数据库、图形渲染层。这个工具只被动收集数据，并且图形渲染能力较弱一般和Grafana配合使用。</td>
+</tr>
+</tbody></table>
+<p>其他开源组件存储包括：Elasticsearch、InfluxDB、Kafka、OpenTSDB、TiKV、PostgreSQLTimescaleDB</p>
+<h1 id="集群模式"><a href="#集群模式" class="headerlink" title="集群模式"></a>集群模式</h1><p>目前，Prometheus并没有一套非常完整的集群方案，仅能够通过联邦的方式解决部分问题。</p>
+<p>当前可以采用的</p>
+<ul>
+<li>基本HA方式：部署多套Prometheus，并且采集相同的Server实例。这种方式只能解决服务可用性的问题，无法解决一致性、故障恢复、动态扩展等问题，只适合：<strong>小集群、不进行迁移</strong>的场景。</li>
+<li>基本HA方式 + 远程存储：Promthus Server将数据保存在远程服务上，并且部署多个实例，用NGINX路由请求。</li>
+<li>基本HA + 远程存储 + 联邦集群</li>
+<li>其他集群方案，如thanos</li>
+</ul>
+<h1 id="常用管理员命令"><a href="#常用管理员命令" class="headerlink" title="常用管理员命令"></a>常用管理员命令</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除数据</span></span><br><span class="line">curl -X POST \</span><br><span class="line">  -g 'http://172.24.33.31:9090/api/v1/admin/tsdb/delete_series?match[]=&#123;job="node"&#125;'</span><br><span class="line"><span class="meta">#</span><span class="bash"> 触发压缩操作</span></span><br><span class="line">curl -XPOST http://localhost:9090/api/v1/admin/tsdb/clean_tombstones</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 重载配置文件</span></span><br><span class="line">kill -HUP &#123;pid&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://prometheus.io/docs/prometheus/latest/getting_started/" target="_blank" rel="noopener">官方文档</a></p>
+<p><a href="https://yunlzheng.gitbook.io/prometheus-book/" target="_blank" rel="noopener">Prometheus-book</a></p>
+<p><a href="https://prometheus.io/docs/prometheus/latest/querying/functions/" target="_blank" rel="noopener">FUNCTIONS</a></p>
+<p><a href="https://prometheus.io/docs/prometheus/latest/querying/api/" target="_blank" rel="noopener">HTTP API</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.204Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/07/16/0-Prometheus/" target="_blank" rel="external">https://linqing2017.github.io/2019/07/16/0-Prometheus/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Prometheus/" rel="tag">Prometheus</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/16/0-Prometheus/&title=《数据库调研笔记 -- Prometheus》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/16/0-Prometheus/&title=《数据库调研笔记 -- Prometheus》 — LQing的博客&source=数据库调研笔记 – Prometheus" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/16/0-Prometheus/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- Prometheus》 — LQing的博客&url=https://linqing2017.github.io/2019/07/16/0-Prometheus/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/16/0-Prometheus/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/07/23/1-Prometheus/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Prometheus API</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/07/01/waterdrop/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Waterdrop</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/16/0-Prometheus/&title=《数据库调研笔记 -- Prometheus》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/16/0-Prometheus/&title=《数据库调研笔记 -- Prometheus》 — LQing的博客&source=数据库调研笔记 – Prometheus" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/16/0-Prometheus/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- Prometheus》 — LQing的博客&url=https://linqing2017.github.io/2019/07/16/0-Prometheus/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/16/0-Prometheus/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACIUlEQVR42u3a0W7DIAwF0P7/T3fSXqsk13YyrXB4irqUcphk2ZjXKx7v33H0fPTJ51+Tmc/fHw0MDIyvZbxPx+ePHS2iBzuaIV8bBgbGPow8FJ4vPQnH+fz59mFgYGBUp+69g4GBgXFXwK0uKPnuZMswMDD2YSQ/PPn8fEHVeTAwMHZjzBsDzz3/aX8DAwPjXzLexTE/vp+E18PvYmBgLM1ImojVsnZywaLaWoi6qRgYGAsxkhCZ5Gb51iSLLiSLGBgY2zCeaGFWC9TqlmFgYOzAmF8Fm5DytkQhAcXAwFiIUU3FJkdjk9kuElkMDIwNGEmC2Ds+64Xy6jsYGBhrMyaT9gLr/KjuooWJgYGxHKNaQD59Gl+dBwMDYwdGr5V471WJXrDGwMDYjTG/CjbpJOYzREU1BgbGcow81M6vVlQDa17KYmBg7MnIC8teGte7FRKdF2JgYCzHqIbRXiDuHcaNWg4YGBiLMvIitpcmVsvU6tZgYGCsyqheBXvitC/fgov/AAYGxtKMc9783tnkkxvalhgYGF/OyBd9XlL2AnTh+CyZEwMDY1HGuzgmR2/zjA4DA2NPRj7ml1bvKmsxMDD2ZORBNgfn4bsacC+alxgYGEszqkF2fuhWHRfbioGBgREkdjkmSSLzZBQDAwNj8lw9vMvL3cPLYRgYGEszes2AavKXl7VJ26BZi2NgYHwhY9IYmFyb6F1EG2EwMDC+j/EDDEtgvk8cfh8AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

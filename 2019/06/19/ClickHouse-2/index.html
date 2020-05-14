@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- ClickHouse之SQL语法 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,ClickHouse">
+    <meta name="description" content="数据库调研笔记 – ClickHouse">
+<meta name="keywords" content="数据库,ClickHouse">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- ClickHouse之SQL语法">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;06&#x2F;19&#x2F;ClickHouse-2&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="数据库调研笔记 – ClickHouse">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.282Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- ClickHouse之SQL语法</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- ClickHouse之SQL语法</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-06-18T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-06-19
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#SQL语法"><span class="post-toc-number">1.</span> <span class="post-toc-text">SQL语法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SELECT"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">SELECT</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#From语句"><span class="post-toc-number">1.1.1.</span> <span class="post-toc-text">From语句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#SAMPLE语句"><span class="post-toc-number">1.1.2.</span> <span class="post-toc-text">SAMPLE语句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ARRAY-JOIN-子句"><span class="post-toc-number">1.1.3.</span> <span class="post-toc-text">ARRAY JOIN 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Join"><span class="post-toc-number">1.1.4.</span> <span class="post-toc-text">Join</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#WHERE"><span class="post-toc-number">1.1.5.</span> <span class="post-toc-text">WHERE</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#GROUP-BY"><span class="post-toc-number">1.1.6.</span> <span class="post-toc-text">GROUP BY</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#LIMIT-N-BY-子句"><span class="post-toc-number">1.1.7.</span> <span class="post-toc-text">LIMIT N BY 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#HAVING-子句"><span class="post-toc-number">1.1.8.</span> <span class="post-toc-text">HAVING 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#ORDER-BY-子句"><span class="post-toc-number">1.1.9.</span> <span class="post-toc-text">ORDER BY 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#DISTINCT-子句"><span class="post-toc-number">1.1.10.</span> <span class="post-toc-text">DISTINCT 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#LIMIT"><span class="post-toc-number">1.1.11.</span> <span class="post-toc-text">LIMIT</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#UNION-ALL-子句"><span class="post-toc-number">1.1.12.</span> <span class="post-toc-text">UNION ALL 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#INTO-OUTFILE-子句"><span class="post-toc-number">1.1.13.</span> <span class="post-toc-text">INTO OUTFILE 子句</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#IN-运算符"><span class="post-toc-number">1.1.14.</span> <span class="post-toc-text">IN 运算符</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#INSERT-INTO"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">INSERT INTO</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#INSERT"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">INSERT</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#使用SELECT的结果写入"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">使用SELECT的结果写入</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CREATE"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">CREATE</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#创建数据库"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">创建数据库</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#建表"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">建表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#临时表"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">临时表</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#CREATE-VIEW"><span class="post-toc-number">1.3.4.</span> <span class="post-toc-text">CREATE VIEW</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">2.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-ClickHouse-2"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- ClickHouse之SQL语法</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-06-19 00:00:00" datetime="2019-06-18T16:00:00.000Z"  itemprop="datePublished">2019-06-19</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>数据库调研笔记 – ClickHouse</p>
+<a id="more"></a>
+
+<h1 id="SQL语法"><a href="#SQL语法" class="headerlink" title="SQL语法"></a>SQL语法</h1><p>下面的内容简单说明Clickhouse中SQL和标准SQL的差别，以及他的特点：</p>
+<h2 id="SELECT"><a href="#SELECT" class="headerlink" title="SELECT"></a>SELECT</h2><p>如果查询中不包含DISTINCT，GROUP BY，ORDER BY子句以及IN和JOIN子查询，那么它将仅使用O(1)数量的内存来完全流式的处理查询。对于其他高内存消耗的查询，可以使用参数控制内存，并且通过磁盘进行外部排序。</p>
+<h3 id="From语句"><a href="#From语句" class="headerlink" title="From语句"></a>From语句</h3><p>From 之后可以是表、子查询、表函数、ARRAY JOIN子句、JOIN子句。<strong>子查询无需指定别名，即使指定了也会被忽略</strong>。</p>
+<h3 id="SAMPLE语句"><a href="#SAMPLE语句" class="headerlink" title="SAMPLE语句"></a>SAMPLE语句</h3><p>MergeTree表中可以使用SAMPLE来进行采样，并且系统在不同的时间，不同的服务器，不同表上总以相同的方式对数据进行采样。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">SAMPLE k  <span class="comment"># 0&lt;k&lt;1 表示采样百分比，k&gt;=1 表示采样条数</span></span><br><span class="line"><span class="comment">#例子</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    Title,</span><br><span class="line">    <span class="keyword">count</span>() * <span class="number">10</span> <span class="keyword">AS</span> PageViews</span><br><span class="line"><span class="keyword">FROM</span> hits_distributed</span><br><span class="line"><span class="keyword">SAMPLE</span> <span class="number">0.1</span></span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    CounterID = <span class="number">34</span></span><br><span class="line">    <span class="keyword">AND</span> toDate(EventDate) &gt;= toDate(<span class="string">'2013-01-29'</span>)</span><br><span class="line">    <span class="keyword">AND</span> toDate(EventDate) &lt;= toDate(<span class="string">'2013-02-04'</span>)</span><br><span class="line">    <span class="keyword">AND</span> <span class="keyword">NOT</span> DontCountHits</span><br><span class="line">    <span class="keyword">AND</span> <span class="keyword">NOT</span> <span class="keyword">Refresh</span></span><br><span class="line">    <span class="keyword">AND</span> Title != <span class="string">''</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> Title</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> PageViews <span class="keyword">DESC</span> <span class="keyword">LIMIT</span> <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ARRAY-JOIN-子句"><a href="#ARRAY-JOIN-子句" class="headerlink" title="ARRAY JOIN 子句"></a>ARRAY JOIN 子句</h3><p>ARRAY JOIN可以进行与数组（nested数据类型）的连接。</p>
+<p>假设存在下面的表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> arrays_test (s <span class="keyword">String</span>, arr <span class="built_in">Array</span>(UInt8)) <span class="keyword">ENGINE</span> = <span class="keyword">Memory</span></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>s</th>
+<th>arr</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hello</td>
+<td>[1,2]</td>
+</tr>
+<tr>
+<td>World</td>
+<td>[3,4,5]</td>
+</tr>
+<tr>
+<td>Goodbye</td>
+<td>[]</td>
+</tr>
+</tbody></table>
+<p>使用Array Join将arr列展开</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> s, arr, a <span class="keyword">FROM</span> arrays_test <span class="built_in">ARRAY</span> <span class="keyword">JOIN</span> arr <span class="keyword">AS</span> a</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>s</th>
+<th>arr</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hello</td>
+<td>[1,2]</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Hello</td>
+<td>[1,2]</td>
+<td>2</td>
+</tr>
+<tr>
+<td>World</td>
+<td>[3,4,5]</td>
+<td>3</td>
+</tr>
+<tr>
+<td>World</td>
+<td>[3,4,5]</td>
+<td>4</td>
+</tr>
+<tr>
+<td>World</td>
+<td>[3,4,5]</td>
+<td>5</td>
+</tr>
+</tbody></table>
+<p>Array Join可以使用在nested数据结构上：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> nested_test (s <span class="keyword">String</span>, nest <span class="keyword">Nested</span>(x UInt8, y UInt32)) <span class="keyword">ENGINE</span> = <span class="keyword">Memory</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> nested_test <span class="keyword">VALUES</span> (<span class="string">'Hello'</span>, [<span class="number">1</span>,<span class="number">2</span>], [<span class="number">10</span>,<span class="number">20</span>]), (<span class="string">'World'</span>, [<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>], [<span class="number">30</span>,<span class="number">40</span>,<span class="number">50</span>]), (<span class="string">'Goodbye'</span>, [], [])</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> s, nest.x, nest.y <span class="keyword">FROM</span> nested_test <span class="built_in">ARRAY</span> <span class="keyword">JOIN</span> nest</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> s, nest.x, nest.y <span class="keyword">FROM</span> nested_test <span class="built_in">ARRAY</span> <span class="keyword">JOIN</span> nest.x</span><br></pre></td></tr></table></figure>
+
+<p>Array Join的其他特点：</p>
+<ul>
+<li>当多个具有相同大小的数组使用逗号分割出现在ARRAY JOIN子句中时，ARRAY JOIN会将它们同时执行（直接合并，而不是它们的笛卡尔积）。假设有2个数组，数组长度为2，ARRAY JOIN的结果依然是2行。</li>
+<li>在一个查询中只能出现一个ARRAY JOIN子句。</li>
+<li>如果在WHERE/PREWHERE子句中使用了ARRAY JOIN子句的结果，它将优先于WHERE/PREWHERE子句执行，否则它将在WHERE/PRWHERE子句之后执行，以便减少计算。</li>
+</ul>
+<h3 id="Join"><a href="#Join" class="headerlink" title="Join"></a>Join</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> &lt;expr_list&gt; <span class="keyword">FROM</span> &lt;left_subquery&gt;</span><br><span class="line">[<span class="keyword">GLOBAL</span>] [<span class="keyword">ANY</span>|<span class="keyword">ALL</span>] <span class="keyword">INNER</span>|<span class="keyword">LEFT</span>|<span class="keyword">RIGHT</span>|<span class="keyword">FULL</span>|<span class="keyword">CROSS</span> [<span class="keyword">OUTER</span>] <span class="keyword">JOIN</span> &lt;right_subquery&gt;</span><br><span class="line">(<span class="keyword">ON</span> &lt;expr_list&gt;)|(<span class="keyword">USING</span> &lt;column_list&gt;) ...</span><br></pre></td></tr></table></figure>
+
+<p><strong>ANY 和 ALL 的区别</strong>：<br>ANY表示存在多个与左表关联的数据，那么系统仅返回第一个与左表匹配的结果，即结果和左边行数一致。ALL表示返回全部结果，这和标准SQL一致。默认情况下是ALL。</p>
+<p><strong>GLOBAL … JOIN</strong>：<br>当使用普通的JOIN时，查询将被发送给远程的服务器。并在这些远程服务器上生成右表并与它们关联。换句话说，右表来自于各个服务器本身。</p>
+<p>当使用GLOBAL … JOIN，首先会在请求服务器上计算右表并以临时表的方式将其发送到所有服务器。这时每台服务器将直接使用它进行计算。</p>
+<p><strong>Join的其他限制</strong>：</p>
+<ul>
+<li>右表（子查询的结果）将会保存在内存中。如果没有足够的内存，则无法运行JOIN。</li>
+<li>只能在查询中指定一个JOIN。若要运行多个JOIN，你可以将它们放入子查询中。</li>
+<li>每次运行相同的JOIN查询，总是会再次计算 - 没有缓存结果。</li>
+<li>在各种类型的JOIN中，最高效的是ANY LEFT JOIN，然后是ANY INNER JOIN，效率最差的是ALL LEFT JOIN以及ALL INNER JOIN。</li>
+<li>推荐你使用子查询的方式执行JOIN。</li>
+<li>推荐你使用子查询的方式执行JOIN。<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    CounterID,</span><br><span class="line">    hits,</span><br><span class="line">    visits</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">(</span><br><span class="line">    <span class="keyword">SELECT</span></span><br><span class="line">        CounterID,</span><br><span class="line">        <span class="keyword">count</span>() <span class="keyword">AS</span> hits</span><br><span class="line">    <span class="keyword">FROM</span> test.hits</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> CounterID</span><br><span class="line">) <span class="keyword">ANY</span> <span class="keyword">LEFT</span> <span class="keyword">JOIN</span></span><br><span class="line">(</span><br><span class="line">    <span class="keyword">SELECT</span></span><br><span class="line">        CounterID,</span><br><span class="line">        <span class="keyword">sum</span>(<span class="keyword">Sign</span>) <span class="keyword">AS</span> visits</span><br><span class="line">    <span class="keyword">FROM</span> test.visits</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> CounterID</span><br><span class="line">) <span class="keyword">USING</span> CounterID</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> hits <span class="keyword">DESC</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">10</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># USING子句用于指定要进行链接的一个或多个列，系统会将这些列在两张表中相等的值连接起来。如果列是一个列表，不需要使用括号包裹。同时JOIN不支持其他更复杂的Join方式。</span></span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="WHERE"><a href="#WHERE" class="headerlink" title="WHERE"></a>WHERE</h3><ul>
+<li><p>PREWHERE语句与WHERE子句的意思相同。主要的不同之处在于表数据的读取。 当使用PREWHERE时，首先只读取PREWHERE表达式中需要的列。然后在根据PREWHERE执行的结果读取其他需要的。</p>
+</li>
+<li><p>在一个查询中可以同时指定PREWHERE和WHERE，在这种情况下，PREWHERE优先于WHERE执行。</p>
+</li>
+<li><p>如果将’optimize_move_to_prewhere’设置为1，并且在查询中不包含PREWHERE，则系统将自动的把适合PREWHERE表达式的部分从WHERE中抽离到PREWHERE中。</p>
+</li>
+</ul>
+<h3 id="GROUP-BY"><a href="#GROUP-BY" class="headerlink" title="GROUP BY"></a>GROUP BY</h3><ul>
+<li><p>MySQL不同的是（实际上这是符合SQL标准的），SELECT、HAVING、ORDER BY不能够获得一个不在GROUP BY中的非聚合函数列（除了常量表达式）。但是可以使用‘any’（返回遇到的第一个值）、max、min等聚合函数使它工作。</p>
+</li>
+<li><p>如果查询表达式列表中仅包含聚合函数，则可以省略GROUP BY子句，这时会假定将所有数据聚合成一组空“key”。</p>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="keyword">count</span>(),</span><br><span class="line">    <span class="keyword">median</span>(FetchTiming &gt; <span class="number">60</span> ? <span class="number">60</span> : FetchTiming),</span><br><span class="line">    <span class="keyword">count</span>() - <span class="keyword">sum</span>(<span class="keyword">Refresh</span>)</span><br><span class="line"><span class="keyword">FROM</span> hits</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>对于GROUP BY子句，ClickHouse将 NULL 解释为一个值，并且支持NULL=NULL。</p>
+</li>
+<li><p>GROUP BY中允许将临时数据转存到磁盘上，以限制对内存的使用。 max_bytes_before_external_group_by这个配置确定了在GROUP BY中启动将临时数据转存到磁盘上的内存阈值。如果你将它设置为0（这是默认值），这项功能将被禁用。如果有临时数据被刷到了磁盘中，那么这个查询的运行时间将会被延长几倍（大约是3倍）。</p>
+</li>
+<li><p>在分布式查询处理中，外部聚合将会在远程的服务器中执行。为了使请求服务器只使用较少的内存，可以设置distributed_aggregation_memory_efficient为1。</p>
+</li>
+</ul>
+<h3 id="LIMIT-N-BY-子句"><a href="#LIMIT-N-BY-子句" class="headerlink" title="LIMIT N BY 子句"></a>LIMIT N BY 子句</h3><p>LIMIT N BY COLUMNS 子句可以用来在每一个COLUMNS分组中求得最大的N行数据。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    domainWithoutWWW(<span class="keyword">URL</span>) <span class="keyword">AS</span> <span class="keyword">domain</span>,</span><br><span class="line">    domainWithoutWWW(REFERRER_URL) <span class="keyword">AS</span> referrer,</span><br><span class="line">    device_type,</span><br><span class="line">    <span class="keyword">count</span>() cnt</span><br><span class="line"><span class="keyword">FROM</span> hits</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">domain</span>, referrer, device_type</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> cnt <span class="keyword">DESC</span></span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">5</span> <span class="keyword">BY</span> <span class="keyword">domain</span>, device_type</span><br><span class="line"><span class="keyword">LIMIT</span> <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询将会为每个domain, device_type的组合选出前5个访问最多的数据，但是结果最多将不超过100行（LIMIT n BY + LIMIT）。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="HAVING-子句"><a href="#HAVING-子句" class="headerlink" title="HAVING 子句"></a>HAVING 子句</h3><ul>
+<li>HAVING子句可以用来过滤GROUP BY之后的数据，类似于WHERE子句。 同样，HAVING子句中的条件必须出现在Group by中。</li>
+<li>WHERE于HAVING不同之处在于WHERE在聚合前(GROUP BY)执行，HAVING在聚合后执行。 </li>
+<li>如果不存在聚合，则不能使用HAVING。</li>
+</ul>
+<h3 id="ORDER-BY-子句"><a href="#ORDER-BY-子句" class="headerlink" title="ORDER BY 子句"></a>ORDER BY 子句</h3><ul>
+<li>表达式列表中每一个表达式都可以分配一个DESC或ASC（排序的方向）。如果没有指明排序的方向，将假定以ASC的方式进行排序。</li>
+<li>对于字符串的排序来讲，你可以为其指定一个排序规则，在指定排序规则时，排序总是不会区分大小写。<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#例如：</span></span><br><span class="line">ORDER BY SearchPhrase COLLATE 'tr' </span><br><span class="line"><span class="comment"># 使用土耳其字母表对它进行升序排序，同时排序时不会区分大小写，并按照UTF-8字符集进行编码。</span></span><br></pre></td></tr></table></figure></li>
+<li>表达式中相同值的行将以任意的顺序进行输出</li>
+<li>NaN 和 NULL 的排序规则：<ul>
+<li>当使用NULLS FIRST修饰符时，将会先输出NULL，然后是NaN，最后才是其他值。</li>
+<li>当使用NULLS LAST修饰符时，将会先输出其他值，然后是NaN，最后才是NULL。</li>
+<li>默认情况下与使用NULLS LAST修饰符相同。</li>
+<li>当使用浮点类型的数值进行排序时，不管排序的顺序如何，NaNs总是出现在所有值的后面。(升序时NaNs最大，降序时最小)<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> t_null_nan <span class="keyword">ORDER</span> <span class="keyword">BY</span> y <span class="keyword">NULLS</span> <span class="keyword">FIRST</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>如果你在ORDER BY子句后面存在LIMIT并给定了较小的数值，则将会使用较少的内存。否则，内存的使用量将与需要排序的数据成正比。</li>
+<li>对于分布式查询，如果省略了GROUP BY，则在远程服务器上执行部分排序，最后在请求服务器上合并排序结果。这意味这对于分布式查询而言，要排序的数据量可以大于单台服务器的内存。</li>
+<li>如果没有足够的内存，可以使用外部排序（在磁盘中创建一些临时文件）。可以使用max_bytes_before_external_sort来设置外部排序</li>
+</ul>
+<h3 id="DISTINCT-子句"><a href="#DISTINCT-子句" class="headerlink" title="DISTINCT 子句"></a>DISTINCT 子句</h3><ul>
+<li>如果存在DISTINCT子句，则会对结果中的完全相同的行进行去重。</li>
+<li>当不存在ORDER BY子句并存在LIMIT子句时，查询将在同时满足DISTINCT与LIMIT的情况下立即停止查询。</li>
+<li>可以与GROUP BY配合使用。</li>
+<li>在处理数据的同时输出结果，并不是等待整个查询全部完成。</li>
+<li>在SELECT表达式中存在Array类型的列时，不能使用DISTINCT。</li>
+<li>DISTINCT可以与 NULL一起工作，就好像NULL仅是一个特殊的值一样，并且NULL=NULL。</li>
+</ul>
+<h3 id="LIMIT"><a href="#LIMIT" class="headerlink" title="LIMIT"></a>LIMIT</h3><ul>
+<li>LIMIT N：选取前n行</li>
+<li>LIMIT N,M：选取从低n行开始的m行数据</li>
+</ul>
+<h3 id="UNION-ALL-子句"><a href="#UNION-ALL-子句" class="headerlink" title="UNION ALL 子句"></a>UNION ALL 子句</h3><ul>
+<li>UNION ALL子句可以组合任意数量的查询</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> CounterID, <span class="number">1</span> <span class="keyword">AS</span> <span class="keyword">table</span>, toInt64(<span class="keyword">count</span>()) <span class="keyword">AS</span> c</span><br><span class="line">    <span class="keyword">FROM</span> test.hits</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> CounterID</span><br><span class="line"></span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> CounterID, <span class="number">2</span> <span class="keyword">AS</span> <span class="keyword">table</span>, <span class="keyword">sum</span>(<span class="keyword">Sign</span>) <span class="keyword">AS</span> c</span><br><span class="line">    <span class="keyword">FROM</span> test.visits</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> CounterID</span><br><span class="line">    <span class="keyword">HAVING</span> c &gt; <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>UNION ALL中的查询可以同时运行，它们的结果将被混合到一起。</li>
+<li>查询的结果结果必须相同（列的数量和类型）。</li>
+<li>如果两个查询中有相同的列，但是类型不同但是兼容，CK会自动进行转化。</li>
+<li>列名可以是不同的。在这种情况下，最终结果的列名将从第一个查询中获取。</li>
+</ul>
+<h3 id="INTO-OUTFILE-子句"><a href="#INTO-OUTFILE-子句" class="headerlink" title="INTO OUTFILE 子句"></a>INTO OUTFILE 子句</h3><ul>
+<li>INTO OUTFILE filename 子句用于将查询结果重定向输出到指定文件中</li>
+<li>执行的结果文件将在客户端建立，如果文件已存在，查询将会失败。 </li>
+</ul>
+<h3 id="IN-运算符"><a href="#IN-运算符" class="headerlink" title="IN 运算符"></a>IN 运算符</h3><ul>
+<li>运算符的左侧是单列或列的元组。<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> UserID <span class="keyword">IN</span> (<span class="number">123</span>, <span class="number">456</span>) <span class="keyword">FROM</span> ...</span><br><span class="line"><span class="keyword">SELECT</span> (CounterID, UserID) <span class="keyword">IN</span> ((<span class="number">34</span>, <span class="number">123</span>), (<span class="number">101500</span>, <span class="number">456</span>)) <span class="keyword">FROM</span> ...</span><br></pre></td></tr></table></figure></li>
+<li>左侧是单个列并且是一个索引，并且右侧是一组常量时，系统将使用索引来处理查询。</li>
+<li>右侧可以是一个表的名字，或者是一个子查询</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">UserID IN users</span><br><span class="line">UserID IN (<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">users</span>)</span><br><span class="line"><span class="keyword">SELECT</span> (CounterID, UserID) <span class="keyword">IN</span> (<span class="keyword">SELECT</span> CounterID, UserID <span class="keyword">FROM</span> ...) <span class="keyword">FROM</span> ...</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>如果操作符的右侧是一个Set引擎的表时（数据总是在内存中准备好），则不会每次都为查询创建新的数据集。</p>
+</li>
+<li><p>IN操作符的左右两侧应具有相同的类型。</p>
+</li>
+<li><p>IN操作符的子查询中可以出现任意子句，包含聚合函数与lambda函数。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    EventDate,</span><br><span class="line">    <span class="keyword">avg</span>(UserID <span class="keyword">IN</span></span><br><span class="line">    (</span><br><span class="line">        <span class="keyword">SELECT</span> UserID</span><br><span class="line">        <span class="keyword">FROM</span> test.hits</span><br><span class="line">        <span class="keyword">WHERE</span> EventDate = toDate(<span class="string">'2014-03-17'</span>)</span><br><span class="line">    )) <span class="keyword">AS</span> ratio</span><br><span class="line"><span class="keyword">FROM</span> test.hits</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> EventDate</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> EventDate <span class="keyword">ASC</span></span><br></pre></td></tr></table></figure></li>
+<li><p>IN操作符总是假定 NULL 值的操作结果总是等于0</p>
+</li>
+</ul>
+<p>在分布式表中使用IN或者Join:</p>
+<pre><code>1. 当使用普通的IN时，查询总是被发送到远程的服务器，并且在每个服务器中运行“IN”或“JOIN”子句中的子查询。
+2. 当使用GLOBAL IN / GLOBAL JOIN时，首先会为GLOBAL IN / GLOBAL JOIN运行所有子查询，并将结果收集到临时表中，并将临时表发送到每个远程服务器，并使用该临时表运行查询。
+
+因此，对于非分布式查询，请使用普通的IN ／ JOIN。在分布式查询中使用IN / JOIN子句中使用子查询需要根据实际情况。</code></pre><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> uniq(UserID) <span class="keyword">FROM</span> distributed_table </span><br><span class="line"><span class="keyword">WHERE</span> </span><br><span class="line">    CounterID = <span class="number">101500</span> </span><br><span class="line"><span class="keyword">AND</span> </span><br><span class="line">    UserID <span class="keyword">IN</span> (</span><br><span class="line">        <span class="keyword">SELECT</span> UserID <span class="keyword">FROM</span> local_table <span class="keyword">WHERE</span> CounterID = <span class="number">34</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"><span class="comment"># IN子句中的数据集将被在每台服务器上被独立的收集，仅与每台服务器上的本地存储上的数据计算交集。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果单个UserID的数据完全分布在单个服务器上，那么这将是正确且最佳的查询方式。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 当UserID的数据分布在不同的服务器上时：</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> uniq(UserID) <span class="keyword">FROM</span> distributed_table </span><br><span class="line"><span class="keyword">WHERE</span> </span><br><span class="line">    CounterID = <span class="number">101500</span> </span><br><span class="line"><span class="keyword">AND</span> </span><br><span class="line">    UserID <span class="keyword">IN</span> (</span><br><span class="line">        <span class="keyword">SELECT</span> UserID <span class="keyword">FROM</span> distributed_table <span class="keyword">WHERE</span> CounterID = <span class="number">34</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line"><span class="comment"># 子查询将在每个远程服务器上执行。</span></span><br><span class="line"><span class="comment"># 因为子查询使用分布式表，所有每个远程服务器上的子查询将查询再次发送给所有的远程服务器</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 例如，如果你拥有100台服务器的集群，执行整个查询将需要10，000次请求，这通常被认为是不可接受的。因此这里要使用GLOBAL IN来替代IN。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> uniq(UserID) <span class="keyword">FROM</span> distributed_table </span><br><span class="line"><span class="keyword">WHERE</span> </span><br><span class="line">    CounterID = <span class="number">101500</span> </span><br><span class="line"><span class="keyword">AND</span> </span><br><span class="line">    UserID <span class="keyword">GLOBAL</span> <span class="keyword">IN</span> (</span><br><span class="line">        <span class="keyword">SELECT</span> UserID <span class="keyword">FROM</span> distributed_table <span class="keyword">WHERE</span> CounterID = <span class="number">34</span></span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+
+<h2 id="INSERT-INTO"><a href="#INSERT-INTO" class="headerlink" title="INSERT INTO"></a>INSERT INTO</h2><h3 id="INSERT"><a href="#INSERT" class="headerlink" title="INSERT"></a>INSERT</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> [db.]<span class="keyword">table</span> [(c1, c2, c3)] <span class="keyword">VALUES</span> (v11, v12, v13), (v21, v22, v23), ...</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>可以在查询中指定插入的列的列表，如：[(c1, c2, c3)]。对于存在于表结构中但不存在于插入列表中的列，它们将会按照如下方式填充数据：</p>
+<ul>
+<li>如果存在DEFAULT表达式，根据DEFAULT表达式计算被填充的值。</li>
+<li>如果没有定义DEFAULT表达式，则填充零或空字符串。</li>
+</ul>
+</li>
+<li><p>数据可以以ClickHouse支持的任何<a href="https://clickhouse.yandex/docs/zh/interfaces/formats/#formats" target="_blank" rel="noopener">输入输出</a>格式 传递给INSERT。</p>
+</li>
+<li><p>ClickHouse会清除数据前所有的空白字符与一行摘要信息</p>
+</li>
+</ul>
+<h3 id="使用SELECT的结果写入"><a href="#使用SELECT的结果写入" class="headerlink" title="使用SELECT的结果写入"></a>使用SELECT的结果写入</h3><ul>
+<li><p>写入与SELECT的列的对应关系是使用位置来进行对应的,尽管它们在SELECT表达式与INSERT中的名称可能是不同的。</p>
+</li>
+<li><p>在进行INSERT时将会对写入的数据进行一些处理，按照主键排序，按照月份对数据进行分区等。所以如果在您的写入数据中包含多个月份的混合数据时：</p>
+<ul>
+<li>数据总是以尽量大的batch进行写入，如每次写入100,000行。</li>
+<li>数据在写入ClickHouse前预先的对数据进行分组。</li>
+</ul>
+</li>
+</ul>
+<h2 id="CREATE"><a href="#CREATE" class="headerlink" title="CREATE"></a>CREATE</h2><h3 id="创建数据库"><a href="#创建数据库" class="headerlink" title="创建数据库"></a>创建数据库</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> [<span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>] db_name</span><br></pre></td></tr></table></figure>
+
+<h3 id="建表"><a href="#建表" class="headerlink" title="建表"></a>建表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># 可以用三种方式指定默认值</span></span><br><span class="line"><span class="comment"># </span></span><br><span class="line"><span class="comment">#   DEFAULT expr： 普通默认值，如果INSERT中不包含指定的列，那么将通过表达式计算它的默认值并填充它。</span></span><br><span class="line"><span class="comment">#   MATERIALIZED expr ： 物化表达式，被该表达式指定的列不能包含在INSERT的列表中，因为它总是被计算出来的。</span></span><br><span class="line"><span class="comment">#   ALIAS expr ： 这样的列不会存储在表中。 它的值不能够通过INSERT写入，同时使用SELECT查询星号时，这些列也不会被用来替换星号。 但是它们可以显示的用于SELECT中，在这种情况下，在查询分析中别名将被替换。</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> [<span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>] [db.]table_name [<span class="keyword">ON</span> CLUSTER cluster]</span><br><span class="line">(</span><br><span class="line">    name1 [type1] [<span class="keyword">DEFAULT</span>|<span class="keyword">MATERIALIZED</span>|<span class="keyword">ALIAS</span> expr1],</span><br><span class="line">    name2 [type2] [<span class="keyword">DEFAULT</span>|<span class="keyword">MATERIALIZED</span>|<span class="keyword">ALIAS</span> expr2],</span><br><span class="line">    ...</span><br><span class="line">) <span class="keyword">ENGINE</span> = <span class="keyword">engine</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一张和表2结构相同的表，</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> [<span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>] [db.]table_name <span class="keyword">AS</span> [db2.]name2 [<span class="keyword">ENGINE</span> = <span class="keyword">engine</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一张和SELEC结构相同的表，并且用SELECT填充</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> [<span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>] [db.]table_name <span class="keyword">ENGINE</span> = <span class="keyword">engine</span> <span class="keyword">AS</span> <span class="keyword">SELECT</span> ...</span><br></pre></td></tr></table></figure>
+
+<h3 id="临时表"><a href="#临时表" class="headerlink" title="临时表"></a>临时表</h3><p>ClickHouse支持临时表，其具有以下特征：</p>
+<ul>
+<li>当回话结束时，临时表将随会话一起消失，这包含链接中断。</li>
+<li>临时表仅能够使用Memory表引擎。</li>
+<li>无法为临时表指定数据库。它是在数据库之外创建的。</li>
+<li>如果临时表与另一个表名称相同，那么当在查询时没有显示的指定db的情况下，将优先使用临时- 表。</li>
+<li>对于分布式处理，查询中使用的临时表将被传递到远程服务器。</li>
+</ul>
+<h3 id="CREATE-VIEW"><a href="#CREATE-VIEW" class="headerlink" title="CREATE VIEW"></a>CREATE VIEW</h3><p>支持普通视图和物化视图：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> [<span class="keyword">MATERIALIZED</span>] <span class="keyword">VIEW</span> [<span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>] [db.]table_name [<span class="keyword">TO</span>[db.]<span class="keyword">name</span>] [<span class="keyword">ENGINE</span> = <span class="keyword">engine</span>] [POPULATE] <span class="keyword">AS</span> <span class="keyword">SELECT</span> ...</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>普通视图不存储任何数据，只是执行从另一个表中的读取。换句话说，普通视图只是保存了视图的查询，当从视图中查询时，此查询被作为子查询用于替换FROM子句。</p>
+</li>
+<li><p>物化视图存储的数据是由相应的SELECT查询转换得来的。在创建物化视图时，你还必须指定表的引擎 - 将会使用这个表引擎存储数据。</p>
+</li>
+<li><p>物化视图只会包含在物化视图创建后的新写入的数据。(不指定POPULATE的情况)</p>
+</li>
+<li><p>目前对物化视图执行ALTER是不支持的，因此这可能是不方便的。</p>
+</li>
+</ul>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://clickhouse.yandex/docs/zh/query_language" target="_blank" rel="noopener">官方文档</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.282Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/06/19/ClickHouse-2/" target="_blank" rel="external">https://linqing2017.github.io/2019/06/19/ClickHouse-2/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ClickHouse/" rel="tag">ClickHouse</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/&title=《数据库调研笔记 -- ClickHouse之SQL语法》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/&title=《数据库调研笔记 -- ClickHouse之SQL语法》 — LQing的博客&source=数据库调研笔记 – ClickHouse" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/06/19/ClickHouse-2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- ClickHouse之SQL语法》 — LQing的博客&url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/07/01/waterdrop/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Waterdrop</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/06/10/ClickHouse-1/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">数据库调研笔记 -- ClickHouse</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/&title=《数据库调研笔记 -- ClickHouse之SQL语法》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/&title=《数据库调研笔记 -- ClickHouse之SQL语法》 — LQing的博客&source=数据库调研笔记 – ClickHouse" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/06/19/ClickHouse-2/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- ClickHouse之SQL语法》 — LQing的博客&url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/06/19/ClickHouse-2/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACM0lEQVR42u3awXLrIAwF0Pz/T7vb96aNeyU5nQEOq0zGBg4LGZBer7hd/7T7/6837b7n+1EeaxgYGMsyrtt2P93vv5OxeuP+sjQYGBgHMJIh87eqyOoCYWBgYFQZ+dQ/8QwGBgZGsqXrTaK6AcXAwMBIDpMJvrft+9OzOAYGxoKMZ6fy7O+P5DcwMDCWYlzFlqQtk/57SdC3vWFgYGzNqF7cT1KbeVFFdT4YGBh7MyYBsfdMHmoLMAwMjGMY+SavuhC9DV8Syn8IuBgYGNsxqgVek2B9HzTzhXv7FgYGxtaMyQGyl25MSjRGS4OBgbEpozpkXvSQTLpXRvbKvxIYGBjLMvLuqhdhvUNp9QPw31kcAwNja0ZeSJEPNgmpeT8YGBgYvcNtvhzVEPxLQRgGBsYBjPwSLUkMJFu6+QYUAwPjNMYk6dgsj4hLykZbQwwMjMUZ1Xg1SVLmy9EM2RgYGJsyepf11RKxHJ8UhP3QAwYGxtaM/PK9ekx96pIufwYDA+McxuSyrJfOnBSZvQ24GBgYBzCSLd0kOFZTlVG4x8DAOICRPDpJPU6SEIWAi4GBsR3jKrZqIE566CVEm18GDAyMBRl566Uqe4mH5PlqmMbAwFid0Tw0tpKaySrmac7CkBgYGFswCqfeOHLnAXdS2IGBgYGRkybg6hIUKjswMDCOZ/Su5JJNZEJ6LOBiYGAswqgmA6pbwGr684PXbRgYGAsyqiUOvUNmFDSLdSIYGBgHML4AnKxBz8mIPe8AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>数据库调研笔记 -- PostgreSQL | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="数据库,PostgreSQL">
+    <meta name="description" content="PostgreSQL 调研笔记">
+<meta name="keywords" content="数据库,PostgreSQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库调研笔记 -- PostgreSQL">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;09&#x2F;24&#x2F;Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="PostgreSQL 调研笔记">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.313Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">数据库调研笔记 -- PostgreSQL</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">数据库调研笔记 -- PostgreSQL</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-09-23T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-09-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Quick-Start"><span class="post-toc-number">1.</span> <span class="post-toc-text">Quick-Start</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#安装部署"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">安装部署</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#账号管理"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">账号管理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#权限类型"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">权限类型</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#删除账号"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">删除账号</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#默认Roles"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">默认Roles</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Client-认证"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Client 认证</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SQL-Language"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">SQL Language</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#设置参数"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">设置参数</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置内容"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">配置内容</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#高可用方案"><span class="post-toc-number">2.</span> <span class="post-toc-text">高可用方案</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">3.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Postgresql-安装介绍"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">数据库调研笔记 -- PostgreSQL</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-09-24 00:00:00" datetime="2019-09-23T16:00:00.000Z"  itemprop="datePublished">2019-09-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>PostgreSQL 调研笔记</p>
+<a id="more"></a>
+
+<h1 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick-Start"></a>Quick-Start</h1><h2 id="安装部署"><a href="#安装部署" class="headerlink" title="安装部署"></a>安装部署</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm</span><br><span class="line">yum -y install postgresql11 postgresql11-server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装完成后，安装目录为/usr/pgsql-11，postgresql-11-setup脚本用来进行环境初始化和升级操作。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 需要注意的是：安装完RPM包后，如果想要修改默认的数据目录（/var/lib/pgsql/11/data），需要修改/usr/lib/systemd/system/postgresql-11.service中的环境变量PGDATA，并执行systemctl daemon-reload。</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> postgresql-11-setup会创建postgres和postgres，并且设定用户的home目录为/var/lib/pgsql</span></span><br><span class="line"></span><br><span class="line">/usr/pgsql-11/bin/postgresql-11-setup initdb</span><br><span class="line">systemctl enable postgresql-11</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改 pg_hba.conf文件，放开用户远程登录权限，注意同时要放开listen_addresses配置为*</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> host    all             root            all                     md5</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> host    all             postgres        172.24.9.1/24           md5</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line">systemctl start postgresql-11</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改postgres用户登录密码，创建root用户</span></span><br><span class="line">sudo -u postgres psql -d postgres -c "ALTER USER postgres WITH PASSWORD 'rjbigdata_admin';"</span><br><span class="line">sudo -u postgres psql -d postgres -c "CREATE ROLE root LOGIN REPLICATION CREATEDB PASSWORD 'rjbigdata'"</span><br></pre></td></tr></table></figure>
+
+<p>关于系统配置的最佳实践：</p>
+<ul>
+<li><p>建议将硬盘挂载点的Owner设置为PostgreSQL用户，数据目录直接放置在该目录之下（有利于避免升级、clean时的权限问题）。</p>
+</li>
+<li><p>使用NAS文件系统时可以会导致数据损坏（官方建议 synchronously 方式挂载，并且关闭caching），参考<a href="https://www.postgresql.org/docs/11/creating-cluster.html" target="_blank" rel="noopener">NFS的可能的问题</a>。</p>
+</li>
+<li><p>关于型号量和共享内存的配置（<a href="http://www.postgres.cn/docs/10/kernel-resources.html" target="_blank" rel="noopener">参考</a>）,Linux涉及到的配置需要关注的有kernel.shmmax（最大段尺寸）和kernel.shmall（最大共享内存页面）</p>
+</li>
+<li><p>使用systemd必须注意IPC资源（共享内存和信号量） 不会被操作系统过早删除，默认情况下要避免这种情况需要将启动pg的用户设定为系统用户（id小于1000）以及修改/etc/systemd/logind.conf 中RemoveIPC=no。（参考<a href="https://www.postgresql.org/docs/11/kernel-resources.html" target="_blank" rel="noopener">18.4.2. systemd RemoveIPC</a>）</p>
+</li>
+<li><p>资源限制：maxproc、openfiles、datasize</p>
+</li>
+<li><p>防止PG在内存过渡调拨时Killer</p>
+<ul>
+<li>设定systemd文件中的PG_OOM_ADJUST_VALUE=-1000，这样保证子进程不被Killer ；</li>
+<li>设定systemd文件中的PG_OOM_ADJUST_FILE=/proc/self/oom_score_adj 的值为-1000（echo -1000 &gt; /proc/self/oom_score_adj），保证postmaster不被kill</li>
+<li>降低PG内存相关配置，如shared_buffers 和work_mem）</li>
+</ul>
+</li>
+<li><p>shared_buffers配置较大时，可以开启大页配置。评估页面数vm.nr_hugepages，可以参考 postmaster VmPeak / Hugepagesize </p>
+</li>
+<li><p>关闭数据库时，发送不同的信号量，PG关闭的方式不同（kill -INT <code>head -1 /usr/local/pgsql/data/postmaster.pid</code>），<strong>不要用-9关闭PG，危！！</strong></p>
+<ul>
+<li>SIGTERM：智能关闭模式，不在接收新连接、会让现有的会话正常结束它们的工作。仅当所有的会话终止后它才关闭。 </li>
+<li>SIGINT：服务器不再允许新的连接，并向所有现有服务器进程发送SIGTERM，让它们中断当前事务并立刻退出。然后服务器等待所有服务器进程退出并最终关闭。 如果服务处于在线备份模式，备份模式将被终止并致使备份无用。</li>
+<li>SIGQUIT：服务器将给所有子进程发送 SIGQUIT并且等待它们终止。如果有任何进程没有在 5 秒内终止，它们将被发送 SIGKILL。主服务器进程将在所有子进程退出之后立刻退出，而无需做普通的数据库关闭处理。这将导致在下一次启动时（通过重放 WAL 日志）恢复。</li>
+</ul>
+</li>
+</ul>
+<h2 id="账号管理"><a href="#账号管理" class="headerlink" title="账号管理"></a>账号管理</h2><ul>
+<li>PostgreSQL 基于 roles 对数据库用户进行权限管理。</li>
+<li>根据roles的创建方式不同，可以指特定用户或者某一组用户，即包含user和groups两个概念）。</li>
+<li>Roles 基于可以和数据库的Objects绑定，或者将名下objects的权限赋予其他roles。</li>
+<li>Roles 与操作系统的用户是完全分开的，不会相互影响。</li>
+<li>系统预创建的超级用户为 postgres ，可以 su - postgres 切换到该用户后登录pg。</li>
+<li>用户也可以在执行psql命令时，使用-U指定登录的用户。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> <span class="keyword">name</span>;													<span class="comment">-- 创建ROLE，等价于使用createuser name</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">ROLE</span> <span class="keyword">name</span>;														<span class="comment">-- 删除ROLE，等价于使用dropuser  name</span></span><br><span class="line"><span class="keyword">SELECT</span> rolname <span class="keyword">FROM</span> pg_roles; 										<span class="comment">-- 查询已有roles</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> <span class="keyword">name</span>;													<span class="comment">-- 创建用户</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">ROLE</span> XXX 														<span class="comment">-- 修改用户权限</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> root LOGIN <span class="keyword">REPLICATION</span> CREATEDB CREATEEXTTABLE <span class="keyword">PASSWORD</span> <span class="string">'rjbigdata'</span>    <span class="comment">-- 创建一个roles，并赋予各种权限</span></span><br><span class="line"><span class="keyword">GRANT</span> group_role <span class="keyword">TO</span> role1, ... ;									<span class="comment">-- role赋权</span></span><br><span class="line"><span class="keyword">REVOKE</span> group_role <span class="keyword">FROM</span> role1, ... ;									<span class="comment">-- role回收权限</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">ROLE</span> <span class="keyword">name</span>;</span><br><span class="line"><span class="comment">-- 关于Roles权限继承的实例，其中joe被设计成user，admin、wheel被设计成Role Group：</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> joe LOGIN INHERIT;				<span class="comment">-- joe可以重其他roles中继承权限</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> <span class="keyword">admin</span> NOINHERIT;				<span class="comment">-- 不允许从其他roles中继承权限</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">ROLE</span> wheel NOINHERIT;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">admin</span> <span class="keyword">TO</span> joe;</span><br><span class="line"><span class="keyword">GRANT</span> wheel <span class="keyword">TO</span> <span class="keyword">admin</span>;</span><br><span class="line"><span class="keyword">SET</span> <span class="keyword">ROLE</span> <span class="keyword">admin</span> / <span class="keyword">SET</span> <span class="keyword">ROLE</span> wheel; 			<span class="comment">-- 获取admin和wheel的权限</span></span><br><span class="line"><span class="keyword">SET</span> <span class="keyword">ROLE</span> joe / <span class="keyword">SET</span> <span class="keyword">ROLE</span> <span class="keyword">NONE</span> / <span class="keyword">RESET</span> <span class="keyword">ROLE</span>;  <span class="comment">-- 恢复权限</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="权限类型"><a href="#权限类型" class="headerlink" title="权限类型"></a>权限类型</h3><p>PostgreSQL中的权限（pg_roles中有roles的权限明细）：</p>
+<ul>
+<li>login privilege：roles有该权限时，可以作为一个普通用户登录</li>
+<li>superuser status：除了login privilege以外所有权限</li>
+<li>database creation</li>
+<li>role creation</li>
+<li>initiating replication：流复制的角色权限？？ 用来副本同步？</li>
+<li>password</li>
+<li>INHERIT：具有INHERIT属性的成员角色会自动使用其所属成员角色的特权，通常用来在pg中区别roles和users</li>
+</ul>
+<h3 id="删除账号"><a href="#删除账号" class="headerlink" title="删除账号"></a>删除账号</h3><p>删除账号时有以下注意点：</p>
+<ul>
+<li>需要将roles名下所有objects收回（ALTER TABLE bobs_table OWNER TO alice;）</li>
+<li>REASSIGN OWNED 可以将一个role名下所有object转义给另一个object</li>
+<li>DROP OWNED 删除role名下所有的object</li>
+</ul>
+<h3 id="默认Roles"><a href="#默认Roles" class="headerlink" title="默认Roles"></a>默认Roles</h3><p>PG提供的一些默认Role，<a href="https://www.postgresql.org/docs/11/default-roles.html" target="_blank" rel="noopener">参考</a>，这些Role名下关联了许多系统表。</p>
+<h2 id="Client-认证"><a href="#Client-认证" class="headerlink" title="Client 认证"></a>Client 认证</h2><ul>
+<li>用户认证相关的配置文件为：pg_hba.conf，如何配置可以<a href="https://www.postgresql.org/docs/11/auth-pg-hba-conf.html" target="_blank" rel="noopener">参考</a></li>
+<li>PG支持password、ldap、gss等方式的认证</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 配置pg允许远程连接，pg_hba.conf中追加下面一行</span><br><span class="line">host    all             root            all                     md5</span><br></pre></td></tr></table></figure>
+
+<h2 id="SQL-Language"><a href="#SQL-Language" class="headerlink" title="SQL Language"></a>SQL Language</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 建表,支持的类型包括：int，smallint，实数，双精度，char（N），varchar（N），date, time, timestamp, interval，以及自定义类型</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> weather (</span><br><span class="line">    city            <span class="built_in">varchar</span>(<span class="number">80</span>),</span><br><span class="line">    temp_lo         <span class="built_in">int</span>,           <span class="comment">-- low temperature</span></span><br><span class="line">    temp_hi         <span class="built_in">int</span>,           <span class="comment">-- high temperature</span></span><br><span class="line">    prcp            <span class="built_in">real</span>,          <span class="comment">-- precipitation</span></span><br><span class="line">    <span class="built_in">date</span>            <span class="built_in">date</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> weather <span class="keyword">VALUES</span> (<span class="string">'San Francisco'</span>, <span class="number">46</span>, <span class="number">50</span>, <span class="number">0.25</span>, <span class="string">'1994-11-27'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> weather (<span class="built_in">date</span>, city, temp_hi, temp_lo) <span class="keyword">VALUES</span> (<span class="string">'1994-11-29'</span>, <span class="string">'Hayward'</span>, <span class="number">54</span>, <span class="number">37</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 文件批量导入，后端进程直接导入</span></span><br><span class="line">COPY weather FROM '/home/user/weather.txt';</span><br></pre></td></tr></table></figure>
+<h2 id="设置参数"><a href="#设置参数" class="headerlink" title="设置参数"></a>设置参数</h2><ul>
+<li><p>postgresql.conf文件可以通过pg_ctl reload命令，或者 pg_reload_conf() 函数重载（部分配置可能要重启生效）</p>
+<ul>
+<li>postgresql.conf文件可以包含 include ‘filename’ 配置、include_dir ‘directory’配置</li>
+<li></li>
+</ul>
+</li>
+<li><p>postgresql.auto.conf不应该手工编辑，这个文件保存了通过ALTER SYSTEM命令提供的设置，并且会覆盖postgresql.conf中的配置</p>
+</li>
+<li><p>通过SQL进行配置：ALTER SYSTEM（全局配置，等效于配置文件）、ALTER DATABASE、ALTER ROLE</p>
+</li>
+<li><p>show/set 命令可以查看当前会话的配置，以及针对会话更新配置。</p>
+</li>
+<li><p>服务端启动时可以使用-c 指定配置，这些配置覆盖ALTER SYSTEM和配置文件配置</p>
+</li>
+<li><p>启动Client时可以使用环境变量指定，如（env PGOPTIONS=”-c geqo=off -c statement_timeout=5min” psql）</p>
+</li>
+</ul>
+<h3 id="配置内容"><a href="#配置内容" class="headerlink" title="配置内容"></a>配置内容</h3><ul>
+<li><p>文件位置：<a href="http://www.postgres.cn/docs/10/runtime-config-file-locations.html" target="_blank" rel="noopener">参考</a></p>
+</li>
+<li><p>连接和认证：<a href="http://www.postgres.cn/docs/10/runtime-config-connection.html" target="_blank" rel="noopener">参考</a></p>
+<ul>
+<li>max_connections：最大连接数配置，默认是100，实际user的最大连接数为max_connections - superuser_reserved_connections </li>
+</ul>
+</li>
+<li><p>资源消耗：<a href="http://www.postgres.cn/docs/10/runtime-config-resource.html" target="_blank" rel="noopener">参考</a></p>
+<ul>
+<li>内存配置：<ul>
+<li>shared_buffers : 一个合理的shared_buffers开始值是系统内存的 25%。默认是128mb</li>
+<li>work_mem ：内部排序操作和哈希表使用的内存量，默认4mb。一个查询可能有好几个排序或者hash操作，每个操作会使用work_mem大小的内存。</li>
+<li>maintenance_work_mem ：维护性操作（例如VACUUM、CREATE INDEX和ALTER TABLE ADD FOREIGN KEY）中使用的 最大的内存量，默认64mb。</li>
+<li>autovacuum_work_mem : 指定每个自动清理工作者进程能使用的最大内存量。</li>
+<li>temp_buffers ：每个数据库会话使用的临时缓冲区的最大数目，是会话的本地缓冲区，只用于访问临时表，默认是 8 兆字节（8MB）。</li>
+</ul>
+</li>
+<li>工作线程配置：max_worker_processes 、 max_parallel_workers 、max_parallel_workers_per_gather （<a href="http://www.postgres.cn/docs/10/runtime-config-resource.html" target="_blank" rel="noopener">并行查询参考</a>）</li>
+<li>强制刷盘配置：backend_flush_after（默认不强制刷盘）</li>
+</ul>
+</li>
+<li><p>日志相关配置，<a href="http://www.postgres.cn/docs/10/runtime-config-wal.html" target="_blank" rel="noopener">参考</a></p>
+</li>
+<li><p>流复制配置,<a href="http://www.postgres.cn/docs/10/runtime-config-replication.html" target="_blank" rel="noopener">参考</a></p>
+</li>
+<li><p>其他配置，<a href="http://www.postgres.cn/docs/10/runtime-config.html" target="_blank" rel="noopener">参考</a></p>
+</li>
+</ul>
+<h1 id="高可用方案"><a href="#高可用方案" class="headerlink" title="高可用方案"></a>高可用方案</h1><p>各种方案<a href="http://www.postgres.cn/docs/10/different-replication-solutions.html#HIGH-AVAILABILITY-MATRIX" target="_blank" rel="noopener">一览表</a></p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.postgresql.org/download/" target="_blank" rel="noopener">安装部署</a></p>
+<p><a href="https://www.pgpool.net/mediawiki/index.php/Main_Page" target="_blank" rel="noopener">Pgpool-II</a></p>
+<p><a href="https://www.postgresql.org/docs/11/biblio.html" target="_blank" rel="noopener">官方参考资料 &amp; 论文集</a></p>
+<p><a href="https://www.postgresql.org/docs/11/charset.html" target="_blank" rel="noopener">PG的编码集配置</a></p>
+<p><a href="http://www.postgres.cn/docs/10/" target="_blank" rel="noopener">PostgreSQL 10.1 手册</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.313Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/" target="_blank" rel="external">https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PostgreSQL/" rel="tag">PostgreSQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- PostgreSQL》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- PostgreSQL》 — LQing的博客&source=PostgreSQL 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- PostgreSQL》 — LQing的博客&url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/09/30/sysbench/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- Sysbench</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/09/04/0-OpenCV-%E5%AD%A6%E4%B9%A0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">OpenCV 学习笔记</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- PostgreSQL》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/&title=《数据库调研笔记 -- PostgreSQL》 — LQing的博客&source=PostgreSQL 调研笔记" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《数据库调研笔记 -- PostgreSQL》 — LQing的博客&url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/09/24/Postgresql-%E5%AE%89%E8%A3%85%E4%BB%8B%E7%BB%8D/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADMklEQVR42u3aS27jQAwFwLn/pT3bAQaW3yMVwOqUVoETS13UguHnz5/4ev13/ft5fof8W++eOLvb8MLGxsZ+CPt1eeWHePf37z5J7nx92nchuLZgY2Njn8rOU851OkmQOSZ/JbkFGxsbG3uT9vJU1yYtbGxsbOwZ+7oYmPV58hIlb3JhY2Nj/wb2/t/9JASbe+Znu7mXho2Njf317M2Y9tt+/pH5NjY2NvYXs1/llS/xtIVK/sQbFNjY2NgHsfMEsAlKe7g2fc4WfbCxsbHPYCdN/+TobQtps8SzL5mwsbGxT2Ln49VZAtss7mwGz1HgsLGxsQ9iJ1+eLdbMVmqS+2xmAdjY2NgnsZMlmOQo+YHuHeLm38LGxsY+lb1pLbXj3nbQmw+Vb2gqYWNjYz+c3aalfIRQP360mpOH5kMFho2Njf1AdgtoV3k26bAFFyUTNjY29kHsZFEmTzDtiDdPk+1CT/0KsbGxsR/Lzts0SXmwT0izwqZ+SdjY2NgHsduDzlr57TihDfRw8ICNjY19BHs2xN2vy7TFSXvPD+kNGxsb+zh2/m993oJvB705fjN4wMbGxj6PnaSi9toz8pdxc1MJGxsb+7HsfcumHfe26bMtmdohBzY2NvZz2feOWtv0dl3Y/GASxcbGxv5l7Fkjadb0SUIzu0PUwcLGxsZ+IHvW4pmtubfDhrueEg0JsLGxsR/OzltF7SpPu3DZLoC2a5fY2NjY57GT5k5Scmzu0H6Sh/Xtb7GxsbGPY69a7XFR0ZY9s3Fy8gKwsbGxT2L/RBKajXVn5dCsCYWNjY19HjsvM2YFyT64+4T3tpeGjY2NfSi7XYtpG/dJQtrcOWqHYWNjYx/Hbnd88jTTrunkaXUWSmxsbOyT2K/yypd49iOEdkhQNKewsbGxD2K3ySApBtrFmja4s0Q7DAE2Njb2Q9ibomJWNiTBuitwH2ba2NjY2Aex27WYfctpM0LOg/shgWFjY2P/SnYSlFnF0y7r5Ge4eSqCjY2N/XD2JhybpHjdtKrLJGxsbOzj2HnauLfpk5cl+XdvHg9gY2Njfz17sy6TpKLZek3bhNq0q7CxsbEfy/4L4+Y2YVyobQUAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

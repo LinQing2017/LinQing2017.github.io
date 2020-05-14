@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>摄像头标定 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="OpenCV,标定">
+    <meta name="description" content="简述张氏标定法，以及深度相机标定原理。">
+<meta name="keywords" content="OpenCV,标定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="摄像头标定">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;09&#x2F;02&#x2F;%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="简述张氏标定法，以及深度相机标定原理。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;%E5%9D%90%E6%A0%87%E7%B3%BB.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;%E7%9B%B8%E6%9C%BA%E5%9D%90%E6%A0%87%E7%B3%BB%E5%88%B0%E5%9B%BE%E5%83%8F%E5%9D%90%E6%A0%87%E7%B3%BB.png">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.316Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;LinQing2017&#x2F;notes&#x2F;blob&#x2F;master&#x2F;pictures&#x2F;%E5%9D%90%E6%A0%87%E7%B3%BB.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">摄像头标定</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">摄像头标定</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-09-01T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-09-02
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#RGB相机标定"><span class="post-toc-number">1.</span> <span class="post-toc-text">RGB相机标定</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#矩阵变换关系"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">矩阵变换关系</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#张氏相机标定"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">张氏相机标定</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#深度相机标定"><span class="post-toc-number">2.</span> <span class="post-toc-text">深度相机标定</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#相机标定工具"><span class="post-toc-number">3.</span> <span class="post-toc-text">相机标定工具</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-GML"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">1. GML</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-camera-calibration"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">2. camera_calibration</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#其他知识"><span class="post-toc-number">4.</span> <span class="post-toc-text">其他知识</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-齐次坐标"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">1. 齐次坐标</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-单应性变换"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">2. 单应性变换</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">5.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-摄像头标定"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">摄像头标定</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-09-02 00:00:00" datetime="2019-09-01T16:00:00.000Z"  itemprop="datePublished">2019-09-02</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>简述张氏标定法，以及深度相机标定原理。</p>
+<a id="more"></a>
+
+<h1 id="RGB相机标定"><a href="#RGB相机标定" class="headerlink" title="RGB相机标定"></a>RGB相机标定</h1><h2 id="矩阵变换关系"><a href="#矩阵变换关系" class="headerlink" title="矩阵变换关系"></a>矩阵变换关系</h2><p>相机标定涉及到以下坐标系，其最终目的是建立<strong>世界坐标系</strong>和<strong>像素坐标系</strong>之间的关系</p>
+<ul>
+<li><strong>世界坐标系</strong>$$(x_w,y_w,z_w)$$：用户定义的三维世界坐标系</li>
+<li><strong>相机坐标系</strong>$$(x_c,y_c,z_c)$$：相机坐标系z轴和光轴重合，且垂直于图像坐标系</li>
+<li><strong>图像坐标系</strong>$$(x,y,z)$$：成像平面坐标</li>
+<li><strong>像素坐标系</strong>$$(u,v)$$：和图像坐标系同平面，但是原点在左上角，单位为像素</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://github.com/LinQing2017/notes/blob/master/pictures/%E5%9D%90%E6%A0%87%E7%B3%BB.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<p>上述坐标系有如下变换：</p>
+<p><strong>1. 世界坐标系到相机坐标系</strong></p>
+<p>将三维坐标中的点使用其次坐标表示，且刚体坐标系的变换可以通过旋转和平移得到：<br>$$<br>\left[\begin{matrix}x_c \y_c \z_c \ 1\end{matrix}\right]=<br>\left[\begin{matrix} R &amp; t \ 0 &amp; 1 \end{matrix}\right]<br>\left[\begin{matrix}x_w \y_w \z_w \ 1\end{matrix}\right]=<br>\left[\begin{matrix}r_1 &amp; r_2 &amp; r_3 &amp; t\end{matrix}\right]<br>\left[\begin{matrix}x_w \y_w \0 \ 1\end{matrix}\right]=<br>\left[\begin{matrix}r_1 &amp; r_2 &amp; t\end{matrix}\right]<br>\left[\begin{matrix}x_w \y_w \1\end{matrix}\right] \tag{1}<br>$$<br>上面的公式假定，物体的$$z_w=0$$，即可以认为标定时棋盘平面和$$X_wOY_w$$重合。</p>
+<p><strong>2. 相机坐标到图像坐标系</strong></p>
+<p>这一过程进行了从三维坐标到二维坐标的转换，即寻找相机坐标系中点（三维坐标）在图像坐标系中的成像点（二维坐标）。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://github.com/LinQing2017/notes/blob/master/pictures/%E7%9B%B8%E6%9C%BA%E5%9D%90%E6%A0%87%E7%B3%BB%E5%88%B0%E5%9B%BE%E5%83%8F%E5%9D%90%E6%A0%87%E7%B3%BB.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+<p>根据上述图中的变换关系，即可推到出以下公式（$$f$$为相机焦距）。</p>
+<p>$$<br>z_c\left[\begin{matrix}x \y \ 1\end{matrix}\right]=<br>\left[\begin{matrix} f&amp;0&amp;0\0&amp;f&amp;0\0&amp;0&amp;1 \end{matrix}\right]<br>\left[\begin{matrix}x_c \y_c \z_c\end{matrix}\right]=<br>\left[\begin{matrix} f&amp;0&amp;0\0&amp;f&amp;0\0&amp;0&amp;1 \end{matrix}\right]<br>\left[\begin{matrix} 1&amp;0&amp;0&amp;0\0&amp;1&amp;0&amp;0\0&amp;0&amp;1&amp;0 \end{matrix}\right]<br>\left[\begin{matrix}x_c \y_c \z_c \1\end{matrix}\right]<br>\tag{2}<br>$$</p>
+<p>*<em>3. *</em>图像坐标系考虑畸变</p>
+<p>畸变是相机内部的固有性质，主要包括：径向畸变、切向畸变、薄透镜畸变。</p>
+<p>$$[x，y，1]^T$$如何矫正畸变转换为实际图像坐标系暂时不介绍。</p>
+<p><strong>4. （实际）图像坐标系到像素坐标系</strong></p>
+<p>由于定义的像素坐标系原点与图像坐标系原点不重合，假设像素坐标系原点在图像坐标系下的坐标为$$(u0，v0)$$，每个像素点在图像坐标系x轴、y轴方向的尺寸为：dx、dy（每个像素点代表的实际尺寸），且像点在实际图像坐标系下的坐标为$$(x，y)$$，于是可得到像点在像素坐标系下的坐标为：</p>
+<p>$$u=x/d_x+u_0, v=v/d_y+v_0$$，矩阵形式为：<br>$$<br>\left[\begin{matrix}u \v \1\end{matrix}\right] =<br>\left[\begin{matrix} 1/d_x&amp;0&amp;u_0\0&amp;1/d_y&amp;v_0\0&amp;0&amp;1 \end{matrix}\right]<br>\left[\begin{matrix}x \y \1\end{matrix}\right] \tag3<br>$$</p>
+<p>将上面的三个公式合并，得到世界坐标系——相机坐标系——图像坐标系——像素坐标系的转换公式：<br>$$<br>\left[\begin{matrix}u \v \1\end{matrix}\right] =<br>\left[\begin{matrix} 1/d_x&amp;0&amp;u_0\0&amp;1/d_y&amp;v_0\0&amp;0&amp;1 \end{matrix}\right]1/z_c<br>\left[\begin{matrix} f&amp;0&amp;0\0&amp;f&amp;0\0&amp;0&amp;1 \end{matrix}\right]<br>\left[\begin{matrix} 1&amp;0&amp;0&amp;0\0&amp;1&amp;0&amp;0\0&amp;0&amp;1&amp;0 \end{matrix}\right]<br>\left[\begin{matrix}r_1 &amp; r_2 &amp; r_3 &amp; t\end{matrix}\right]<br>\left[\begin{matrix}x_w \y_w \0 \ 1\end{matrix}\right]<br>$$<br>根据上面的公式化简，得到：<br>$$<br>M=\left[\begin{matrix} 1/d_x&amp;0&amp;u_0\0&amp;1/d_y&amp;v_0\0&amp;0&amp;1 \end{matrix}\right]<br>\left[\begin{matrix} f&amp;0&amp;0\0&amp;f&amp;0\0&amp;0&amp;1 \end{matrix}\right]=<br>\left[\begin{matrix} f/d_x=f_x&amp;0&amp;u_0\0&amp;f/d_y=f_y&amp;v_0\0&amp;0&amp;1 \end{matrix}\right]<br>$$</p>
+<p>$$<br>\left[\begin{matrix} R &amp; t \ 0 &amp; 1 \end{matrix}\right]=<br>\left[\begin{matrix} 1&amp;0&amp;0&amp;0\0&amp;1&amp;0&amp;0\0&amp;0&amp;1&amp;0 \end{matrix}\right]<br>\left[\begin{matrix}r_1 &amp; r_2 &amp; r_3 &amp; t\end{matrix}\right]<br>$$</p>
+<p>上面两矩阵即是标定时的相机<strong>内参矩阵</strong>和<strong>外参矩阵</strong>，根据两者的含义可以知道：</p>
+<ul>
+<li><p>内参矩阵是固定不变的</p>
+</li>
+<li><p>外参矩阵由于相机相对于世界坐标系的位置不同，会发生变化。</p>
+</li>
+</ul>
+<p>  PS：外参矩阵通常表示成棋盘格到相机坐标系的变换，相机到棋盘格有多少个视角，就有多少个外参矩阵。此处实际上是假设：<strong>棋盘平面和$$X_wOY_w$$重合，即$$Z_w=0$$</strong>。</p>
+<p>  如果按照以下方式标定：</p>
+<ul>
+<li><p>将机械臂基座作为世界坐标系</p>
+</li>
+<li><p>相机位置固定</p>
+</li>
+<li><p>棋盘格固定在TCP上，通过移动TCP点获取相机到棋盘格的不同视角，然后进行标定</p>
+<p>按上述方式，世界坐标系到相机的变换是固定的，外参实际上是机械器末端执行器的一个坐标系到相机坐标系的变换。</p>
+</li>
+</ul>
+<h2 id="张氏相机标定"><a href="#张氏相机标定" class="headerlink" title="张氏相机标定"></a>张氏相机标定</h2><p>由像素坐标系到世界坐标系的成像关系如下：<br>$$<br>\left[\begin{matrix}u \ v \ 1\end{matrix}\right]=<br>s\left[\begin{matrix} f_x&amp;\gamma&amp;u_0\0&amp;f_y&amp;v_0\0&amp;0&amp;1 \end{matrix}\right]<br>\left[\begin{matrix}r_1 &amp; r_2 &amp; t\end{matrix}\right]<br>\left[\begin{matrix}x_w \ y_w \ 1\end{matrix}\right]=<br>sM\left[\begin{matrix}r_1 &amp; r_2 &amp; t\end{matrix}\right]<br>\left[\begin{matrix}x_w \ y_w \ 1\end{matrix}\right]<br>$$<br>上面公式中s是<strong>尺度因子</strong>，$$fx、fy、u0、v0、γ$$（由于制造误差产生的两个坐标轴偏斜参数，通常很小）表示5个相机内参，$$R,t$$表示相机外参。</p>
+<p>上述变换实际上是一个单应性变换，对应变换矩阵为<strong>单应性矩阵</strong>，它<strong>同时包含了相机内参和外参</strong>。</p>
+<p>所以相机标定的目标即根据标定图得到单应矩阵，具体的过程如下：</p>
+<ul>
+<li>打印一张棋盘格标定图纸，将其贴在平面物体的表面</li>
+<li>拍摄一组不同方向棋盘格的图片，可以通过移动相机来实现，也可以移动标定图片来实现</li>
+<li>对于每张拍摄的棋盘图片，检测图片中所有棋盘格的特征点（角点，也就是下图中黑白棋盘交叉点）。可以定义打印的棋盘图纸位于世界坐标系Zw=0的平面上，世界坐标系的原点位于棋盘图纸的固定一角，像素坐标系原点位于图片左上角。</li>
+<li><strong>棋盘标定图纸中所有角点的空间坐标是已知的</strong>，<strong>角点对应在拍摄的标定图片中的角点的像素坐标也是已知的</strong></li>
+<li>使用OpenCV中的现成函数求解单应矩阵</li>
+</ul>
+<h1 id="深度相机标定"><a href="#深度相机标定" class="headerlink" title="深度相机标定"></a>深度相机标定</h1><p>深度相机同样需要标定相机内参和外参，并且当深度相机和RGB相机的安装位置有区别时，还需将深度相机的信息转换到RGB相机中，这个过程称为<strong>配准</strong>。</p>
+<ul>
+<li>深度相机标定：求解深度相机的内参和外参</li>
+<li>深度相机配准：求解深度相机到RGB相机的变换矩阵</li>
+</ul>
+<p>不同于RGB相机，深度相机的标定有很多方法，这里不介绍原理。</p>
+<h1 id="相机标定工具"><a href="#相机标定工具" class="headerlink" title="相机标定工具"></a>相机标定工具</h1><h2 id="1-GML"><a href="#1-GML" class="headerlink" title="1. GML"></a>1. GML</h2><p><a href="http://graphics.cs.msu.ru/en/node/909" target="_blank" rel="noopener">GML C++ Camera Calibration Toolbox</a>是基于OpenCV的一款开源相机标定工具，具有图形界面，能够对RGB相机进行标定，并返回相机<strong>内参矩阵</strong>、<strong>畸变函数</strong>。</p>
+<h2 id="2-camera-calibration"><a href="#2-camera-calibration" class="headerlink" title="2. camera_calibration"></a>2. camera_calibration</h2><p><a href="http://wiki.ros.org/camera_calibration" target="_blank" rel="noopener">Camera Calibration</a>是ROS上的一个标定工具，该工具使用棋盘格的方式可以标定深度和彩色相机。</p>
+<h1 id="其他知识"><a href="#其他知识" class="headerlink" title="其他知识"></a>其他知识</h1><h2 id="1-齐次坐标"><a href="#1-齐次坐标" class="headerlink" title="1. 齐次坐标"></a>1. 齐次坐标</h2><p>齐次坐标表示是计算机图形学的重要手段之一，它既能够用来<strong>明确区分向量和点</strong>，同时也更易用于进行仿射（线性）几何变换。</p>
+<p>基本内容：</p>
+<ul>
+<li><p>对于向量$$\vec v$$及其基$$( \boldsymbol a, \boldsymbol b, \boldsymbol c)$$存在一组坐标$$(v_1,v_2,v_3)$$，使得$$\vec v=v_1<em>a+v_2</em>b+v_3*c$$</p>
+</li>
+<li><p>对于空间中的点$$p$$则存在坐标$$(p_1,p_2,p_3)$$，使得$$p-p_0=p_1<em>a+p_2</em>b+p_3*c$$，其中$$p_0$$是坐标系的原点</p>
+</li>
+</ul>
+<p>考虑以上两个公式，在三维坐标系中，统一表示向量和点可以使用四维向量$$(v_1,v_2,v_3,w)$$，当$$w=0$$时该四维向量表示三维空间的一个向量，当$$w=1$$时该四维向量表示三维空间的一个点。</p>
+<h2 id="2-单应性变换"><a href="#2-单应性变换" class="headerlink" title="2. 单应性变换"></a>2. 单应性变换</h2><p><strong>单应性变换</strong>是一种图像变换方式，常见图像变换包括以下几种。</p>
+<ul>
+<li><p>线性变换：旋转、镜像、缩放、推移</p>
+</li>
+<li><p>仿射变换：线性变换 + <strong>平移</strong></p>
+</li>
+<li><p>透视变换：图片投影到一个新的视平面</p>
+</li>
+<li><p>单应性变换：一个平面到另外一个平面的投影映射。如，二维平面上的点映射到摄像机成像仪上的映射。</p>
+</li>
+</ul>
+<p>单应性变换会涉及到<strong>单应性矩阵</strong>，有以下公式：</p>
+<p>$$b = Ha^T$$，其中$$a=[x,y,1]^T$$，$$a=[x_1,y_1,1]^T$$为同一个点在原图像和映射图像上的坐标，$$H$$为$$3*3$$的单应性矩阵。</p>
+<p>要求解上述公式中的H，只需获得四个点对即可，在OpenCV等视觉算法库中通常都有相应函数。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://www.cnblogs.com/csyisong/archive/2008/12/09/1351372.html" target="_blank" rel="noopener">齐次坐标</a></p>
+<p><a href="https://www.cnblogs.com/ml-cv/p/5871052.html?utm_source=itdadao&utm_medium=referral" target="_blank" rel="noopener">单应性变换求解</a></p>
+<p><a href="http://www.sohu.com/a/220313594_100007727" target="_blank" rel="noopener">张氏相机标定1</a></p>
+<p><a href="http://www.sohu.com/a/223594989_100007727" target="_blank" rel="noopener">张氏相机标定2</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.316Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" target="_blank" rel="external">https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenCV/" rel="tag">OpenCV</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%A0%87%E5%AE%9A/" rel="tag">标定</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/&title=《摄像头标定》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/&title=《摄像头标定》 — LQing的博客&source=简述张氏标定法，以及深度相机标定原理。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《摄像头标定》 — LQing的博客&url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/09/04/0-OpenCV-%E5%AD%A6%E4%B9%A0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">OpenCV 学习笔记</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/08/21/6-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ROS学习笔记（六）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/&title=《摄像头标定》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/&title=《摄像头标定》 — LQing的博客&source=简述张氏标定法，以及深度相机标定原理。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《摄像头标定》 — LQing的博客&url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/09/02/%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADL0lEQVR42u3aS3IiQQwFQO5/aRzhraF5kpoZWmStCBoXlcVC1ud2i9f9d+VP88/f/6y/n0ye3t6xsLGxsS/Cvh+uZwfNAcefeXbo492qTx98CzY2NvY6djXMHH/lMSOH9c4ZBWBsbGzsr2Tn6co9WHlI6wVUbGxsbOzjoFJNXY4DUjX4/Ye4jY2Njf3x7Gqa0SsP5RfaI72lloaNjY398exqo/eTX7+xv42NjY39kex7cfVSiF7Ayy+9rMDGxsZexK6OTr6jkTBJP/KUqXwIbGxs7Iuwk8bq8RbJ07x9m5eiej/eg7iNjY2NfXF2Dzm/iElztzfig42Njb2VfVygqR4uv74qIAmHhWvFxsbGXsTOP9rD5BdaTVTmoRcbGxt7BzsvxJyVouQXN0lIXoQ6bGxs7HXsJFRMikq90Zxe8Ivw2NjY2OvYZ72urt4gzgnNZmxsbOxF7ElCkpf4eyWnSXMiCrfY2NjYK9i9oJJsnQewaiJR3edpewAbGxt7Ebs3RvlvikG9ocwXPxg2Njb2InZvFCYp7swbyb3QWG0qY2NjY1+dXb2Ps1oFvbGbXsnpwTvY2NjYS9nVNKM3KNlr3OZpSfS32NjY2KvZvWSj2ujNA+QkUXm6PzY2NvZqdn7Qars3TyHmg5UvmhDY2NjYS9kTxuTQeVJxVmELGxsbex970litFoB6OydFq8I72NjY2IvYSbiqNhLyMlO1tdBjv2gSYGNjY1+c/aL4MmmmFi+iVzzqnQEbGxt7E7vwj3urGDQZkeylKIULxcbGxl7BnpeTeslDryHRO+eD/bGxsbEXsSeFm6QsVX2aN5jzENvsjWBjY2NfhF09UPUo1UJPEvaq142NjY39Dezqdr1mcLW01Nvnlm+BjY2NvYhdLR71ivV5mJkUjKImNDY2NvYidi/UTYJWtXmQYPJAW74CbGxs7Iuw8yBR6Dm0RnMm56kGVGxsbOx97MmQZe/o8xGfaskMGxsbGzvPaZLiTi8I5UlLNKmEjY2N/ZXsswZ6JoWnSQMDGxsbeys736jXXq0GofzikhM+DWDY2NjYK9i9Rm+SWpw7NFkNqNjY2NhfwP4BCyy3Cu8Vi28AAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

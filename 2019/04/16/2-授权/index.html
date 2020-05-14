@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Solr 授权配置 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Solr">
+    <meta name="description" content="使用Solr的 Rule-Based Authorization 插件在CDH上实现权限管理！">
+<meta name="keywords" content="Solr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Solr 授权配置">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;04&#x2F;16&#x2F;2-%E6%8E%88%E6%9D%83&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="使用Solr的 Rule-Based Authorization 插件在CDH上实现权限管理！">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.277Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Solr 授权配置</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Solr 授权配置</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-04-15T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-04-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#权限模型"><span class="post-toc-number">1.</span> <span class="post-toc-text">权限模型</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#例子"><span class="post-toc-number">2.</span> <span class="post-toc-text">例子</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#注意事项"><span class="post-toc-number">3.</span> <span class="post-toc-text">注意事项</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考文档"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考文档</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2-授权"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Solr 授权配置</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-04-16 00:00:00" datetime="2019-04-15T16:00:00.000Z"  itemprop="datePublished">2019-04-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/">大数据</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>使用Solr的 Rule-Based Authorization 插件在CDH上实现权限管理！</p>
+<a id="more"></a>
+
+<p>Rule-Based Authorization Plugin 是Apache Solr提供的唯一一个权限插件。</p>
+<p>实际实践过程中发现，该插件易用性不高。虽然可以进行细粒度权限控制，但是在网上参考资料很少，配置方式也相当反人类！</p>
+<h1 id="权限模型"><a href="#权限模型" class="headerlink" title="权限模型"></a>权限模型</h1><p>Rule-Based Authorization通过：Permission和Role绑定，Role和User绑定的方式给用户配置权限，所有相关的权限&amp;用户定义在security.json文件中。</p>
+<p>Rule-Based Authorization中包括两种类型的Permission：预定义的Permisson和自定义的Permisson。</p>
+<p>所有预定义权限的限制对象都是所有Collection，包括以下13种：</p>
+<table>
+<thead>
+<tr>
+<th>Permisson</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>security-edit</td>
+<td>编辑security.json权限</td>
+</tr>
+<tr>
+<td>security-read</td>
+<td>读security.json权限</td>
+</tr>
+<tr>
+<td>schema-edit</td>
+<td>编辑任意Collection的schema的权限</td>
+</tr>
+<tr>
+<td>schema-read</td>
+<td>读任意Collection的schema的权限</td>
+</tr>
+<tr>
+<td>config-read</td>
+<td>编辑任意Collection的solrconfig的权限</td>
+</tr>
+<tr>
+<td>config-edit</td>
+<td>读任意Collection的solrconfig的权限</td>
+</tr>
+<tr>
+<td>collection-admin-read</td>
+<td>执行/admin/collections地址下读操作的权限（不限制Collection）</td>
+</tr>
+<tr>
+<td>collection-admin-edit</td>
+<td>执行/admin/collections地址下写操作的权限（不限制Collection）</td>
+</tr>
+<tr>
+<td>core-admin-read</td>
+<td>执行Core API中读操作的权限（不限制Collection）</td>
+</tr>
+<tr>
+<td>core-admin-edit</td>
+<td>执行Core API中写操作的权限（不限制Collection）</td>
+</tr>
+<tr>
+<td>update</td>
+<td>执行任意Collection中/update操作的权限</td>
+</tr>
+<tr>
+<td>read</td>
+<td>执行任意Collection中读操作的权限，如/get、/select</td>
+</tr>
+<tr>
+<td>all</td>
+<td>上述所有权限</td>
+</tr>
+</tbody></table>
+<p>自定义权限可以限制请求中的以下实体：</p>
+<ul>
+<li>Collection名称</li>
+<li>请求类型，如GET、POST、PUT等</li>
+<li>请求的地址，如/select、/collection 等</li>
+</ul>
+<p>下面的自定义权限，定义了访问securecollection的/select的权限。官方文档关于 <a href="https://lucene.apache.org/solr/guide/7_0/rule-based-authorization-plugin.html#authorization-api" target="_blank" rel="noopener">Authorization API</a> 有比较详细说明。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>:<span class="string">"secure-collection1-permission"</span>,</span><br><span class="line">    <span class="attr">"collection"</span>:<span class="string">"securecollection"</span>,</span><br><span class="line">    <span class="attr">"path"</span>:<span class="string">"/select"</span>,</span><br><span class="line">    <span class="attr">"before"</span>:<span class="string">"collection-admin-read"</span>,</span><br><span class="line">    <span class="attr">"role"</span>:<span class="string">"admin"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h1><p>下面的权限配置实现以下效果：</p>
+<ul>
+<li>任意用户有除security.json以外的Read权限</li>
+<li>dev用户有除security.json以外的完整编辑权限</li>
+<li>solr、solr/node1、solr/node2有所有权限</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">"authorization": &#123;</span><br><span class="line">  "class": "org.apache.solr.security.RuleBasedAuthorizationPlugin",</span><br><span class="line">  "permissions": [</span><br><span class="line">    &#123;"name": "security-read", "role": "security_role"&#125;,</span><br><span class="line">    &#123;"name": "security-edit", "role": "security_role"&#125;,</span><br><span class="line"></span><br><span class="line">    &#123;"name": "read", "role": "*"&#125;,</span><br><span class="line">    &#123;"name": "schema-read", "role": "*"&#125;,</span><br><span class="line">    &#123;"name": "config-read", "role": "*"&#125;,</span><br><span class="line">    &#123;"name": "collection-admin-read", "role": "*"&#125;,</span><br><span class="line">    &#123;"name": "core-admin-read", "role": "*"&#125;,</span><br><span class="line"></span><br><span class="line">    &#123;"name": "update", "role": "dev"&#125;,</span><br><span class="line">    &#123;"name": "schema-edit", "role": "dev"&#125;,</span><br><span class="line">    &#123;"name": "config-edit", "role": "dev"&#125;,</span><br><span class="line">    &#123;"name": "collection-admin-edit", "role": "dev"&#125;,</span><br><span class="line">    &#123;<span class="attr">"name"</span>: <span class="string">"core-admin-edit"</span>, <span class="attr">"role"</span>: <span class="string">"dev"</span>&#125;</span><br><span class="line">  ],</span><br><span class="line">  "user-role": &#123;</span><br><span class="line">    "solr/bdnode2@LINQING.COM": ["security_role","dev"],</span><br><span class="line">    "solr/bdnode3@LINQING.COM": ["security_role","dev"],</span><br><span class="line">    "solr@LINQING.COM": ["security_role","dev"],</span><br><span class="line">    "dev@LINQING.COM": "dev"</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用下面的curl请求可以测试：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建用户-Role映射，需要security-edit权限</span></span><br><span class="line">curl --negotiate -u : -H 'Content-type:application/json' -d '&#123; "set-user-role" : &#123;"demo@LINQING.COM": null&#125;&#125;' http://bdnode2:8983/solr/admin/authorization</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建Collection、删除Collection、重载Collection，需要collection-admin-edit权限</span></span><br><span class="line"></span><br><span class="line">curl --negotiate -u : 'http://bdnode2:8983/solr/admin/collections?action=CREATE&amp;name=film&amp;numShards=2&amp;replicationFactor=2&amp;maxShardsPerNode=2&amp;collection.configName=film'</span><br><span class="line">curl --negotiate -u : 'http://bdnode3:8983/solr/admin/collections?action=DELETE&amp;name=film'</span><br><span class="line">curl --negotiate -u : 'http://bdnode3:8983/solr/admin/collections?action=RELOAD&amp;name=film'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 修改Schema，需要schema-edit权限</span></span><br><span class="line"></span><br><span class="line">curl --negotiate -u : -X POST -H 'Content-type:application/json' --data-binary '&#123;"add-field": &#123;"name":"name", "type":"text_general", "multiValued":false, "stored":true&#125;&#125;' http://bdnode2:8983/solr/film/schema</span><br><span class="line">curl --negotiate -u : -X POST -H 'Content-type:application/json' --data-binary '&#123;"add-copy-field" : &#123;"source":"*","dest":"_text_"&#125;&#125;' http://bdnode3:8983/solr/film/schema</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> update数据，需要update权限</span></span><br><span class="line">curl --negotiate -u : -X POST -H 'Content-Type: application/json' --data-binary '</span><br><span class="line">&#123;</span><br><span class="line">    "id": "xxxxxxxxxxxxxxxxxxxx",</span><br><span class="line">    "initial_release_date": "2007-06-28",</span><br><span class="line">    "name": "Harry Potter and the Order of the Phoenix",</span><br><span class="line">    "genre": [</span><br><span class="line">      "Family",</span><br><span class="line">      "Mystery",</span><br><span class="line">      "Adventure Film",</span><br><span class="line">      "Fantasy",</span><br><span class="line">      "Fantasy Adventure",</span><br><span class="line">      "Fiction"</span><br><span class="line">    ],</span><br><span class="line">    "directed_by": [</span><br><span class="line">      "David Yates"</span><br><span class="line">    ]</span><br><span class="line">&#125;' http://bdnode2:8983/solr/film/update/json/docs</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查询security配置，需要security-read权限</span></span><br><span class="line">curl --negotiate -u : 'http://bdnode2:8983/solr/admin/authorization'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查询所有Collection配置，需要collection-admin-read权限</span></span><br><span class="line">curl --negotiate -u : 'http://bdnode2:8983/solr/admin/collections?action=LIST'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查询某个Collection，<span class="built_in">read</span>权限</span></span><br><span class="line">curl --negotiate -u : 'http://bdnode2:8983/solr/film/select?q=*:*&amp;rows=0'</span><br></pre></td></tr></table></figure>
+
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><ul>
+<li>使用Kerberos认证时，在security.json中需要定义principal的fully name，不能定义短名称</li>
+<li>使用Kerberos认证时，所有Solr节点使用的principal都需要手工配置权限</li>
+<li>Solr确认Permission是按照顺序的，定义permissions时需要将小权限放在大权限之前，因此ALL需要放在最后定义</li>
+<li>配置该插件之后，如果出现资源不存在的情况，错误提示也会出现403</li>
+</ul>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><p><a href="https://lucene.apache.org/solr/guide/7_0/rule-based-authorization-plugin.html" target="_blank" rel="noopener">Rule-Based Authorization</a></p>
+<p><a href="https://lucidworks.com/2017/04/14/securing-solr-tips-tricks-and-other-things-you-really-need-to-know/" target="_blank" rel="noopener">Securing Solr: Tips and Tricks You Really Need to Know</a></p>
+<p><a href="https://lucidworks.com/2015/08/17/securing-solr-basic-auth-permission-rules/" target="_blank" rel="noopener">Securing Solr with Basic Authentication</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.277Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/04/16/2-%E6%8E%88%E6%9D%83/" target="_blank" rel="external">https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Solr/" rel="tag">Solr</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/&title=《Solr 授权配置》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/&title=《Solr 授权配置》 — LQing的博客&source=使用Solr的 Rule-Based Authorization 插件在CDH上实现权限管理！" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Solr 授权配置》 — LQing的博客&url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/04/16/1-%E8%AE%A4%E8%AF%81/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Solr 认证配置</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/04/11/0-%E5%85%A5%E9%97%A8/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Solr 学习笔记</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/&title=《Solr 授权配置》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/&title=《Solr 授权配置》 — LQing的博客&source=使用Solr的 Rule-Based Authorization 插件在CDH上实现权限管理！" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Solr 授权配置》 — LQing的博客&url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/04/16/2-%E6%8E%88%E6%9D%83/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACKUlEQVR42u3aS27DMAwFwNz/0um2mzjvUU6LSONVEfijUQGCIvl4xNfz1/Xq9+vr+s3XX7ntwsDA+FpG8vnr318t6/rZ5J5iazAwMA5gJKEwWe4sjF4/e30/BgYGRrusNmjm24GBgYExC4J5EtlSMTAwMGaH2E8E3384i2NgYHwhI6+6//3fH+lvYGBgfBXjWV5tEFx/W7QqDAyMrRl5gEsWmh9H89SzWA8GBsamjOtF5MfXpLifF/WSdmlxVsbAwPhyxkopP//MXenmGzAGBsZhjLxJmQyKzTYoaQBgYGCcwGiTtrZANsvl2hIeBgbGOYx29GE9EZwV16JpEQwMjI0YSWqYhOA8yWs36LYMFwMDYwtGHuDapDBfbvJs0YnFwMDYgtGma+2RtW1/5gH95f8BAwNjO8b6STAJnXnCtzRsgYGBcQAjL3vNgmY7rjFLMTEwMPZjzI6ds3ZCG+6LOzEwMA5gJCldmwh+ovT2ZtgCAwNjU0bdJlwe6pp98YbcFgMDYyPGShEtSfVacNHAwMDAOICRF+vvGpjIW5XRJmJgYBzAaAteM8As4EZpJQYGxqaMZ3nlBbX8DbPmKAYGxjmMWUidJYv5yNf66AYGBsZ+jOGhccRO3jxsLWBgYBzAGJbj49CZH3fbDcLAwMBYGoCIj6ztU/VUCAYGxmGM9Zbk7KAbHWIxMDC2ZsxK+W2Jf2UUAwMD42RGO+KQB+i7hi3atBIDA2Mjxg+ZDMdl2kktIwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

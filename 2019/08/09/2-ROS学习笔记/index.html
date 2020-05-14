@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>ROS学习笔记（二） | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="ROS">
+    <meta name="description" content="编写一个ROS上运行的Hello World程序。">
+<meta name="keywords" content="ROS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS学习笔记（二）">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;08&#x2F;09&#x2F;2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="编写一个ROS上运行的Hello World程序。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-14T07:59:03.277Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">ROS学习笔记（二）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">ROS学习笔记（二）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-08-08T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-08-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Turtlesim"><span class="post-toc-number">1.</span> <span class="post-toc-text">Turtlesim</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#观察node之间如何通信"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">观察node之间如何通信</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#调用Node服务以及修改参数"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">调用Node服务以及修改参数</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#查看node日志使用roslaunch"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">查看node日志使用roslaunch</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#定义msg和srv"><span class="post-toc-number">2.</span> <span class="post-toc-text">定义msg和srv</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#自定义msg"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">自定义msg</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#srv接口定义"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">srv接口定义</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Python实现Publisher-Subscriber"><span class="post-toc-number">3.</span> <span class="post-toc-text">Python实现Publisher/Subscriber</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Python实现Service和Client"><span class="post-toc-number">4.</span> <span class="post-toc-text">Python实现Service和Client</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#使用rosbag记录和回放Topic"><span class="post-toc-number">5.</span> <span class="post-toc-text">使用rosbag记录和回放Topic</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-2-ROS学习笔记"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">ROS学习笔记（二）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-08-09 00:00:00" datetime="2019-08-08T16:00:00.000Z"  itemprop="datePublished">2019-08-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA/">机器人</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>编写一个ROS上运行的Hello World程序。</p>
+<a id="more"></a>
+
+<h1 id="Turtlesim"><a href="#Turtlesim" class="headerlink" title="Turtlesim"></a>Turtlesim</h1><p>Turtlesim是ROS官方提供的一个示例，用来帮助用户理解ROS中基本概念。</p>
+<h2 id="观察node之间如何通信"><a href="#观察node之间如何通信" class="headerlink" title="观察node之间如何通信"></a>观察node之间如何通信</h2><p>参考官方<a href="http://wiki.ros.org/ROS/Tutorials/UnderstandingTopics" target="_blank" rel="noopener">Topic的概念</a>。</p>
+<p>示例提供了一个简易的海龟绘图功能，涉及到下面几个Package：</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Publications</th>
+<th>Pub</th>
+<th>Subscriptions</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>turtlesim</td>
+<td>turtlesim_node</td>
+<td>/turtle1/color_sensor</br>/turtle1/pose</br></td>
+<td>/turtle1/cmd_vel</td>
+<td>—–</td>
+</tr>
+<tr>
+<td>turtlesim</td>
+<td>turtle_teleop_key</td>
+<td>/turtle1/cmd_vel</td>
+<td>—–</td>
+<td>—–</td>
+</tr>
+</tbody></table>
+<p>turtlesim_node是海龟的绘图界面，通过监听cmd_vel的位置信息来进行绘图。</p>
+<p>turtle_teleop_key是基于键盘方向键的发送程序，不断的向cmd_vel中发送geometry_msgs/Twist格式的位置数据。</p>
+<p>用户可以通过rostopic直接向cmd_vel发送数据控制海龟运动轨迹，或查看cmd_vel的数据。</p>
+<p>使用rqt_graph可以绘制<strong>topic连接的具体拓扑信息</strong>，命令为<strong>rosrun rqt_graph rqt_graph</strong>。</p>
+<p>使用rqt_plot可以<strong>将topic的数值信息绘制为连续曲线</strong>，命令为<strong>rosrun rqt_plot rqt_plot</strong>。</p>
+<h2 id="调用Node服务以及修改参数"><a href="#调用Node服务以及修改参数" class="headerlink" title="调用Node服务以及修改参数"></a>调用Node服务以及修改参数</h2><p>turtlesim_node 提供了一些Services用来清空画板、复制画笔等功能，这些功能可以使用rosservice来调用（<a href="http://wiki.ros.org/ROS/Tutorials/UnderstandingServicesParams" target="_blank" rel="noopener">参考</a>）。</p>
+<h2 id="查看node日志使用roslaunch"><a href="#查看node日志使用roslaunch" class="headerlink" title="查看node日志使用roslaunch"></a>查看node日志使用roslaunch</h2><p><a href="http://wiki.ros.org/ROS/Tutorials/UsingRqtconsoleRoslaunch" target="_blank" rel="noopener">参考</a></p>
+<p><a href="https://www.cnblogs.com/hiram-zhang/p/10393328.html" target="_blank" rel="noopener">参考2</a></p>
+<h1 id="定义msg和srv"><a href="#定义msg和srv" class="headerlink" title="定义msg和srv"></a>定义msg和srv</h1><h2 id="自定义msg"><a href="#自定义msg" class="headerlink" title="自定义msg"></a>自定义msg</h2><p>假设在beginner_tutorials包中定义一个新msg包含以下内容：</p>
+<p>Step 1：在beginner_tutorials中创建msg目录，并在该目录下创建Student.msg文件，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">string first_name</span><br><span class="line">string last_name</span><br><span class="line">uint8 age</span><br><span class="line">uint32 score</span><br></pre></td></tr></table></figure>
+<p>Step 2：修改package.xml文件添加message_generation依赖和message_runtime，其中编译时只用依赖message_generation，而运行时需要依赖message_runtime。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--编译时依赖--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">build_depend</span>&gt;</span>message_generation<span class="tag">&lt;/<span class="name">build_depend</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--运行时依赖--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">exec_depend</span>&gt;</span>message_runtime<span class="tag">&lt;/<span class="name">exec_depend</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Step 3： 修改CMakeLists.txt</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">cmake_minimum_required(VERSION <span class="number">2.8</span><span class="number">.3</span>)</span><br><span class="line">project(beginner_tutorials)</span><br><span class="line"></span><br><span class="line">find_package(catkin REQUIRED COMPONENTS</span><br><span class="line">  roscpp</span><br><span class="line">  rospy</span><br><span class="line">  std_msgs</span><br><span class="line">  message_generation	# 添加编译时需要的message_generation组件</span><br><span class="line">)</span><br><span class="line">add_message_files(</span><br><span class="line">   FILES</span><br><span class="line">   Num.msg				# 指明msg定义文件的地址</span><br><span class="line"> )</span><br><span class="line">generate_messages(		# message_generation组件主键的依赖，这里只依赖std_msgs</span><br><span class="line">   DEPENDENCIES</span><br><span class="line">   std_msgs</span><br><span class="line"> )</span><br><span class="line">catkin_package(</span><br><span class="line">#  INCLUDE_DIRS include</span><br><span class="line">#  LIBRARIES beginner_tutorials</span><br><span class="line">   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime		#CATKIN指明依赖</span><br><span class="line">#  DEPENDS system_lib</span><br><span class="line">)</span><br><span class="line">include_directories(</span><br><span class="line"># include</span><br><span class="line">  $&#123;catkin_INCLUDE_DIRS&#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>Step 3：编译beginner_tutorials，使用rosmsg show beginner_tutorials/Student查看生成的msg</p>
+<h2 id="srv接口定义"><a href="#srv接口定义" class="headerlink" title="srv接口定义"></a>srv接口定义</h2><p><a href="http://wiki.ros.org/ROS/Tutorials/CreatingMsgAndSrv" target="_blank" rel="noopener">参考</a></p>
+<h1 id="Python实现Publisher-Subscriber"><a href="#Python实现Publisher-Subscriber" class="headerlink" title="Python实现Publisher/Subscriber"></a>Python实现Publisher/Subscriber</h1><p>python脚本放在Package的scripts目录下，可以无需编译直接运行：</p>
+<p>talker.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># license removed for brevity</span></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">from</span> std_msgs.msg <span class="keyword">import</span> String</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">talker</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment"># 创建一个Topic，名称为chatter，类型为String，队列深度为10</span></span><br><span class="line">    pub = rospy.Publisher(<span class="string">'chatter'</span>, String, queue_size=<span class="number">10</span>) </span><br><span class="line">    <span class="comment"># 启动一个和roscore通信的node，名称为talker+xxxx</span></span><br><span class="line">    rospy.init_node(<span class="string">'talker'</span>, anonymous=<span class="literal">True</span>)</span><br><span class="line">    rate = rospy.Rate(<span class="number">10</span>) <span class="comment"># 10hz的数量发送数据</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> rospy.is_shutdown():</span><br><span class="line">        hello_str = <span class="string">"hello world %s"</span> % rospy.get_time()</span><br><span class="line">        <span class="comment"># loginfo：将信息打印到屏幕，并写入到rosout和日志文件</span></span><br><span class="line">        rospy.loginfo(hello_str)</span><br><span class="line">        pub.publish(hello_str)  <span class="comment">#发送数据</span></span><br><span class="line">        rate.sleep()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        talker()</span><br><span class="line">    <span class="keyword">except</span> rospy.ROSInterruptException:</span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>listener.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="keyword">import</span> rospy</span><br><span class="line"><span class="keyword">from</span> std_msgs.msg <span class="keyword">import</span> String</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">callback</span><span class="params">(data)</span>:</span></span><br><span class="line">    rospy.loginfo(rospy.get_caller_id() + <span class="string">"I heard %s"</span>, data.data)</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listener</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># In ROS, nodes are uniquely named. If two nodes with the same</span></span><br><span class="line">    <span class="comment"># name are launched, the previous one is kicked off. The</span></span><br><span class="line">    <span class="comment"># anonymous=True flag means that rospy will choose a unique</span></span><br><span class="line">    <span class="comment"># name for our 'listener' node so that multiple listeners can</span></span><br><span class="line">    <span class="comment"># run simultaneously.</span></span><br><span class="line">    rospy.init_node(<span class="string">'listener'</span>, anonymous=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    rospy.Subscriber(<span class="string">"chatter"</span>, String, callback)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># spin() simply keeps python from exiting until this node is stopped</span></span><br><span class="line">    rospy.spin()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    listener()</span><br></pre></td></tr></table></figure>
+
+<h1 id="Python实现Service和Client"><a href="#Python实现Service和Client" class="headerlink" title="Python实现Service和Client"></a>Python实现Service和Client</h1><p><a href="http://wiki.ros.org/ROS/Tutorials/WritingServiceClient%28python%29" target="_blank" rel="noopener">参考</a></p>
+<h1 id="使用rosbag记录和回放Topic"><a href="#使用rosbag记录和回放Topic" class="headerlink" title="使用rosbag记录和回放Topic"></a>使用rosbag记录和回放Topic</h1><p><a href="http://wiki.ros.org/ROS/Tutorials/Recording%20and%20playing%20back%20data" target="_blank" rel="noopener">参考</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-05-14T07:59:03.277Z" itemprop="dateUpdated">2020-05-14 15:59:03</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" target="_blank" rel="external">https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ROS/" rel="tag">ROS</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（二）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（二）》 — LQing的博客&source=编写一个ROS上运行的Hello World程序。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（二）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/08/13/5-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">ROS学习笔记（五）</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/08/09/1-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">ROS学习笔记（一）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（二）》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&title=《ROS学习笔记（二）》 — LQing的博客&source=编写一个ROS上运行的Hello World程序。" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《ROS学习笔记（二）》 — LQing的博客&url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/08/09/2-ROS%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3awWojMRAEUP//T2dhT4HFdlW3FG/gzck4Ho2eDGqnWo9HfH39vb6//v5O8v6/r599pr33wIWHh4c3mvqz6/XUX4/Wjp/MKh8TDw8P7zZvtinny9GOkCxZVGDw8PDwPsrblI32r69JeHh4eL+LN9vc8/KAh4eH91t4bViQFI/X09rfezhrwcPDw4t5swbYZ19f7+/h4eHhjbrqbQCxLwDtD/c388TDw8O7wMsf3/61LS3JYg3bbHh4eHhHec+mmEer+VGDTXloIxI8PDy8n+El/+rnLa7ZMrU/pt+UKzw8PLwLvPaf/Byz/zGdvF98h3h4eHhHee1E261/E1tsjrTi4eHh3eZtwtP2kGuC30Qnb75DPDw8vAUv37iPddvKA16zhXvkq4uHh4c3T0qPNck2xaZd9DZixsPDw9vz8mntwZvRhm05PDw8vAu8NjLIt/K8kZaM3MbKeHh4ePd4ZzfxtrTk4cWw2YaHh4d3mdcWhllMMAsm8mjjaQMMDw8P7yhvE+Am1M3hrdl88PDw8O7xkpvbo6izmKNtxeVBCR4eHt4NXhtGtBFt/pS22EQj4OHh4R3lbbb+PBTIm14JI58PHh4e3j1e3srKt+bhhNZHB57GuHh4eHhHee1tbcFoX8+OcNUnI/Dw8PBGvM2GXjSfyqsNf6On4+Hh4R3i5fFrjm+38ln8URwXwMPDwzvK2x+WypcmPzqwLy14eHh493hf5TVrVrUNts1z3xwdwMPDwzszWrHH5j+XT8W7s0/i4eHh3eZtikE+WhIu5PFxMTc8PDy8a7y8GORBalJOhrFsEEbj4eHh/W+8WYurfeKBhcbDw8P7KG+z3Z+Nd+vzEXh4eHgXeJumV3LUoIVtGmNFlw8PDw9vfm/RAMuD3XY58gJwDIaHh4fX8f4ABiKIvQWfvGAAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
