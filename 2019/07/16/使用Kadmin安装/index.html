@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Kubernetes学习笔记 -- Kadmin安装单机环境 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Kubernetes - Docker">
+    <meta name="description" content="安装 kubeadm（控制面单点）1. 前提条件 关闭swap  echo vm.swappiness=0 &amp;gt;&amp;gt; &#x2F;etc&#x2F;sysctl.conf 注释掉fstab里的swap   进行网络参数配置   123456sudo modprobe br_netfiltercat &amp;lt;&amp;lt;EOF | sudo tee &#x2F;etc&#x2F;sysctl.d&#x2F;k8s.confnet.bridg">
+<meta name="keywords" content="Kubernetes - Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes学习笔记 -- Kadmin安装单机环境">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;07&#x2F;16&#x2F;%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="安装 kubeadm（控制面单点）1. 前提条件 关闭swap  echo vm.swappiness=0 &amp;gt;&amp;gt; &#x2F;etc&#x2F;sysctl.conf 注释掉fstab里的swap   进行网络参数配置   123456sudo modprobe br_netfiltercat &amp;lt;&amp;lt;EOF | sudo tee &#x2F;etc&#x2F;sysctl.d&#x2F;k8s.confnet.bridg">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-06-06T10:43:09.777Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Kubernetes学习笔记 -- Kadmin安装单机环境</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Kubernetes学习笔记 -- Kadmin安装单机环境</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-07-15T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-07-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#安装-kubeadm（控制面单点）"><span class="post-toc-number">1.</span> <span class="post-toc-text">安装 kubeadm（控制面单点）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1-前提条件"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1. 前提条件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2-安装kubeadm、kubelet、kubectl"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2. 安装kubeadm、kubelet、kubectl</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3-kubeadmin介绍"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">3. kubeadmin介绍</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4-安装网络插件"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">4. 安装网络插件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5-其他配置"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">5. 其他配置</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-清理环境"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">6. 清理环境</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">2.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-使用Kadmin安装"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Kubernetes学习笔记 -- Kadmin安装单机环境</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-07-16 00:00:00" datetime="2019-07-15T16:00:00.000Z"  itemprop="datePublished">2019-07-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <a id="more"></a>
+
+<h1 id="安装-kubeadm（控制面单点）"><a href="#安装-kubeadm（控制面单点）" class="headerlink" title="安装 kubeadm（控制面单点）"></a>安装 kubeadm（控制面单点）</h1><h2 id="1-前提条件"><a href="#1-前提条件" class="headerlink" title="1. 前提条件"></a>1. 前提条件</h2><ul>
+<li><p>关闭swap</p>
+<ul>
+<li>echo vm.swappiness=0 &gt;&gt; /etc/sysctl.conf</li>
+<li>注释掉fstab里的swap</li>
+</ul>
+</li>
+<li><p>进行网络参数配置</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo modprobe br_netfilter</span><br><span class="line">cat &lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf</span><br><span class="line">net.bridge.bridge-nf-call-ip6tables = 1</span><br><span class="line">net.bridge.bridge-nf-call-iptables = 1</span><br><span class="line">EOF</span><br><span class="line">sudo sysctl --system</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-安装kubeadm、kubelet、kubectl"><a href="#2-安装kubeadm、kubelet、kubectl" class="headerlink" title="2. 安装kubeadm、kubelet、kubectl"></a>2. 安装kubeadm、kubelet、kubectl</h2><p>Kubeadm不会替用户安装kubelet和kubectl，用户可以通过yum、二进制安装包在所有node安装这些服务。</p>
+<p>PS：安装时需要kubelet、kubectl和kubeadm版本匹配</p>
+<p>三个服务都可以通过下面的repo安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo</span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">setenforce 0</span><br><span class="line">sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config</span><br><span class="line"></span><br><span class="line">yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes</span><br><span class="line"></span><br><span class="line">systemctl enable kubelet</span><br><span class="line">systemctl start kubelet</span><br></pre></td></tr></table></figure>
+<p>国内源</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cat &lt;&lt;EOF &gt; kubernetes.repo</span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h2 id="3-kubeadmin介绍"><a href="#3-kubeadmin介绍" class="headerlink" title="3. kubeadmin介绍"></a>3. kubeadmin介绍</h2><p>通过kubeadmin可以快速的安装部署kubernetes集群：</p>
+<ul>
+<li><p>init：用于创建kubernetes中的管理面节点（control-plane node），即运行 etcd 、API Service的节点</p>
+<ul>
+<li><p>init执行了哪些工作，可以参考<a href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/" target="_blank" rel="noopener">Kubernetes官网</a></p>
+</li>
+<li><p>相关重要参数：</p>
+<ul>
+<li>apiserver-advertise-address：API Service的监听地址，默认情况下如果不指定，那么走的就是默认ip地址</li>
+<li>apiserver-bind-port：默认6443</li>
+<li>cert-dir：证书文件目录，默认/etc/kubernetes/pki</li>
+<li>config：kubeadm 配置文件</li>
+<li>control-plane-endpoint：控制面板的稳定地址</li>
+<li>image-repository：镜像地址，默认k8s.gcr.io</li>
+<li>kubernetes-version：kubernetes版本</li>
+<li>pod-network-cidr：pod分配的ip网段</li>
+<li>service-cidr：Default: “10.96.0.0/12”，service分配到的ip网段</li>
+</ul>
+</li>
+<li><p>init命令会创建静态pod的yaml文件到/etc/kubernetes/manifests目录，包括：manager 、etcd、scheduler等</p>
+</li>
+<li><p>init命令执行完成后，可以使用以下命令配置kubectl</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p $HOME/.kube</span><br><span class="line">sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>config：可以查看相关k8s集群的配置</p>
+<ul>
+<li>images list：列出k8s相关镜像</li>
+<li>images pull：批量拉取k8s相关镜像</li>
+</ul>
+</li>
+<li><p>join：添加一个node到一个指定的control-plane node控制面</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">kubeadm join 172.24.33.110:6443 --token wm28gj.xoeiagyk2epva317 \</span><br><span class="line">    --discovery-token-ca-cert-hash  sha256:b6a91123760c45b7e7ae6eca075674b43b31d1103bdd890256c318640e4e5d4b</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> token可以使用 kubeadm token list 查看，默认情况下Token会在24小时后过期，此时用户可以通过 kubeadm token create 重新创建</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> cert的<span class="built_in">hash</span>编码值，可以使用以下命令获取：</span></span><br><span class="line">openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin    -outform der 2&gt;/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>默认情况，如果安装单机场景的K8S（即控制平面单机），只需要用户安装完成docker，并下载好镜像后，执行 kubeadm init 就完成了控制平面的安装。</p>
+<h2 id="4-安装网络插件"><a href="#4-安装网络插件" class="headerlink" title="4. 安装网络插件"></a>4. 安装网络插件</h2><p>网络插件称为Container Network Interface (CNI)，是K8S中容器间通信的接口规范，实现了这个规范后，就能提供IP地址、网关、路由、DNS等相关的网络参数。</p>
+<p>当前K8S提供了非常多的CNI实现，并且全都是通过K8s工作负载的方式安装的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装calico插件</span></span><br><span class="line">kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-其他配置"><a href="#5-其他配置" class="headerlink" title="5. 其他配置"></a>5. 其他配置</h2><p>当使用 kubeadmin 安装时，控制面相关服务的YAML文件保存在/etc/kubernetes/manifests/目录下（包括：etcd、apiserver、controller-manager、shceduler），需要修改Kubernetes服务时，可以修改这些 YAML 文件中的配置。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 移除master节点隔离，服务可以调度到Master节点</span></span><br><span class="line">kubectl taint nodes --all node-role.kubernetes.io/master-</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 部署dashboad</span></span><br><span class="line">kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取临时登录的token。PS：需要暴露服务到nodeport，并且创建相应的账号</span></span><br><span class="line">kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep kubernetes-dashboard | awk '&#123;print $1&#125;')</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-清理环境"><a href="#6-清理环境" class="headerlink" title="6. 清理环境"></a>6. 清理环境</h2><p>略</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/" target="_blank" rel="noopener">Installing kubeadm</a></p>
+<p><a href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/" target="_blank" rel="noopener">kubeadm Doc</a></p>
+<p><a href="https://docs.projectcalico.org/getting-started/kubernetes/quickstart" target="_blank" rel="noopener">Kubernetes安装calico插件</a></p>
+<p><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#tear-down" target="_blank" rel="noopener">Clean Up</a></p>
+<p><a href="https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/" target="_blank" rel="noopener">web-ui-dashboard</a></p>
+<p><a href="https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md" target="_blank" rel="noopener">集群外访问Dashboad</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-06-06T10:43:09.777Z" itemprop="dateUpdated">2020-06-06 18:43:09</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/" target="_blank" rel="external">https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kubernetes-Docker/" rel="tag">Kubernetes - Docker</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/&title=《Kubernetes学习笔记 -- Kadmin安装单机环境》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/&title=《Kubernetes学习笔记 -- Kadmin安装单机环境》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kubernetes学习笔记 -- Kadmin安装单机环境》 — LQing的博客&url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/07/16/0-Prometheus/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">数据库调研笔记 -- Prometheus</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Kubernetes学习笔记 -- 安装Harbor仓库</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/&title=《Kubernetes学习笔记 -- Kadmin安装单机环境》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/&title=《Kubernetes学习笔记 -- Kadmin安装单机环境》 — LQing的博客&source=弄个博客假装技术宅！？？" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kubernetes学习笔记 -- Kadmin安装单机环境》 — LQing的博客&url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACrklEQVR42u3aQW4bMRAEQP//08k5sLXpniEVBSidBGu1y6IBctTDr6/49evb69U1z3eYXfn83AMvPDw8vPXQv9/u+S+vHv/qW89jeHVl8vQf7o+Hh4d3jZcv5ckQi8cHk9VOEx4eHt6n8dpiOp+ydmPAw8PD+194CXUWTDwX5Xh4eHifxkuK2jbYnS3oz9HGxawFDw8Pr0sDVqXw+99f6e/h4eHhrbvqs+MCz5vKbNEfjhYPDw/vAi9fcDcNrbzRlU9ZEYXg4eHhXeDloUCy6CcDnU3cPuTFw8PDO8ubldFJuZxM1ubp0baBh4eHd4iXL/3tYal8EGc3hh9+K+Dh4eG9kZcv+mfj2lPFOh4eHt4NXnLpBpaEBTmjLcrx8PDw7vGS8vRfNb1mLbo6a8HDw8Mb8Q4kweVWserUBd/Fw8PDu8drW1BtGT3bGHL2sLOHh4eHt+DNAtnNNM1aYof/n3h4eHgLXrsZnIoVZscR2uIeDw8P7528TWjbNrHqKDZn4+Hh4R3l5VV2Gx/s7zk7dPUHEg8PD+8CLw8j2kV/c+gq+fRw1oKHh4cX33MWvM6OW7VBQ9vWellS4+Hh4R3lbUrkPMxNjlLtPy32Ojw8PLyjvKTu3oSws+W+nVw8PDy89/DyiCGPaGcHp9pQoy7H8fDw8Na8ZGHNr2mX8naJz48s4OHh4b2fdzbebcOL9j5/OVOGh4eHd423f98u8cOG1qk8Aw8PD28EayOATdywb6oVWxQeHh7eBd5sjZ21stryfbY5HdhC8PDw8IKR5D/187h2H9FuNhs8PDy89/DakCL5VovZhyl4eHh4n8zbT8HsqEH7LDw8PLxP4O23gc1mkwfNeHh4eLd57ZGmPFRNBtEOuog88PDw8C7w2h/8m02iWNAf71zEuHh4eHgneb8BzdB9gjysN2YAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

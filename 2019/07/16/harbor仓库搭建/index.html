@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Kubernetes学习笔记 -- 安装Harbor仓库 | LQing的博客 | “做程序员太辛苦了, 我想换行，我该怎么办?” “敲一下回车。”</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Kubernetes - Docker - Harbor">
+    <meta name="description" content="Kubernetes学习笔记 – 安装Harbor仓库">
+<meta name="keywords" content="Kubernetes - Docker - Harbor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes学习笔记 -- 安装Harbor仓库">
+<meta property="og:url" content="https:&#x2F;&#x2F;linqing2017.github.io&#x2F;2019&#x2F;07&#x2F;16&#x2F;harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA&#x2F;index.html">
+<meta property="og:site_name" content="LQing的博客">
+<meta property="og:description" content="Kubernetes学习笔记 – 安装Harbor仓库">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-06-06T10:43:09.718Z">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="LQing的博客" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">LQing</h5>
+          <a href="mailto:m15651620957@163.com" target="_blank" rel="noopener" title="m15651620957@163.com" class="mail">m15651620957@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/LinQing2017" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Kubernetes学习笔记 -- 安装Harbor仓库</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Kubernetes学习笔记 -- 安装Harbor仓库</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-07-15T16:00:00.000Z" itemprop="datePublished" class="page-time">
+  2019-07-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#安装部署"><span class="post-toc-number">1.</span> <span class="post-toc-text">安装部署</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#创建SSL证书"><span class="post-toc-number">2.</span> <span class="post-toc-text">创建SSL证书</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#关于免费SSL证书"><span class="post-toc-number">3.</span> <span class="post-toc-text">关于免费SSL证书</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#参考"><span class="post-toc-number">4.</span> <span class="post-toc-text">参考</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-harbor仓库搭建"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Kubernetes学习笔记 -- 安装Harbor仓库</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-07-16 00:00:00" datetime="2019-07-15T16:00:00.000Z"  itemprop="datePublished">2019-07-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a></li></ul>
+
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>Kubernetes学习笔记 – 安装Harbor仓库</p>
+<a id="more"></a>
+
+<h1 id="安装部署"><a href="#安装部署" class="headerlink" title="安装部署"></a>安装部署</h1><ul>
+<li><p>下载离线安装包 harbor-offline-installer-v1.10.2.tar.gz 解压</p>
+</li>
+<li><p>编辑 harbor.yml ，注意以下配置：</p>
+<ul>
+<li>hostname：主机名（填：harbor）</li>
+<li>http.port: http端口（填：18000）</li>
+<li>https.port: https端口（填：18443）</li>
+<li>https.certificate: CA签发到服务端的证书</li>
+<li>https.private_key: 服务端私钥</li>
+<li>data_volume: 数据目录，映射到主机上</li>
+</ul>
+</li>
+<li><p>执行prepare，生成配置</p>
+</li>
+<li><p>docker-compose启动</p>
+</li>
+</ul>
+<h1 id="创建SSL证书"><a href="#创建SSL证书" class="headerlink" title="创建SSL证书"></a>创建SSL证书</h1><p>注意创建时，harbor节点主机名为：harbor</p>
+<p>配置/etc/hosts 中全域名为：<ipaddress> harbor harbor.goblin.com</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建根证书</span></span><br><span class="line"></span><br><span class="line">openssl genrsa -out ca.key 4096</span><br><span class="line"></span><br><span class="line">openssl req -x509 -new -nodes -sha512 -days 3650 \</span><br><span class="line"> -subj "/C=CN/ST=Fujian/L=FuZhou/O=LQ/OU=Goblin/CN=harbor.goblin.com" \</span><br><span class="line"> -key ca.key \</span><br><span class="line"> -out ca.crt</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> 生成服务端证书</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 1. 服务端私钥</span></span></span><br><span class="line">openssl genrsa -out harbor.goblin.com.key 4096</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 2. 服务端的签发请求</span></span></span><br><span class="line">openssl req -sha512 -new \</span><br><span class="line">    -subj "/C=CN/ST=Fujian/L=FuZhou/O=LQ/OU=Goblin/CN=harbor.goblin.com" \</span><br><span class="line">    -key harbor.goblin.com.key \</span><br><span class="line">    -out harbor.goblin.com.csr</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 3. 生成请求配置</span></span></span><br><span class="line">cat &gt; v3.ext &lt;&lt;-EOF</span><br><span class="line">authorityKeyIdentifier=keyid,issuer</span><br><span class="line">basicConstraints=CA:FALSE</span><br><span class="line">keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line">subjectAltName = @alt_names</span><br><span class="line"></span><br><span class="line">[alt_names]</span><br><span class="line">DNS.1=harbor.goblin.com</span><br><span class="line">DNS.2=harbor.goblin</span><br><span class="line">DNS.3=harbor</span><br><span class="line">EOF</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 4. 生成服务端证书</span></span></span><br><span class="line">openssl x509 -req -sha512 -days 3650 \</span><br><span class="line">    -extfile v3.ext \</span><br><span class="line">    -CA ca.crt -CAkey ca.key -CAcreateserial \</span><br><span class="line">    -in harbor.goblin.com.csr \</span><br><span class="line">    -out harbor.goblin.com.crt</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置Docker客户端证书  </span></span><br><span class="line">  </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 1. 证书转换cert格式（Docker使用这个格式的证书）</span></span></span><br><span class="line">openssl x509 -inform PEM -in harbor.goblin.com.crt -out harbor.goblin.com.cert</span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 2. 配置docker端证书</span></span></span><br><span class="line">mkdir -p  /etc/docker/certs.d/harbor.goblin.com:&lt;https_port&gt;</span><br><span class="line">cp harbor.goblin.com.cert /etc/docker/certs.d/harbor.goblin.com:&lt;https_port&gt;</span><br><span class="line">cp harbor.goblin.com.key /etc/docker/certs.d/harbor.goblin.com:&lt;https_port&gt;</span><br><span class="line">cp ca.crt /etc/docker/certs.d/harbor.goblin.com:&lt;https_port&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 3. 修改/etc/hosts,添加：&lt;ipaddress&gt; harbor harbor.goblin.com</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 4. 登录验证</span></span></span><br><span class="line">docker login lqdocker.goblin.com:18443 -u admin</span><br></pre></td></tr></table></figure>
+
+<h1 id="关于免费SSL证书"><a href="#关于免费SSL证书" class="headerlink" title="关于免费SSL证书"></a>关于免费SSL证书</h1><p>在<a href="https://letsencrypt.osfipin.com/" target="_blank" rel="noopener">letsencrypt</a>可以申请到免费的SSL证书，并且配合<a href="https://github.com/certbot/certbot" target="_blank" rel="noopener">certbot</a>能够自动更新，用户只要拥有一个合法域名基本上就可以获得无限期的SSL证书。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://github.com/goharbor/harbor" target="_blank" rel="noopener">安装包地址</a></p>
+<p><a href="https://goharbor.io/docs/1.10/install-config/configure-https/" target="_blank" rel="noopener">配置SSL</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-06-06T10:43:09.718Z" itemprop="dateUpdated">2020-06-06 18:43:09</time>
+</span><br>
+
+
+        
+        原文地址 ：<a href="/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" target="_blank" rel="external">https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="https://LinQing2017.github.io">
+            <img src="/img/avatar.jpg" alt="LQing">
+            LQing
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kubernetes-Docker-Harbor/" rel="tag">Kubernetes - Docker - Harbor</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/&title=《Kubernetes学习笔记 -- 安装Harbor仓库》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/&title=《Kubernetes学习笔记 -- 安装Harbor仓库》 — LQing的博客&source=Kubernetes学习笔记 – 安装Harbor仓库" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kubernetes学习笔记 -- 安装Harbor仓库》 — LQing的博客&url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2019/07/16/%E4%BD%BF%E7%94%A8Kadmin%E5%AE%89%E8%A3%85/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Kubernetes学习笔记 -- Kadmin安装单机环境</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2019/07/01/waterdrop/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Waterdrop</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>LQing &copy; 2015 - 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/&title=《Kubernetes学习笔记 -- 安装Harbor仓库》 — LQing的博客&pic=https://LinQing2017.github.io/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/&title=《Kubernetes学习笔记 -- 安装Harbor仓库》 — LQing的博客&source=Kubernetes学习笔记 – 安装Harbor仓库" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Kubernetes学习笔记 -- 安装Harbor仓库》 — LQing的博客&url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/&via=https://LinQing2017.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://linqing2017.github.io/2019/07/16/harbor%E4%BB%93%E5%BA%93%E6%90%AD%E5%BB%BA/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsklEQVR42u3a22ocMRAEUP//TzuQp0Cy46puae3AmadlLyOdMUjtan18xNfn7+vP18/X86/+/jQf8ePGhYeHhzeaejLRdshX33m+2/MDyueMh4eHd5vXbgbPwyTL/fM7s00FDw8P76fxki2hXfTbh4uHh4f3v/OeF/pNPIGHh4f383l5INvGDcnd8sL6YtaCh4eHF/NmDbDvfX29v4eHh4c36qonC2475D7IKGaLh4eHd4GXt+3buCEvcNs4o35weHh4eBd4edyQHxrIN4A2FB6GvHh4eHhHeXnpnESxsxZXe5+iLYeHh4d3lNdOd38wa1YcD0fBw8PDu8Dbx6yzYTYHs9o/AB4eHt5Z3qYs3kQPs4I7iS1eltR4eHh4F3izVlNecO+3gaQox8PDw3sPb7Yczyaaj3gAjIeHh3eBl3fJ2hbUprXWtsq+oOLh4eEd5c3OGkRnuMpvbsLll2w8PDy8t/DaoHbW5s8D2bzQj1JqPDw8vDVv9uNk29gcSsgDjujIAh4eHt5R3myKm0V/HxYXDTY8PDy8a7y8SM23kOTT5JHlge8/fouHh4d3jZdvD5t3kg1jxi72PTw8PLw1b1bs5gV3Hu/mRw3acfHw8PBu8Noo4UBTalFSF/k0Hh4e3jVe/q/+ftKzo1ebQAQPDw/vLG9TwrYBwQyWbwN4eHh47+ftDwS0h6vqpCQo6182wPDw8PAO8dq6Oz8W0AYZ+4K7rsrx8PDwRrzP8tq3o/JP8/ZYEUbg4eHhrXn7xXdWlM9C27Oj4OHh4W14yWaw3zZmUe/sSBYeHh7ee3in2v95nLEPNaIQGQ8PD+9becmGsT9M0D7KKMzFw8PD+2G8fJk+dVAgedx4eHh4t3l5GJFHA7NFv23IfXFPPDw8vAu8WQPsVIdtcxRg1dPDw8PDm/B+Aeudc6jAxxUFAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'LQing的博客';
+            clearTimeout(titleTime);
+        } else {
+            document.title = 'LQing的博客';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
